@@ -39,7 +39,7 @@ class Home extends StatelessWidget {
             child: Watch((context) {
               switch (screenActive.value) {
                 case 0:
-                  return const Selling();
+                  return Selling();
                 case 1:
                   return const Inventory();
                 case 2:
@@ -49,7 +49,7 @@ class Home extends StatelessWidget {
                 case 4:
                   return const Customer();
                 default:
-                  return const Selling();
+                  return Selling();
               }
             }),
           ),

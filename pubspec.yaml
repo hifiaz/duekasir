@@ -48,6 +48,7 @@ dependencies:
   isar_flutter_libs: ^3.1.0+1
   shadcn_ui: ^0.3.3
   intl: ^0.19.0
+  equatable: ^2.0.5
 
 dev_dependencies:
   flutter_test:

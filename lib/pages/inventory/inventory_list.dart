@@ -56,7 +56,7 @@ class InventoryList extends StatelessWidget {
                             DataCell(Text(item.hargaJual.toString())),
                             DataCell(Text(item.ukuran)),
                             DataCell(
-                              const Icon(Icons.keyboard_arrow_right_outlined),
+                              const Icon(Icons.more_horiz),
                               onTap: () {
                                 inventoryController.inventorySelected.value =
                                     item;

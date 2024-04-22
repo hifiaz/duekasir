@@ -1,59 +1,79 @@
-import 'package:due_kasir/pages/customer.dart';
-import 'package:due_kasir/pages/inventory.dart';
-import 'package:due_kasir/pages/report.dart';
-import 'package:due_kasir/pages/selling.dart';
-import 'package:due_kasir/pages/users.dart';
-import 'package:due_kasir/pages/widget/menu_left.dart';
-import 'package:due_kasir/utils/date_utils.dart';
+import 'package:due_kasir/controller/auth_controller.dart';
+import 'package:due_kasir/pages/drawer.dart';
+import 'package:due_kasir/pages/home/users_sheet.dart';
+import 'package:due_kasir/service/database.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
-
-final screenActive = signal(0);
 
 class Home extends StatelessWidget {
   const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+    final auth = authController.customer.watch(context);
     return Scaffold(
+      drawer: const NavDrawer(),
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Due Kasir'),
-            Text(
-              dateWithTime.format(DateTime.now()),
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-          ],
-        ),
+        title: const Text('Account'),
         centerTitle: false,
-      ),
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Expanded(flex: 1, child: MenuLeft()),
-          const VerticalDivider(),
-          Expanded(
-            flex: 4,
-            child: Watch((context) {
-              switch (screenActive.value) {
-                case 0:
-                  return Selling();
-                case 1:
-                  return const Inventory();
-                case 2:
-                  return const Report();
-                case 3:
-                  return const Users();
-                case 4:
-                  return const Customer();
-                default:
-                  return Selling();
-              }
-            }),
+        actions: [
+          ShadButton(
+            icon: const Padding(
+                padding: EdgeInsets.only(right: 8), child: Icon(Icons.store)),
+            text: const Text('Backup'),
+            onPressed: () async => await Database().createBackUp(),
+          ),
+          ShadButton(
+            icon: const Padding(
+                padding: EdgeInsets.only(right: 8), child: Icon(Icons.store)),
+            text: const Text('Store'),
+            onPressed: () {
+              context.push('/home/store');
+            },
           ),
         ],
+      ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: ShadCard(
+            width: 350,
+            title: Text('Account Login', style: theme.textTheme.h4),
+            description:
+                const Text('Make sure you have login with your account'),
+            content: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text('Name', style: theme.textTheme.large),
+                  Text(auth.value?.user.value?.nama ?? 'Kasir'),
+                  const SizedBox(height: 6),
+                  Text('Role', style: theme.textTheme.large),
+                  Text(auth.value?.user.value?.keterangan ?? 'Super User'),
+                ],
+              ),
+            ),
+            footer: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ShadButton(
+                  text: const Text('Change'),
+                  onPressed: () {
+                    showShadSheet(
+                      side: ShadSheetSide.right,
+                      context: context,
+                      builder: (context) => const UsersSheet(),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

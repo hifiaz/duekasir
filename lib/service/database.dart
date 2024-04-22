@@ -1,8 +1,15 @@
+import 'dart:io';
+
+import 'package:due_kasir/controller/selling_controller.dart';
+import 'package:due_kasir/model/auth_model.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/pembeli_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
+import 'package:due_kasir/model/store_model.dart';
 import 'package:due_kasir/model/user_model.dart';
+import 'package:due_kasir/service/get_it.dart';
 import 'package:isar/isar.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 class Database {
@@ -10,6 +17,27 @@ class Database {
 
   Database() {
     db = openDB();
+  }
+
+  Future<void> loginUser(AuthModel val) async {
+    final isar = await db;
+    isar.writeTxnSync<int>(() => isar.authModels.putSync(val));
+  }
+
+  Future<void> changeUser(AuthModel val) async {
+    final isar = await db;
+    isar.writeTxn(() async {
+      await isar.authModels.put(val);
+      await val.user.save();
+    });
+  }
+
+  Future<AuthModel> authUser() async {
+    final isar = await db;
+    IsarCollection<AuthModel> authCollection = isar.collection<AuthModel>();
+    final users = await authCollection.where().findAll();
+    getIt.get<SellingController>().kasir.value = users.first.user.value;
+    return users.first;
   }
 
   Future<void> addNewUser(UserModel val) async {
@@ -29,9 +57,15 @@ class Database {
 
   Future<List<UserModel>> getUsers() async {
     final isar = await db;
-    // IsarCollection<Contact> contacts = isar.contacts;
     IsarCollection<UserModel> userCollection = isar.collection<UserModel>();
     final users = userCollection.where().findAll();
+    return users;
+  }
+
+  Future<UserModel?> getUserById(int id) async {
+    final isar = await db;
+    IsarCollection<UserModel> userCollection = isar.collection<UserModel>();
+    final users = userCollection.get(id);
     return users;
   }
 
@@ -56,6 +90,14 @@ class Database {
         isar.collection<PembeliModel>();
     final customer = customerCollection.where().findAll();
     return customer;
+  }
+
+  Future<PembeliModel?> getCustomerById(int id) async {
+    final isar = await db;
+    IsarCollection<PembeliModel> customerCollection =
+        isar.collection<PembeliModel>();
+    final users = customerCollection.get(id);
+    return users;
   }
 
   Future<void> addInventory(ItemModel val) async {
@@ -95,6 +137,81 @@ class Database {
     return items;
   }
 
+  Future<ItemModel?> searchByBarcode(String value) async {
+    final isar = await db;
+    IsarCollection<ItemModel> inventoryCollection =
+        isar.collection<ItemModel>();
+    final items = await inventoryCollection
+        .filter()
+        .group((q) => q.codeContains(value, caseSensitive: false))
+        .findFirst();
+    return items;
+  }
+
+  Future<void> addPenjualan(PenjualanModel val) async {
+    final isar = await db;
+    isar.writeTxnSync<int>(() => isar.penjualanModels.putSync(val));
+  }
+
+  Future<void> removePenjualan(int val) async {
+    final isar = await db;
+    isar.writeTxn<bool>(() => isar.penjualanModels.delete(val));
+  }
+
+  Future<List<PenjualanModel>> getPenjualan() async {
+    final isar = await db;
+    IsarCollection<PenjualanModel> inventoryCollection =
+        isar.collection<PenjualanModel>();
+    final items = inventoryCollection.where().findAll();
+    return items;
+  }
+
+  Future<void> addStore(StoreModel val) async {
+    final isar = await db;
+    isar.writeTxnSync<int>(() => isar.storeModels.putSync(val));
+  }
+
+  Future<void> updateStore(StoreModel val) async {
+    final isar = await db;
+    isar.writeTxn<int>(() async => await isar.storeModels.put(val));
+  }
+
+  Future<StoreModel?> getStore() async {
+    final isar = await db;
+    IsarCollection<StoreModel> storeCollection = isar.collection<StoreModel>();
+    final store = storeCollection.get(1);
+    return store;
+  }
+
+  Future<void> createBackUp() async {
+    final isar = await db;
+    final backUpDir = await getApplicationSupportDirectory();
+
+    final File backUpFile = File('${backUpDir.path}/backup_db.isar');
+    if (await backUpFile.exists()) {
+      // if already we have another backup file, delete it here.
+      await backUpFile.delete();
+    }
+    await isar.copyToFile('${backUpDir.path}/backup_db.isar');
+  }
+
+  Future<void> restoreDB() async {
+    final isar = await db;
+    final dbDirectory = await getApplicationDocumentsDirectory();
+    final backupDirectory = await getApplicationSupportDirectory();
+
+    // close the database before any changes
+    await isar.close();
+
+    final dbFile = File('${backupDirectory.path}/backup_db.isar');
+    final dbPath = p.join(dbDirectory.path, 'default.isar');
+
+    if (await dbFile.exists()) {
+      // here we overwrite the backup file on the database file
+      await dbFile.copy(dbPath);
+    }
+  }
+
   Future<Isar> openDB() async {
     if (Isar.instanceNames.isEmpty) {
       final dir = await getApplicationDocumentsDirectory();
@@ -103,7 +220,9 @@ class Database {
           ItemModelSchema,
           PembeliModelSchema,
           PenjualanModelSchema,
-          UserModelSchema
+          UserModelSchema,
+          AuthModelSchema,
+          StoreModelSchema
         ],
         directory: dir.path,
         inspector: true,

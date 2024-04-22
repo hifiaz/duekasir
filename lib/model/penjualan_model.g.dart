@@ -27,36 +27,30 @@ const PenjualanModelSchema = CollectionSchema(
       name: r'diskon',
       type: IsarType.double,
     ),
-    r'items': PropertySchema(
-      id: 2,
-      name: r'items',
-      type: IsarType.objectList,
-      target: r'ItemData',
-    ),
     r'kasir': PropertySchema(
-      id: 3,
+      id: 2,
       name: r'kasir',
       type: IsarType.long,
     ),
     r'keterangan': PropertySchema(
-      id: 4,
+      id: 3,
       name: r'keterangan',
       type: IsarType.string,
     ),
     r'pembeli': PropertySchema(
-      id: 5,
+      id: 4,
       name: r'pembeli',
       type: IsarType.long,
     ),
     r'totalHarga': PropertySchema(
-      id: 6,
+      id: 5,
       name: r'totalHarga',
       type: IsarType.double,
     ),
     r'totalItem': PropertySchema(
-      id: 7,
+      id: 6,
       name: r'totalItem',
-      type: IsarType.double,
+      type: IsarType.long,
     )
   },
   estimateSize: _penjualanModelEstimateSize,
@@ -65,8 +59,15 @@ const PenjualanModelSchema = CollectionSchema(
   deserializeProp: _penjualanModelDeserializeProp,
   idName: r'id',
   indexes: {},
-  links: {},
-  embeddedSchemas: {r'ItemData': ItemDataSchema},
+  links: {
+    r'items': LinkSchema(
+      id: -3395604233004221325,
+      name: r'items',
+      target: r'ItemModel',
+      single: false,
+    )
+  },
+  embeddedSchemas: {},
   getId: _penjualanModelGetId,
   getLinks: _penjualanModelGetLinks,
   attach: _penjualanModelAttach,
@@ -79,19 +80,6 @@ int _penjualanModelEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  {
-    final list = object.items;
-    if (list != null) {
-      bytesCount += 3 + list.length * 3;
-      {
-        final offsets = allOffsets[ItemData]!;
-        for (var i = 0; i < list.length; i++) {
-          final value = list[i];
-          bytesCount += ItemDataSchema.estimateSize(value, offsets, allOffsets);
-        }
-      }
-    }
-  }
   {
     final value = object.keterangan;
     if (value != null) {
@@ -109,17 +97,11 @@ void _penjualanModelSerialize(
 ) {
   writer.writeDateTime(offsets[0], object.createdAt);
   writer.writeDouble(offsets[1], object.diskon);
-  writer.writeObjectList<ItemData>(
-    offsets[2],
-    allOffsets,
-    ItemDataSchema.serialize,
-    object.items,
-  );
-  writer.writeLong(offsets[3], object.kasir);
-  writer.writeString(offsets[4], object.keterangan);
-  writer.writeLong(offsets[5], object.pembeli);
-  writer.writeDouble(offsets[6], object.totalHarga);
-  writer.writeDouble(offsets[7], object.totalItem);
+  writer.writeLong(offsets[2], object.kasir);
+  writer.writeString(offsets[3], object.keterangan);
+  writer.writeLong(offsets[4], object.pembeli);
+  writer.writeDouble(offsets[5], object.totalHarga);
+  writer.writeLong(offsets[6], object.totalItem);
 }
 
 PenjualanModel _penjualanModelDeserialize(
@@ -132,17 +114,11 @@ PenjualanModel _penjualanModelDeserialize(
   object.createdAt = reader.readDateTime(offsets[0]);
   object.diskon = reader.readDouble(offsets[1]);
   object.id = id;
-  object.items = reader.readObjectList<ItemData>(
-    offsets[2],
-    ItemDataSchema.deserialize,
-    allOffsets,
-    ItemData(),
-  );
-  object.kasir = reader.readLong(offsets[3]);
-  object.keterangan = reader.readStringOrNull(offsets[4]);
-  object.pembeli = reader.readLongOrNull(offsets[5]);
-  object.totalHarga = reader.readDouble(offsets[6]);
-  object.totalItem = reader.readDouble(offsets[7]);
+  object.kasir = reader.readLong(offsets[2]);
+  object.keterangan = reader.readStringOrNull(offsets[3]);
+  object.pembeli = reader.readLongOrNull(offsets[4]);
+  object.totalHarga = reader.readDouble(offsets[5]);
+  object.totalItem = reader.readLong(offsets[6]);
   return object;
 }
 
@@ -158,22 +134,15 @@ P _penjualanModelDeserializeProp<P>(
     case 1:
       return (reader.readDouble(offset)) as P;
     case 2:
-      return (reader.readObjectList<ItemData>(
-        offset,
-        ItemDataSchema.deserialize,
-        allOffsets,
-        ItemData(),
-      )) as P;
-    case 3:
       return (reader.readLong(offset)) as P;
-    case 4:
+    case 3:
       return (reader.readStringOrNull(offset)) as P;
-    case 5:
+    case 4:
       return (reader.readLongOrNull(offset)) as P;
+    case 5:
+      return (reader.readDouble(offset)) as P;
     case 6:
-      return (reader.readDouble(offset)) as P;
-    case 7:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -184,12 +153,13 @@ Id _penjualanModelGetId(PenjualanModel object) {
 }
 
 List<IsarLinkBase<dynamic>> _penjualanModelGetLinks(PenjualanModel object) {
-  return [];
+  return [object.items];
 }
 
 void _penjualanModelAttach(
     IsarCollection<dynamic> col, Id id, PenjualanModel object) {
   object.id = id;
+  object.items.attach(col, col.isar.collection<ItemModel>(), r'items', id);
 }
 
 extension PenjualanModelQueryWhereSort
@@ -449,113 +419,6 @@ extension PenjualanModelQueryFilter
         upper: upper,
         includeUpper: includeUpper,
       ));
-    });
-  }
-
-  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
-      itemsIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'items',
-      ));
-    });
-  }
-
-  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
-      itemsIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'items',
-      ));
-    });
-  }
-
-  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
-      itemsLengthEqualTo(int length) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'items',
-        length,
-        true,
-        length,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
-      itemsIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'items',
-        0,
-        true,
-        0,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
-      itemsIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'items',
-        0,
-        false,
-        999999,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
-      itemsLengthLessThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'items',
-        0,
-        true,
-        length,
-        include,
-      );
-    });
-  }
-
-  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
-      itemsLengthGreaterThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'items',
-        length,
-        include,
-        999999,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
-      itemsLengthBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'items',
-        lower,
-        includeLower,
-        upper,
-        includeUpper,
-      );
     });
   }
 
@@ -910,58 +773,49 @@ extension PenjualanModelQueryFilter
   }
 
   QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
-      totalItemEqualTo(
-    double value, {
-    double epsilon = Query.epsilon,
-  }) {
+      totalItemEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'totalItem',
         value: value,
-        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
       totalItemGreaterThan(
-    double value, {
+    int value, {
     bool include = false,
-    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
         property: r'totalItem',
         value: value,
-        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
       totalItemLessThan(
-    double value, {
+    int value, {
     bool include = false,
-    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
         property: r'totalItem',
         value: value,
-        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
       totalItemBetween(
-    double lower,
-    double upper, {
+    int lower,
+    int upper, {
     bool includeLower = true,
     bool includeUpper = true,
-    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -970,24 +824,77 @@ extension PenjualanModelQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
-        epsilon: epsilon,
       ));
     });
   }
 }
 
 extension PenjualanModelQueryObject
+    on QueryBuilder<PenjualanModel, PenjualanModel, QFilterCondition> {}
+
+extension PenjualanModelQueryLinks
     on QueryBuilder<PenjualanModel, PenjualanModel, QFilterCondition> {
-  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
-      itemsElement(FilterQuery<ItemData> q) {
+  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition> items(
+      FilterQuery<ItemModel> q) {
     return QueryBuilder.apply(this, (query) {
-      return query.object(q, r'items');
+      return query.link(q, r'items');
+    });
+  }
+
+  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
+      itemsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'items', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
+      itemsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'items', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
+      itemsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'items', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
+      itemsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'items', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
+      itemsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'items', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
+      itemsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'items', lower, includeLower, upper, includeUpper);
     });
   }
 }
-
-extension PenjualanModelQueryLinks
-    on QueryBuilder<PenjualanModel, PenjualanModel, QFilterCondition> {}
 
 extension PenjualanModelQuerySortBy
     on QueryBuilder<PenjualanModel, PenjualanModel, QSortBy> {
@@ -1260,13 +1167,6 @@ extension PenjualanModelQueryProperty
     });
   }
 
-  QueryBuilder<PenjualanModel, List<ItemData>?, QQueryOperations>
-      itemsProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'items');
-    });
-  }
-
   QueryBuilder<PenjualanModel, int, QQueryOperations> kasirProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'kasir');
@@ -1291,1125 +1191,9 @@ extension PenjualanModelQueryProperty
     });
   }
 
-  QueryBuilder<PenjualanModel, double, QQueryOperations> totalItemProperty() {
+  QueryBuilder<PenjualanModel, int, QQueryOperations> totalItemProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'totalItem');
     });
   }
 }
-
-// **************************************************************************
-// IsarEmbeddedGenerator
-// **************************************************************************
-
-// coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
-
-const ItemDataSchema = Schema(
-  name: r'ItemData',
-  id: 4439479512583442687,
-  properties: {
-    r'barangKeluar': PropertySchema(
-      id: 0,
-      name: r'barangKeluar',
-      type: IsarType.dateTime,
-    ),
-    r'barangMasuk': PropertySchema(
-      id: 1,
-      name: r'barangMasuk',
-      type: IsarType.dateTime,
-    ),
-    r'createdAt': PropertySchema(
-      id: 2,
-      name: r'createdAt',
-      type: IsarType.dateTime,
-    ),
-    r'deskripsi': PropertySchema(
-      id: 3,
-      name: r'deskripsi',
-      type: IsarType.string,
-    ),
-    r'diskonPersen': PropertySchema(
-      id: 4,
-      name: r'diskonPersen',
-      type: IsarType.double,
-    ),
-    r'hargaDasar': PropertySchema(
-      id: 5,
-      name: r'hargaDasar',
-      type: IsarType.double,
-    ),
-    r'hargaJual': PropertySchema(
-      id: 6,
-      name: r'hargaJual',
-      type: IsarType.double,
-    ),
-    r'hargaJualPersen': PropertySchema(
-      id: 7,
-      name: r'hargaJualPersen',
-      type: IsarType.double,
-    ),
-    r'id': PropertySchema(
-      id: 8,
-      name: r'id',
-      type: IsarType.long,
-    ),
-    r'isHargaJualPersen': PropertySchema(
-      id: 9,
-      name: r'isHargaJualPersen',
-      type: IsarType.bool,
-    ),
-    r'jumlahBarang': PropertySchema(
-      id: 10,
-      name: r'jumlahBarang',
-      type: IsarType.long,
-    ),
-    r'nama': PropertySchema(
-      id: 11,
-      name: r'nama',
-      type: IsarType.string,
-    ),
-    r'quantity': PropertySchema(
-      id: 12,
-      name: r'quantity',
-      type: IsarType.long,
-    )
-  },
-  estimateSize: _itemDataEstimateSize,
-  serialize: _itemDataSerialize,
-  deserialize: _itemDataDeserialize,
-  deserializeProp: _itemDataDeserializeProp,
-);
-
-int _itemDataEstimateSize(
-  ItemData object,
-  List<int> offsets,
-  Map<Type, List<int>> allOffsets,
-) {
-  var bytesCount = offsets.last;
-  {
-    final value = object.deskripsi;
-    if (value != null) {
-      bytesCount += 3 + value.length * 3;
-    }
-  }
-  bytesCount += 3 + object.nama.length * 3;
-  return bytesCount;
-}
-
-void _itemDataSerialize(
-  ItemData object,
-  IsarWriter writer,
-  List<int> offsets,
-  Map<Type, List<int>> allOffsets,
-) {
-  writer.writeDateTime(offsets[0], object.barangKeluar);
-  writer.writeDateTime(offsets[1], object.barangMasuk);
-  writer.writeDateTime(offsets[2], object.createdAt);
-  writer.writeString(offsets[3], object.deskripsi);
-  writer.writeDouble(offsets[4], object.diskonPersen);
-  writer.writeDouble(offsets[5], object.hargaDasar);
-  writer.writeDouble(offsets[6], object.hargaJual);
-  writer.writeDouble(offsets[7], object.hargaJualPersen);
-  writer.writeLong(offsets[8], object.id);
-  writer.writeBool(offsets[9], object.isHargaJualPersen);
-  writer.writeLong(offsets[10], object.jumlahBarang);
-  writer.writeString(offsets[11], object.nama);
-  writer.writeLong(offsets[12], object.quantity);
-}
-
-ItemData _itemDataDeserialize(
-  Id id,
-  IsarReader reader,
-  List<int> offsets,
-  Map<Type, List<int>> allOffsets,
-) {
-  final object = ItemData();
-  object.barangKeluar = reader.readDateTimeOrNull(offsets[0]);
-  object.barangMasuk = reader.readDateTimeOrNull(offsets[1]);
-  object.createdAt = reader.readDateTime(offsets[2]);
-  object.deskripsi = reader.readStringOrNull(offsets[3]);
-  object.diskonPersen = reader.readDoubleOrNull(offsets[4]);
-  object.hargaDasar = reader.readDouble(offsets[5]);
-  object.hargaJual = reader.readDouble(offsets[6]);
-  object.hargaJualPersen = reader.readDoubleOrNull(offsets[7]);
-  object.id = reader.readLong(offsets[8]);
-  object.isHargaJualPersen = reader.readBool(offsets[9]);
-  object.jumlahBarang = reader.readLong(offsets[10]);
-  object.nama = reader.readString(offsets[11]);
-  object.quantity = reader.readLong(offsets[12]);
-  return object;
-}
-
-P _itemDataDeserializeProp<P>(
-  IsarReader reader,
-  int propertyId,
-  int offset,
-  Map<Type, List<int>> allOffsets,
-) {
-  switch (propertyId) {
-    case 0:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 1:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 2:
-      return (reader.readDateTime(offset)) as P;
-    case 3:
-      return (reader.readStringOrNull(offset)) as P;
-    case 4:
-      return (reader.readDoubleOrNull(offset)) as P;
-    case 5:
-      return (reader.readDouble(offset)) as P;
-    case 6:
-      return (reader.readDouble(offset)) as P;
-    case 7:
-      return (reader.readDoubleOrNull(offset)) as P;
-    case 8:
-      return (reader.readLong(offset)) as P;
-    case 9:
-      return (reader.readBool(offset)) as P;
-    case 10:
-      return (reader.readLong(offset)) as P;
-    case 11:
-      return (reader.readString(offset)) as P;
-    case 12:
-      return (reader.readLong(offset)) as P;
-    default:
-      throw IsarError('Unknown property with id $propertyId');
-  }
-}
-
-extension ItemDataQueryFilter
-    on QueryBuilder<ItemData, ItemData, QFilterCondition> {
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> barangKeluarIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'barangKeluar',
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      barangKeluarIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'barangKeluar',
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> barangKeluarEqualTo(
-      DateTime? value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'barangKeluar',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      barangKeluarGreaterThan(
-    DateTime? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'barangKeluar',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> barangKeluarLessThan(
-    DateTime? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'barangKeluar',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> barangKeluarBetween(
-    DateTime? lower,
-    DateTime? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'barangKeluar',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> barangMasukIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'barangMasuk',
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      barangMasukIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'barangMasuk',
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> barangMasukEqualTo(
-      DateTime? value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'barangMasuk',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      barangMasukGreaterThan(
-    DateTime? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'barangMasuk',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> barangMasukLessThan(
-    DateTime? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'barangMasuk',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> barangMasukBetween(
-    DateTime? lower,
-    DateTime? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'barangMasuk',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> createdAtEqualTo(
-      DateTime value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'createdAt',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> createdAtGreaterThan(
-    DateTime value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'createdAt',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> createdAtLessThan(
-    DateTime value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'createdAt',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> createdAtBetween(
-    DateTime lower,
-    DateTime upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'createdAt',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> deskripsiIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'deskripsi',
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> deskripsiIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'deskripsi',
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> deskripsiEqualTo(
-    String? value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'deskripsi',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> deskripsiGreaterThan(
-    String? value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'deskripsi',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> deskripsiLessThan(
-    String? value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'deskripsi',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> deskripsiBetween(
-    String? lower,
-    String? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'deskripsi',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> deskripsiStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'deskripsi',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> deskripsiEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'deskripsi',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> deskripsiContains(
-      String value,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'deskripsi',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> deskripsiMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'deskripsi',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> deskripsiIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'deskripsi',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      deskripsiIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'deskripsi',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> diskonPersenIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'diskonPersen',
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      diskonPersenIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'diskonPersen',
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> diskonPersenEqualTo(
-    double? value, {
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'diskonPersen',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      diskonPersenGreaterThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'diskonPersen',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> diskonPersenLessThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'diskonPersen',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> diskonPersenBetween(
-    double? lower,
-    double? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'diskonPersen',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> hargaDasarEqualTo(
-    double value, {
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'hargaDasar',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> hargaDasarGreaterThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'hargaDasar',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> hargaDasarLessThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'hargaDasar',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> hargaDasarBetween(
-    double lower,
-    double upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'hargaDasar',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> hargaJualEqualTo(
-    double value, {
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'hargaJual',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> hargaJualGreaterThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'hargaJual',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> hargaJualLessThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'hargaJual',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> hargaJualBetween(
-    double lower,
-    double upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'hargaJual',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      hargaJualPersenIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'hargaJualPersen',
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      hargaJualPersenIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'hargaJualPersen',
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      hargaJualPersenEqualTo(
-    double? value, {
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'hargaJualPersen',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      hargaJualPersenGreaterThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'hargaJualPersen',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      hargaJualPersenLessThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'hargaJualPersen',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      hargaJualPersenBetween(
-    double? lower,
-    double? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'hargaJualPersen',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> idEqualTo(int value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'id',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> idGreaterThan(
-    int value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'id',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> idLessThan(
-    int value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'id',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> idBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'id',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      isHargaJualPersenEqualTo(bool value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'isHargaJualPersen',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> jumlahBarangEqualTo(
-      int value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'jumlahBarang',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition>
-      jumlahBarangGreaterThan(
-    int value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'jumlahBarang',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> jumlahBarangLessThan(
-    int value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'jumlahBarang',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> jumlahBarangBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'jumlahBarang',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> namaEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'nama',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> namaGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'nama',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> namaLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'nama',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> namaBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'nama',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> namaStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'nama',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> namaEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'nama',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> namaContains(
-      String value,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'nama',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> namaMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'nama',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> namaIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'nama',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> namaIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'nama',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> quantityEqualTo(
-      int value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'quantity',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> quantityGreaterThan(
-    int value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'quantity',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> quantityLessThan(
-    int value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'quantity',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<ItemData, ItemData, QAfterFilterCondition> quantityBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'quantity',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-}
-
-extension ItemDataQueryObject
-    on QueryBuilder<ItemData, ItemData, QFilterCondition> {}

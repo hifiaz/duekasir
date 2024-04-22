@@ -2,6 +2,7 @@ import 'package:due_kasir/controller/user_controller.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:signals/signals_flutter.dart';
 
 class UserList extends StatelessWidget {
@@ -63,7 +64,7 @@ class UserList extends StatelessWidget {
                                 const Icon(Icons.keyboard_arrow_right_outlined),
                                 onTap: () {
                                   userController.userSelected.value = user;
-                                  userController.listActive.value = false;
+                                  context.push('/user/form');
                                 },
                               ),
                             ])

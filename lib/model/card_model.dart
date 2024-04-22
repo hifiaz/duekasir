@@ -6,8 +6,13 @@ class Cart extends Equatable {
 
   final List<ItemModel> items;
 
+  int get totalItem {
+    return items.fold(0, (total, current) => total + current.quantity);
+  }
+
   double get totalPrice {
-    return items.fold(0, (total, current) => total + current.hargaJual);
+    return items.fold(
+        0, (total, current) => total + (current.quantity * current.hargaJual));
   }
 
   @override

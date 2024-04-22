@@ -1,17 +1,25 @@
+import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/controller/selling/events.dart';
 import 'package:due_kasir/controller/selling/service.dart';
 import 'package:due_kasir/enum/payment_enum.dart';
 import 'package:due_kasir/model/card_model.dart';
+import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/pembeli_model.dart';
 import 'package:due_kasir/model/user_model.dart';
+import 'package:due_kasir/service/database.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:collection/collection.dart';
 
 class SellingController {
   SellingController(this._cartService);
   final CartService _cartService;
+  final isSearch = Signal(false);
   final tipeBayar = Signal(TypePayment.qris);
   final pelanggan = Signal<PembeliModel?>(null);
   final kasir = Signal<UserModel?>(null);
+  final selectedPrint = Signal<Printer?>(null);
 
   late final _cart = signal<AsyncState<Cart>>(AsyncLoading());
   ReadonlySignal<AsyncState<Cart>> get cart => _cart;
@@ -29,8 +37,19 @@ class SellingController {
       case CartItemAdded(:final item):
         if (_cart.value case AsyncData<Cart>(:final value)) {
           try {
+            final isSame = _cart.value.value?.items
+                .firstWhereOrNull((val) => val.code == item.code);
             _cartService.add(item);
-            _cart.value = AsyncData(Cart(items: [...value.items, item]));
+            if (isSame != null) {
+              _cart.value = AsyncData(Cart(items: [...value.items, item]));
+              _cart.value = AsyncData(
+                Cart(
+                  items: [...value.items]..remove(event.item),
+                ),
+              );
+            } else {
+              _cart.value = AsyncData(Cart(items: [...value.items, item]));
+            }
           } catch (e, s) {
             _cart.value = AsyncError(e, s);
           }
@@ -55,5 +74,15 @@ class SellingController {
         _cartService.clear();
         _cart.value = AsyncData(const Cart());
     }
+  }
+
+  Future<void> updateBatch(List<ItemModel> items) async {
+    await Future.forEach<ItemModel>(items, (i) async {
+      final item = i..jumlahBarang = i.jumlahBarang - i.quantity;
+      await Database().updateInventory(item);
+    });
+    Future.delayed(Durations.short1).then((_) {
+      inventoryController.inventory.refresh();
+    });
   }
 }

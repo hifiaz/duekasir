@@ -4,15 +4,17 @@ import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:signals/signals_flutter.dart';
 
 class CustomerForm extends HookWidget {
-  final PembeliModel? customer;
-  CustomerForm({super.key, this.customer});
+  CustomerForm({super.key});
 
   final statusData = {true: 'Active', false: 'Non Active'};
   @override
   Widget build(BuildContext context) {
+    final customer = customerController.customerSelected.watch(context);
     final editingName = useTextEditingController(text: customer?.nama ?? '');
     final editingKtp = useTextEditingController(text: customer?.ktp ?? '');
     final editingKeterangan =
@@ -37,10 +39,7 @@ class CustomerForm extends HookWidget {
             Align(
               alignment: Alignment.centerRight,
               child: ShadButton.ghost(
-                text: const Text('Close'),
-                onPressed: () =>
-                    customerController.listCustomerActive.value = true,
-              ),
+                  text: const Text('Close'), onPressed: () => context.pop()),
             ),
             ShadInputFormField(
               controller: editingName,
@@ -117,11 +116,8 @@ class CustomerForm extends HookWidget {
                     ShadButton.destructive(
                       text: const Text('Delete'),
                       onPressed: () {
-                        Database()
-                            .deleteCustomer(customer!.id)
-                            .whenComplete(() {
+                        Database().deleteCustomer(customer.id).whenComplete(() {
                           customerController.customer.refresh();
-                          customerController.listCustomerActive.value = true;
                           Navigator.pop(context);
                         });
                       },
@@ -134,7 +130,7 @@ class CustomerForm extends HookWidget {
                       } else {
                         if (customer != null) {
                           final updateCustomer = PembeliModel()
-                            ..id = customer!.id
+                            ..id = customer.id
                             ..nama = editingName.text
                             ..dob = lahir.value
                             ..ktp = editingKtp.text
@@ -144,9 +140,8 @@ class CustomerForm extends HookWidget {
                               .updateCustomer(updateCustomer)
                               .whenComplete(() {
                             Future.delayed(Durations.short1).then((_) {
-                              customerController.listCustomerActive.value =
-                                  true;
                               customerController.customer.refresh();
+                              context.pop();
                             });
                           });
                         } else {
@@ -162,7 +157,7 @@ class CustomerForm extends HookWidget {
                               .addNewCustomer(newCustomer)
                               .whenComplete(() {
                             customerController.customer.reset();
-                            customerController.listCustomerActive.value = true;
+                            context.pop();
                           });
                         }
                       }

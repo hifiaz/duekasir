@@ -2,6 +2,7 @@ import 'package:due_kasir/controller/customer_controller.dart';
 import 'package:due_kasir/model/pembeli_model.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:signals/signals_flutter.dart';
 
 class CustomerList extends StatelessWidget {
@@ -67,8 +68,7 @@ class CustomerList extends StatelessWidget {
                                 onTap: () {
                                   customerController.customerSelected.value =
                                       user;
-                                  customerController.listCustomerActive.value =
-                                      false;
+                                  context.push('/customer/form');
                                 },
                               ),
                             ])

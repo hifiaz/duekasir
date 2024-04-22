@@ -4,7 +4,6 @@ import 'package:signals/signals_flutter.dart';
 
 class UserController {
   final users = futureSignal(() async => Database().getUsers());
-  final listActive = signal(true);
   final userSelected = signal<UserModel?>(null);
 }
 

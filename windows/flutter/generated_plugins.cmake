@@ -3,6 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  file_saver
+  flutter_thermal_printer
   isar_flutter_libs
   rive_common
 )

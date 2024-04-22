@@ -2,12 +2,13 @@ import 'package:due_kasir/routes/router.dart';
 import 'package:due_kasir/service/get_it.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   setup();
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 final _router = GoRouter(routes: $appRoutes);

@@ -53,9 +53,13 @@ dependencies:
   collection: ^1.18.0
   csv: ^6.0.0
   file_picker: ^8.0.1
-  flutter_thermal_printer: ^0.0.8
+  flutter_pos_printer_platform_image_3: #^1.1.2
+    git:
+      url: https://github.com/E-MRE/flutter_pos_printer_platform.git
+      ref: feature/version-upgrade
   visibility_detector: ^0.4.0+2
   file_saver: ^0.2.12
+  esc_pos_utils: ^1.1.0
 
 dev_dependencies:
   flutter_test:

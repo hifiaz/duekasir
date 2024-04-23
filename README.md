@@ -1,16 +1,48 @@
-# due_kasir
+# Due Kasir
 
-A new Flutter project.
+Is Open source for POS app focus on offline first
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+To get a local copy up and running follow these simple example steps.
 
-A few resources to get you started if this is your first Flutter project:
+Prerequisite: https://flutter.dev/docs/get-started/install
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+1. To get started, fork this repository to your GitHub account.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+2. Clone the repo.
+    ```sh
+     git clone https://github.com/hifiaz/duekasir
+    ```
+3. Install packages.
+    ```sh
+     flutter pub get
+    ```
+4. Run project.
+    ```sh
+     flutter run
+    ```
+## Features
+
+1. Inventory
+    - [x] Export and Import CSV Inventory
+    - [ ] Scan Barcode with external device to add item
+    - [ ] Scan barcode with mobile phone to add item
+2. Selling
+    - [x] Print to Thermal Printer
+    - [x] Print to open cash drawer
+    - [x] Scan Barcode with external device
+    - [ ] Scan barcode with mobile phone
+3. Report
+4. Customer
+5. User
+6. Backup & Restore Isar
+
+* MacOS Support
+
+## Author
+
+👤 **Luthfi**
+
+* Twitter: [@1hanzla100](https://twitter.com/hifiaz)
+* LinkedIn: [@1hanzla100](https://linkedin.com/in/luthfiazhari)

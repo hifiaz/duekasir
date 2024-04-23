@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/controller/selling/events.dart';
 import 'package:due_kasir/controller/selling/service.dart';
@@ -5,12 +6,11 @@ import 'package:due_kasir/enum/payment_enum.dart';
 import 'package:due_kasir/model/card_model.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/pembeli_model.dart';
+import 'package:due_kasir/model/printer_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:signals/signals_flutter.dart';
-import 'package:collection/collection.dart';
 
 class SellingController {
   SellingController(this._cartService);
@@ -19,7 +19,7 @@ class SellingController {
   final tipeBayar = Signal(TypePayment.qris);
   final pelanggan = Signal<PembeliModel?>(null);
   final kasir = Signal<UserModel?>(null);
-  final selectedPrint = Signal<Printer?>(null);
+  final selectedPrint = Signal<PrinterModel?>(null);
 
   late final _cart = signal<AsyncState<Cart>>(AsyncLoading());
   ReadonlySignal<AsyncState<Cart>> get cart => _cart;

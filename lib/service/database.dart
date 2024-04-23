@@ -224,6 +224,12 @@ class Database {
     }
   }
 
+  Future<void> clearAllData() async {
+    final isar = await db;
+    isar.writeTxn<void>(() => isar.clear());
+    await isar.close(deleteFromDisk: true);
+  }
+
   Future<Isar> openDB() async {
     if (Isar.instanceNames.isEmpty) {
       final dir = await getApplicationDocumentsDirectory();

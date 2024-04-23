@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -11,24 +12,23 @@ import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/service/get_it.dart';
 import 'package:due_kasir/utils/constant.dart';
 
-class SellingLeft extends HookWidget {
+class SellingLeft extends HookConsumerWidget {
   const SellingLeft({super.key});
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final editingBarcode = useTextEditingController(text: 'Scan Barcode...');
     final list = getIt.get<SellingController>().cart.watch(context);
     final isSearch = getIt.get<SellingController>().isSearch.watch(context);
-    final barcode = useState('');
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: SingleChildScrollView(
         child: Column(
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 IconButton(
-                  color: !isSearch ? Colors.green : null,
+                  color: !isSearch ? Colors.blue : null,
                   onPressed: () =>
                       getIt.get<SellingController>().isSearch.value = !isSearch,
                   icon: const Icon(Icons.barcode_reader),
@@ -103,29 +103,35 @@ class SellingLeft extends HookWidget {
                     onBarcodeScanned: (barcode) async {
                       final data = await Database().searchByBarcode(barcode);
                       if (data != null) {
+                        editingBarcode.text = barcode;
                         getIt
                             .get<SellingController>()
                             .dispatch(CartItemAdded(data));
                       } else {
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
+                          ShadToaster.of(context).show(
+                            ShadToast(
                               backgroundColor: Colors.red,
-                              content: const Text('Item Not Found'),
-                              action: SnackBarAction(
-                                label: 'Ok',
-                                onPressed: () {},
+                              title: const Text('Item Not Found'),
+                              description:
+                                  const Text('You can add it on inventory'),
+                              action: ShadButton.outline(
+                                text: const Text('Ok'),
+                                onPressed: () => ShadToaster.of(context).hide(),
                               ),
                             ),
                           );
                         }
                       }
                     },
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Text(barcode.value.isEmpty
-                          ? 'Scan Barcode...'
-                          : 'Barcode: ${barcode.value}'),
+                    child: Expanded(
+                      child: TextField(
+                        readOnly: true,
+                        controller: editingBarcode,
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.search),
+                        ),
+                      ),
                     ),
                   ),
               ],

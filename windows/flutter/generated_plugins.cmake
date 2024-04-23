@@ -6,7 +6,9 @@ list(APPEND FLUTTER_PLUGIN_LIST
   file_saver
   flutter_pos_printer_platform_image_3
   isar_flutter_libs
+  permission_handler_windows
   rive_common
+  webview_windows
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

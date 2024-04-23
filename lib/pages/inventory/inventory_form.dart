@@ -3,18 +3,20 @@ import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
-class InventoryForm extends HookWidget {
+class InventoryForm extends HookConsumerWidget {
   InventoryForm({super.key});
-
   final statusData = {true: 'Active', false: 'Non Active'};
   final _inventoryFormKey = GlobalKey<FormState>();
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final item = inventoryController.inventorySelected.watch(context);
     final editingName = useTextEditingController(text: item?.nama ?? '');
     final editingCode = useTextEditingController(text: item?.code ?? '');
@@ -74,10 +76,41 @@ class InventoryForm extends HookWidget {
                   label: const Text('Nama Barang'),
                   placeholder: const Text('Baju'),
                 ),
-                ShadInputFormField(
-                  controller: editingCode,
-                  label: const Text('Code'),
-                  placeholder: const Text('HP08123'),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: ShadInputFormField(
+                        controller: editingCode,
+                        label: const Text('Code'),
+                        placeholder: const Text('HP08123'),
+                      ),
+                    ),
+                    BarcodeKeyboardListener(
+                      bufferDuration: const Duration(milliseconds: 200),
+                      onBarcodeScanned: (barcode) async {
+                        editingCode.text = barcode;
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.only(bottom: 5.0),
+                        child: ShadButton.ghost(
+                          icon: Icon(Icons.barcode_reader),
+                        ),
+                      ),
+                    ),
+                    ShadButton.ghost(
+                      icon: const Icon(Icons.camera_alt),
+                      onPressed: () async {
+                        var res = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const SimpleBarcodeScannerPage(),
+                            ));
+                        editingCode.text = res;
+                      },
+                    ),
+                  ],
                 ),
                 Row(
                   children: [
@@ -205,7 +238,11 @@ class InventoryForm extends HookWidget {
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
                                   context.pop();
-                                  inventoryController.inventory.refresh();
+                                  Database().searchInventorys('').then((val) {
+                                    inventoryController.inventorySearch.clear();
+                                    inventoryController.inventorySearch
+                                        .addAll(val);
+                                  });
                                   inventoryController.inventorySelected.value =
                                       null;
                                 });
@@ -223,7 +260,11 @@ class InventoryForm extends HookWidget {
                                 ..hargaDasar = int.parse(editingHargaDasar.text)
                                 ..jumlahBarang = stock.value;
                               Database().addInventory(newItem).whenComplete(() {
-                                inventoryController.inventory.refresh();
+                                Database().searchInventorys('').then((val) {
+                                  inventoryController.inventorySearch.clear();
+                                  inventoryController.inventorySearch
+                                      .addAll(val);
+                                });
                                 context.pop();
                               });
                             }

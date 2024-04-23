@@ -22,6 +22,39 @@ class Home extends StatelessWidget {
         actions: [
           ShadButton(
             icon: const Padding(
+                padding: EdgeInsets.only(right: 8),
+                child: Icon(Icons.clear_all)),
+            text: const Text('Reset'),
+            onPressed: () {
+              showShadDialog(
+                context: context,
+                builder: (context) => ShadDialog.alert(
+                  title: const Text('Are you absolutely sure?'),
+                  description: const Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: Text(
+                      'This action cannot be undone. This will permanently delete your data.',
+                    ),
+                  ),
+                  actions: [
+                    ShadButton.outline(
+                      text: const Text('Cancel'),
+                      onPressed: () => Navigator.of(context).pop(false),
+                    ),
+                    ShadButton(
+                      text: const Text('Continue'),
+                      onPressed: () async {
+                        await Database().clearAllData().whenComplete(
+                            () => Navigator.of(context).pop(true));
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          ShadButton(
+            icon: const Padding(
                 padding: EdgeInsets.only(right: 8), child: Icon(Icons.store)),
             text: const Text('Backup'),
             onPressed: () async => await Database().createBackUp(),

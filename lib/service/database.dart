@@ -8,6 +8,7 @@ import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/store_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/service/get_it.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:isar/isar.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -105,6 +106,13 @@ class Database {
     isar.writeTxnSync<int>(() => isar.itemModels.putSync(val));
   }
 
+  Future<void> addAllInventory(List<ItemModel> vals) async {
+    final isar = await db;
+    for (var val in vals) {
+      isar.writeTxnSync<int>(() => isar.itemModels.putSync(val));
+    }
+  }
+
   Future<void> deleteInventory(int val) async {
     final isar = await db;
     isar.writeTxn<bool>(() async => await isar.itemModels.delete(val));
@@ -185,30 +193,34 @@ class Database {
 
   Future<void> createBackUp() async {
     final isar = await db;
-    final backUpDir = await getApplicationSupportDirectory();
+    final backUpDir = await getDownloadsDirectory();
 
-    final File backUpFile = File('${backUpDir.path}/backup_db.isar');
+    final File backUpFile = File('${backUpDir?.path}/backup_db.isar');
     if (await backUpFile.exists()) {
       // if already we have another backup file, delete it here.
       await backUpFile.delete();
     }
-    await isar.copyToFile('${backUpDir.path}/backup_db.isar');
+    await isar.copyToFile('${backUpDir?.path}/backup_db.isar');
   }
 
   Future<void> restoreDB() async {
     final isar = await db;
-    final dbDirectory = await getApplicationDocumentsDirectory();
-    final backupDirectory = await getApplicationSupportDirectory();
 
-    // close the database before any changes
-    await isar.close();
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      File file = File(result.files.single.path!);
+      final dbDirectory = await getApplicationDocumentsDirectory();
 
-    final dbFile = File('${backupDirectory.path}/backup_db.isar');
-    final dbPath = p.join(dbDirectory.path, 'default.isar');
+      // close the database before any changes
+      await isar.close();
 
-    if (await dbFile.exists()) {
-      // here we overwrite the backup file on the database file
-      await dbFile.copy(dbPath);
+      final dbFile = file;
+      final dbPath = p.join(dbDirectory.path, 'default.isar');
+
+      if (await dbFile.exists()) {
+        // here we overwrite the backup file on the database file
+        await dbFile.copy(dbPath);
+      }
     }
   }
 

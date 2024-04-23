@@ -115,14 +115,18 @@ class InventoryForm extends HookWidget {
                     Expanded(
                       child: ShadInputFormField(
                         controller: editingHargaDasar,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
                         label: const Text('Harga Dasar'),
                       ),
                     ),
                     Expanded(
                       child: ShadInputFormField(
                         controller: editingHargaJualPersen,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
                         label: const Text('Harga Jual Persen'),
                       ),
                     ),
@@ -148,9 +152,32 @@ class InventoryForm extends HookWidget {
                         ShadButton.destructive(
                           text: const Text('Delete'),
                           onPressed: () {
-                            Database().deleteInventory(item.id).whenComplete(() {
-                              inventoryController.inventory.refresh();
+                            Database()
+                                .deleteInventory(item.id)
+                                .whenComplete(() {
                               Navigator.pop(context);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: Colors.blue,
+                                    content: const Text(
+                                        'Please refresh data to see changes'),
+                                    action: SnackBarAction(
+                                      label: 'Refresh',
+                                      onPressed: () async {
+                                        Database()
+                                            .searchInventorys('')
+                                            .then((val) {
+                                          inventoryController.inventorySearch
+                                              .clear();
+                                          inventoryController.inventorySearch
+                                              .addAll(val);
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                );
+                              }
                             });
                           },
                         ),

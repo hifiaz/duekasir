@@ -5,7 +5,9 @@ import 'package:collection/collection.dart';
 import 'package:csv/csv.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/model/item_model.dart';
+import 'package:due_kasir/service/database.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -17,14 +19,27 @@ class CsvPreview extends StatefulWidget {
 }
 
 class _CsvPreviewState extends State<CsvPreview> {
-  Future<List<List<dynamic>>> data() async {
+  Future<List<ItemModel>> data() async {
     final csv = inventoryController.csvFile.watch(context);
     final input = File(csv!.path).openRead();
     return await input
         .transform(utf8.decoder)
         .transform(const CsvToListConverter())
         .skip(1)
-        .toList();
+        .map((val) {
+      return ItemModel()
+        ..nama = val[1]
+        ..code = val[2].toString()
+        ..deskripsi = val[3] == 'null' ? null : val[3]
+        ..jumlahBarang = val[4]
+        ..quantity = 1
+        ..ukuran = val[6]
+        ..hargaDasar = val[7]
+        ..hargaJual = val[8]
+        ..hargaJualPersen = double.parse(val[9].toString())
+        ..diskonPersen = double.tryParse(val[10].toString())
+        ..isHargaJualPersen = val[11] == 'TRUE' ? true : false;
+    }).toList();
   }
 
   @override
@@ -32,7 +47,30 @@ class _CsvPreviewState extends State<CsvPreview> {
     final selectAll = inventoryController.selectAll.watch(context);
     final d = inventoryController.listItemFromCsv.watch(context);
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          ShadButton(
+            onPressed: () => d.isNotEmpty
+                ? Database().addAllInventory(d).whenComplete(() {
+                    inventoryController.listItemFromCsv.clear();
+                    Database().searchInventorys('').then((val) {
+                      inventoryController.inventorySearch.clear();
+                      inventoryController.inventorySearch.addAll(val);
+                    });
+                    context.pop();
+                  })
+                : null,
+            text: const Text('Export'),
+            icon: const Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Icon(
+                Icons.import_export,
+                size: 16,
+              ),
+            ),
+          )
+        ],
+      ),
       body: FutureBuilder(
         future: data(),
         builder: (context, res) {
@@ -48,14 +86,16 @@ class _CsvPreviewState extends State<CsvPreview> {
                           label: ShadCheckbox(
                             value: selectAll,
                             onChanged: (v) {
-                              inventoryController.selectAll.value = v;
-                              if (v == false) {
+                              if (v) {
+                                inventoryController.listItemFromCsv
+                                    .addAll(data);
+                              } else {
                                 inventoryController.listItemFromCsv.clear();
                               }
+                              inventoryController.selectAll.value = v;
                             },
                           ),
                         ),
-                        const DataColumn(label: Text('ID')),
                         const DataColumn(label: Text('Nama')),
                         const DataColumn(label: Text('Code')),
                         const DataColumn(label: Text('Description')),
@@ -77,51 +117,40 @@ class _CsvPreviewState extends State<CsvPreview> {
                               ShadCheckbox(
                                 value: d
                                             .firstWhereOrNull(
-                                              (val) =>
-                                                  val.nama == item[1] &&
-                                                  val.code ==
-                                                      item[2].toString(),
-                                            )
-                                            ?.nama ==
-                                        item[1]
-                                    ? true
-                                    : false,
+                                                (val) => val.code == item.code)
+                                            ?.code !=
+                                        item.code
+                                    ? false
+                                    : true,
                                 onChanged: (v) {
-                                  final res = ItemModel()
-                                    ..nama = item[1]
-                                    ..code = item[2].toString()
-                                    ..deskripsi =
-                                        item[3] == 'null' ? null : item[3]
-                                    ..jumlahBarang = item[4]
-                                    ..quantity = 1
-                                    ..ukuran = item[6]
-                                    ..hargaDasar = item[7]
-                                    ..hargaJual = item[8]
-                                    ..hargaJualPersen =
-                                        double.parse(item[9].toString())
-                                    ..diskonPersen =
-                                        double.parse(item[10].toString())
-                                    ..isHargaJualPersen =
-                                        item[11] == 'TRUE' ? true : false;
-                                  // print(res);
-                                  inventoryController.listItemFromCsv.add(res);
+                                  if (d
+                                          .firstWhereOrNull(
+                                              (val) => val.code == item.code)
+                                          ?.code ==
+                                      item.code) {
+                                    inventoryController.listItemFromCsv
+                                        .removeWhere(
+                                            (val) => val.code == item.code);
+                                  } else {
+                                    inventoryController.listItemFromCsv
+                                        .add(item);
+                                  }
                                 },
                               ),
                             ),
-                            DataCell(Text(item[0].toString())),
-                            DataCell(Text(item[1].toString())),
-                            DataCell(Text(item[2].toString())),
-                            DataCell(Text(item[3].toString())),
-                            DataCell(Text(item[4].toString())),
-                            DataCell(Text(item[5].toString())),
-                            DataCell(Text(item[6].toString())),
-                            DataCell(Text(item[7].toString())),
-                            DataCell(Text(item[8].toString())),
-                            DataCell(Text(item[9].toString())),
-                            DataCell(Text(item[10].toString())),
-                            DataCell(Text(item[11].toString())),
-                            DataCell(Text(item[12].toString())),
-                            DataCell(Text(item[13].toString())),
+                            DataCell(Text(item.nama.toString())),
+                            DataCell(Text(item.code.toString())),
+                            DataCell(Text(item.deskripsi.toString())),
+                            DataCell(Text(item.jumlahBarang.toString())),
+                            DataCell(Text(item.quantity.toString())),
+                            DataCell(Text(item.ukuran.toString())),
+                            DataCell(Text(item.hargaDasar.toString())),
+                            DataCell(Text(item.hargaJual.toString())),
+                            DataCell(Text(item.hargaJualPersen.toString())),
+                            DataCell(Text(item.diskonPersen.toString())),
+                            DataCell(Text(item.isHargaJualPersen.toString())),
+                            DataCell(Text(item.barangMasuk.toString())),
+                            DataCell(Text(item.barangKeluar.toString())),
                           ])
                       ],
                     ),
@@ -129,23 +158,8 @@ class _CsvPreviewState extends State<CsvPreview> {
                 ),
               ],
             );
-            // return ListView.builder(
-            //   itemCount: res.data?.length,
-            //   itemBuilder: (_, index) {
-            //     return
-            //     // return Card(
-            //     //   margin: const EdgeInsets.all(3),
-            //     //   color: Colors.white,
-            //     //   child: ListTile(
-            //     //     leading: Text(res.data![index][0].toString()),
-            //     //     title: Text(res.data![index][1]),
-            //     //     trailing: Text(res.data![index][2].toString()),
-            //     //   ),
-            //     // );
-            //   },
-            // );
           }
-          return const Text('Data is Missing');
+          return Text('Data is Missing ${res.error}');
         },
       ),
     );

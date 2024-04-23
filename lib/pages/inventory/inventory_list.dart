@@ -3,19 +3,38 @@ import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/model/item_model.dart';
+import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
-class InventoryList extends StatelessWidget {
+class InventoryList extends HookWidget {
   const InventoryList({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final search = useTextEditingController();
+    // final inventory = inventoryController.inventory.watch(context);
+    final inventorySearch = inventoryController.inventorySearch.watch(context);
+    useListenable(search);
+    useListenableSelector(search, () {
+      if (search.text.length > 2) {
+        Database().searchInventorys(search.text).then((val) {
+          inventoryController.inventorySearch.clear();
+          inventoryController.inventorySearch.addAll(val);
+        });
+      } else if (search.text.length == 1) {
+        Database().searchInventorys('').then((val) {
+          inventoryController.inventorySearch.clear();
+          inventoryController.inventorySearch.addAll(val);
+        });
+      }
+    });
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: SingleChildScrollView(
@@ -26,6 +45,7 @@ class InventoryList extends StatelessWidget {
               children: [
                 Expanded(
                   child: TextFormField(
+                    controller: search,
                     decoration: const InputDecoration(
                       prefixIcon: Icon(Icons.search),
                       hintText: 'Search',
@@ -73,9 +93,7 @@ class InventoryList extends StatelessWidget {
                       "item_out",
                       "created"
                     ]);
-
-                    for (ItemModel map
-                        in inventoryController.inventory.value.value ?? []) {
+                    for (ItemModel map in inventorySearch) {
                       rows.add([
                         map.id,
                         map.nama,
@@ -101,7 +119,7 @@ class InventoryList extends StatelessWidget {
                     File file = File(filePath);
                     File fileCsv = await file.writeAsString(csv);
                     FileSaver.instance.saveFile(
-                        name: 'due-kasir-${DateTime.now()}.csv',
+                        name: 'due-kasir-${DateTime.now().microsecond}.csv',
                         file: fileCsv);
                     // await FileSaver.instance.saveAs(
                     //     name: 'due-kasir-${DateTime.now().isUtc}',
@@ -124,40 +142,24 @@ class InventoryList extends StatelessWidget {
                   DataColumn(label: Text('Ukuran')),
                   DataColumn(label: Text('More')),
                 ],
-                rows: inventoryController.inventory.value.map(
-                    loading: () => [
-                          const DataRow(cells: [
-                            DataCell(Text('Loading')),
-                            DataCell(Text('')),
-                            DataCell(Text('')),
-                            DataCell(Text('')),
-                            DataCell(Text('')),
-                            DataCell(Text('')),
-                            DataCell(Text(''))
-                          ])
-                        ],
-                    error: (e) => Text('Error $e'),
-                    data: (data) {
-                      return [
-                        for (ItemModel item in data)
-                          DataRow(cells: [
-                            DataCell(Text(item.id.toString())),
-                            DataCell(Text(item.nama)),
-                            DataCell(Text(item.code)),
-                            DataCell(Text(item.jumlahBarang.toString())),
-                            DataCell(Text(currency.format(item.hargaJual))),
-                            DataCell(Text(item.ukuran)),
-                            DataCell(
-                              const Icon(Icons.more_horiz),
-                              onTap: () {
-                                inventoryController.inventorySelected.value =
-                                    item;
-                                context.go('/inventory/form');
-                              },
-                            ),
-                          ])
-                      ];
-                    }),
+                rows: inventorySearch
+                    .map((item) => DataRow(cells: [
+                          DataCell(Text(item.id.toString())),
+                          DataCell(Text(item.nama)),
+                          DataCell(Text(item.code)),
+                          DataCell(Text(item.jumlahBarang.toString())),
+                          DataCell(Text(currency.format(item.hargaJual))),
+                          DataCell(Text(item.ukuran)),
+                          DataCell(
+                            const Icon(Icons.more_horiz),
+                            onTap: () {
+                              inventoryController.inventorySelected.value =
+                                  item;
+                              context.go('/inventory/form');
+                            },
+                          ),
+                        ]))
+                    .toList(),
               ),
             ),
           ],

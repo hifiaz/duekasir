@@ -1,4 +1,6 @@
 import 'package:due_kasir/controller/auth_controller.dart';
+import 'package:due_kasir/controller/inventory_controller.dart';
+import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -43,7 +45,13 @@ class NavDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Inventory'),
             leading: const Icon(Icons.inventory),
-            onTap: () => context.go('/inventory'),
+            onTap: () {
+              Database().searchInventorys('').then((val) {
+                inventoryController.inventorySearch.clear();
+                inventoryController.inventorySearch.addAll(val);
+              });
+              context.go('/inventory');
+            },
           ),
           ListTile(
             title: const Text('Report'),
@@ -64,7 +72,21 @@ class NavDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Account'),
             leading: const Icon(Icons.account_circle),
-            trailing: const Icon(Icons.more_vert),
+            trailing: IconButton(
+                onPressed: () {
+                  ShadToaster.of(context).show(
+                    ShadToast(
+                      title: const Text('Restore Backup?'),
+                      description:
+                          const Text('Please pick isar file to restore'),
+                      action: ShadButton.outline(
+                        text: const Text('Select'),
+                        onPressed: () => ShadToaster.of(context).hide(),
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.more_vert)),
             onTap: () => context.go('/home'),
           ),
         ],

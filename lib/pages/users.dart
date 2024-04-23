@@ -14,28 +14,11 @@ class Users extends StatelessWidget {
         title: const Text('Users'),
         centerTitle: false,
       ),
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                const UserList(),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: FloatingActionButton(
-                      onPressed: () => context.push('/user/form'),
-                      tooltip: 'Add',
-                      child: const Icon(Icons.add),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
+      body: const UserList(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push('/user/form'),
+        tooltip: 'Add',
+        child: const Icon(Icons.add),
       ),
     );
   }

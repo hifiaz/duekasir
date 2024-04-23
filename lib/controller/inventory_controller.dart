@@ -6,6 +6,7 @@ import 'package:signals/signals_flutter.dart';
 
 class InventoryController {
   final inventory = futureSignal(() async => Database().getInventorys());
+  final inventorySearch = ListSignal<ItemModel>([]);
   final inventorySelected = signal<ItemModel?>(null);
   final csvFile = signal<File?>(null);
   final selectAll = signal<bool>(false);

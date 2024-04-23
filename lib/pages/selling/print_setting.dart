@@ -44,7 +44,19 @@ class _PrintSettingState extends State<PrintSetting> {
   }
 
   void getUsbDevices() async {
-    await _flutterThermalPrinterPlugin.getUsbDevices();
+    // _devicesStreamSubscription?.cancel();
+    try {
+      await _flutterThermalPrinterPlugin.getUsbDevices();
+      _devicesStreamSubscription = _flutterThermalPrinterPlugin.devicesStream
+          .listen((List<Printer> event) {
+        log(event.map((e) => e.name).toList().toString());
+        setState(() {
+          printers = event;
+        });
+      });
+    } catch (e) {
+      log('Failed to start scanning for devices $e');
+    }
   }
 
   @override

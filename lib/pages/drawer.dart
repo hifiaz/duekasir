@@ -81,7 +81,7 @@ class NavDrawer extends StatelessWidget {
                           const Text('Please pick isar file to restore'),
                       action: ShadButton.outline(
                         text: const Text('Select'),
-                        onPressed: () => ShadToaster.of(context).hide(),
+                        onPressed: () => Database().restoreDB(),
                       ),
                     ),
                   );

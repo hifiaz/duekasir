@@ -53,7 +53,7 @@ dependencies:
   collection: ^1.18.0
   csv: ^6.0.0
   file_picker: ^8.0.1
-  flutter_thermal_printer: ^0.0.7
+  flutter_thermal_printer: ^0.0.8
   visibility_detector: ^0.4.0+2
   file_saver: ^0.2.12
 

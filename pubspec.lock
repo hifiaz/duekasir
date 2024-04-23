@@ -388,10 +388,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_thermal_printer
-      sha256: "4782b69c0c488c5a546920068ae15014ca77e09875c4677d30d16372b944bae2"
+      sha256: addafbaeabd8352c383e57d21a3c966057e5faa095934ef5f92326ea10763c74
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.7"
+    version: "0.0.8"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -1014,10 +1014,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: a75f83f14ad81d5fe4b3319710b90dec37da0e22612326b696c9e1b8f34bbf48
+      sha256: "3923c89304b715fb1eb6423f017651664a03bf5f4b29983627c4da791f74a4ec"
       url: "https://pub.dev"
     source: hosted
-    version: "14.2.0"
+    version: "14.2.1"
   watcher:
     dependency: transitive
     description:

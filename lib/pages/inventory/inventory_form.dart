@@ -46,13 +46,10 @@ class InventoryForm extends HookConsumerWidget {
     useListenable(editingCode);
     useListenable(editingUkuran);
     return Scaffold(
-      body: Form(
-        key: _inventoryFormKey,
-        child: SingleChildScrollView(
-          child: Container(
-            decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(8), topRight: Radius.circular(8))),
+      body: SafeArea(
+        child: Form(
+          key: _inventoryFormKey,
+          child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,

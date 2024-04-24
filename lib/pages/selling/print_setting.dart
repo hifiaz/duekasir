@@ -1,349 +1,483 @@
-// ignore_for_file: depend_on_referenced_packages
-
-
-import 'package:due_kasir/controller/selling_controller.dart';
-import 'package:due_kasir/service/get_it.dart';
+import 'dart:async';
+import 'dart:developer';
+import 'dart:io';
+import 'package:esc_pos_utils/esc_pos_utils.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart';
-import 'package:signals/signals_flutter.dart';
+import 'package:print_bluetooth_thermal/post_code.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal_windows.dart';
 
 class PrintSetting extends StatefulWidget {
   const PrintSetting({super.key});
 
   @override
-  State<PrintSetting> createState() => _PrintSettingState();
+  PrintSettingState createState() => PrintSettingState();
 }
 
-class _PrintSettingState extends State<PrintSetting> {
-  // var defaultPrinterType = PrinterType.usb;
-  // var _isBle = false;
-  // var _reconnect = false;
-  // var _isConnected = false;
-  // var printerManager = PrinterManager.instance;
-  // var devices = <PrinterModel>[];
-  // StreamSubscription<PrinterDevice>? _subscription;
-  // StreamSubscription<BTStatus>? _subscriptionBtStatus;
-  // StreamSubscription<USBStatus>? _subscriptionUsbStatus;
-  // BTStatus _currentStatus = BTStatus.none;
-  // // _currentUsbStatus is only supports on Android
-  // // ignore: unused_field
-  // USBStatus _currentUsbStatus = USBStatus.none;
-  // List<int>? pendingTask;
+class PrintSettingState extends State<PrintSetting> {
+  String _info = "";
+  String _msj = '';
+  bool connected = false;
+  List<BluetoothInfo> items = [];
+  final List<String> _options = [
+    "permission bluetooth granted",
+    "bluetooth enabled",
+    "connection status",
+    "update info"
+  ];
 
-  // @override
-  // void initState() {
-  //   if (Platform.isWindows) defaultPrinterType = PrinterType.usb;
-  //   super.initState();
-  //   _scan();
+  String _selectSize = "2";
+  final _txtText = TextEditingController(text: "Hello developer");
+  bool _progress = false;
+  String _msjprogress = "";
 
-  //   // subscription to listen change status of bluetooth connection
-  //   _subscriptionBtStatus =
-  //       PrinterManager.instance.stateBluetooth.listen((status) {
-  //     log(' ----------------- status bt $status ------------------ ');
-  //     _currentStatus = status;
-  //     if (status == BTStatus.connected) {
-  //       setState(() {
-  //         _isConnected = true;
-  //       });
-  //     }
-  //     if (status == BTStatus.none) {
-  //       setState(() {
-  //         _isConnected = false;
-  //       });
-  //     }
-  //     if (status == BTStatus.connected && pendingTask != null) {
-  //       if (Platform.isAndroid) {
-  //         Future.delayed(const Duration(milliseconds: 1000), () {
-  //           PrinterManager.instance
-  //               .send(type: PrinterType.bluetooth, bytes: pendingTask!);
-  //           pendingTask = null;
-  //         });
-  //       } else if (Platform.isIOS) {
-  //         PrinterManager.instance
-  //             .send(type: PrinterType.bluetooth, bytes: pendingTask!);
-  //         pendingTask = null;
-  //       }
-  //     }
-  //   });
-  //   //  PrinterManager.instance.stateUSB is only supports on Android
-  //   _subscriptionUsbStatus = PrinterManager.instance.stateUSB.listen((status) {
-  //     log(' ----------------- status usb $status ------------------ ');
-  //     _currentUsbStatus = status;
-  //     if (Platform.isAndroid) {
-  //       if (status == USBStatus.connected && pendingTask != null) {
-  //         Future.delayed(const Duration(milliseconds: 1000), () {
-  //           PrinterManager.instance
-  //               .send(type: PrinterType.usb, bytes: pendingTask!);
-  //           pendingTask = null;
-  //         });
-  //       }
-  //     }
-  //   });
-  // }
+  String optionprinttype = "58 mm";
+  List<String> options = ["58 mm", "80 mm"];
 
-  // @override
-  // void dispose() {
-  //   _subscription?.cancel();
-  //   _subscriptionBtStatus?.cancel();
-  //   _subscriptionUsbStatus?.cancel();
-  //   super.dispose();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    initPlatformState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final selectedPrint =
-        getIt.get<SellingController>().selectedPrint.watch(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Print Setting'),
-        centerTitle: false,
-        actions: const [
-          // Padding(
-          //   padding: const EdgeInsets.only(right: 8.0),
-          //   child: ShadBadge(
-          //     text: Text(defaultPrinterType == PrinterType.bluetooth
-          //         ? _currentStatus.name
-          //         : _currentUsbStatus.name),
-          //   ),
-          // )
+        title: const Text('Plugin example app'),
+        actions: [
+          PopupMenuButton(
+            elevation: 3.2,
+            onCanceled: () {
+              log('You have not chossed anything');
+            },
+            tooltip: 'Menu',
+            onSelected: (Object select) async {
+              String sel = select as String;
+              if (sel == "permission bluetooth granted") {
+                bool status =
+                    await PrintBluetoothThermal.isPermissionBluetoothGranted;
+                setState(() {
+                  _info = "permission bluetooth granted: $status";
+                });
+                //open setting permision if not granted permision
+              } else if (sel == "bluetooth enabled") {
+                bool state = await PrintBluetoothThermal.bluetoothEnabled;
+                setState(() {
+                  _info = "Bluetooth enabled: $state";
+                });
+              } else if (sel == "update info") {
+                initPlatformState();
+              } else if (sel == "connection status") {
+                final bool result =
+                    await PrintBluetoothThermal.connectionStatus;
+                connected = result;
+                setState(() {
+                  _info = "connection status: $result";
+                });
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return _options.map((String option) {
+                return PopupMenuItem(
+                  value: option,
+                  child: Text(option),
+                );
+              }).toList();
+            },
+          )
         ],
       ),
-      body: const SizedBox(),
-      // body: Center(
-      //   child: Container(
-      //     height: double.infinity,
-      //     constraints: const BoxConstraints(maxWidth: 400),
-      //     child: SingleChildScrollView(
-      //       padding: EdgeInsets.zero,
-      //       child: Column(
-      //         children: [
-      //           Padding(
-      //             padding: const EdgeInsets.all(8.0),
-      //             child: Row(
-      //               children: [
-      //                 Expanded(
-      //                   child: ElevatedButton(
-      //                     onPressed: selectedPrint == null || _isConnected
-      //                         ? null
-      //                         : () {
-      //                             _connectDevice(selectedPrint);
-      //                           },
-      //                     child: const Text("Connect",
-      //                         textAlign: TextAlign.center),
-      //                   ),
-      //                 ),
-      //                 const SizedBox(width: 8),
-      //                 Expanded(
-      //                   child: ElevatedButton(
-      //                     onPressed: selectedPrint == null || !_isConnected
-      //                         ? null
-      //                         : () {
-      //                             if (selectedPrint.deviceName != null) {
-      //                               printerManager.disconnect(
-      //                                   type: selectedPrint.typePrinter);
-      //                             }
-      //                             setState(() => _isConnected = false);
-      //                           },
-      //                     child: const Text("Disconnect",
-      //                         textAlign: TextAlign.center),
-      //                   ),
-      //                 ),
-      //               ],
-      //             ),
-      //           ),
-      //           DropdownButtonFormField<PrinterType>(
-      //             value: defaultPrinterType,
-      //             decoration: const InputDecoration(
-      //               prefixIcon: Icon(
-      //                 Icons.print,
-      //                 size: 24,
-      //               ),
-      //               labelText: "Type Printer Device",
-      //               labelStyle: TextStyle(fontSize: 18.0),
-      //               focusedBorder: InputBorder.none,
-      //               enabledBorder: InputBorder.none,
-      //             ),
-      //             items: <DropdownMenuItem<PrinterType>>[
-      //               if (Platform.isAndroid || Platform.isIOS)
-      //                 const DropdownMenuItem(
-      //                   value: PrinterType.bluetooth,
-      //                   child: Text("bluetooth"),
-      //                 ),
-      //               if (Platform.isAndroid || Platform.isWindows)
-      //                 const DropdownMenuItem(
-      //                   value: PrinterType.usb,
-      //                   child: Text("usb"),
-      //                 ),
-      //             ],
-      //             onChanged: (PrinterType? value) {
-      //               setState(() {
-      //                 if (value != null) {
-      //                   getIt.get<SellingController>().selectedPrint.value =
-      //                       null;
-      //                   setState(() {
-      //                     defaultPrinterType = value;
-      //                     _isBle = false;
-      //                     _isConnected = false;
-      //                     _scan();
-      //                   });
-      //                 }
-      //               });
-      //             },
-      //           ),
-      //           Visibility(
-      //             visible: defaultPrinterType == PrinterType.bluetooth &&
-      //                 Platform.isAndroid,
-      //             child: SwitchListTile.adaptive(
-      //               contentPadding:
-      //                   const EdgeInsets.only(bottom: 20.0, left: 20),
-      //               title: const Text(
-      //                 "This device supports ble (low energy)",
-      //                 textAlign: TextAlign.start,
-      //                 style: TextStyle(fontSize: 19.0),
-      //               ),
-      //               value: _isBle,
-      //               onChanged: (bool? value) {
-      //                 getIt.get<SellingController>().selectedPrint.value = null;
-      //                 setState(() {
-      //                   _isBle = value ?? false;
-      //                   _isConnected = false;
-      //                   _scan();
-      //                 });
-      //               },
-      //             ),
-      //           ),
-      //           Visibility(
-      //             visible: defaultPrinterType == PrinterType.bluetooth &&
-      //                 Platform.isAndroid,
-      //             child: SwitchListTile.adaptive(
-      //               contentPadding:
-      //                   const EdgeInsets.only(bottom: 20.0, left: 20),
-      //               title: const Text(
-      //                 "reconnect",
-      //                 textAlign: TextAlign.start,
-      //                 style: TextStyle(fontSize: 19.0),
-      //               ),
-      //               value: _reconnect,
-      //               onChanged: (bool? value) {
-      //                 setState(() {
-      //                   _reconnect = value ?? false;
-      //                 });
-      //               },
-      //             ),
-      //           ),
-      //           Column(
-      //               children: devices
-      //                   .map(
-      //                     (device) => ListTile(
-      //                       title: Text('${device.deviceName}'),
-      //                       subtitle: Platform.isAndroid &&
-      //                               defaultPrinterType == PrinterType.usb
-      //                           ? null
-      //                           : Visibility(
-      //                               visible: !Platform.isWindows,
-      //                               child: Text("${device.address}")),
-      //                       onTap: () {
-      //                         // do something
-      //                         selectDevice(device, selectedPrint);
-      //                       },
-      //                       leading: selectedPrint != null &&
-      //                               ((device.typePrinter == PrinterType.usb &&
-      //                                           Platform.isWindows
-      //                                       ? device.deviceName ==
-      //                                           selectedPrint.deviceName
-      //                                       : device.vendorId != null &&
-      //                                           selectedPrint.vendorId ==
-      //                                               device.vendorId) ||
-      //                                   (device.address != null &&
-      //                                       selectedPrint.address ==
-      //                                           device.address))
-      //                           ? const Icon(
-      //                               Icons.check,
-      //                               color: Colors.green,
-      //                             )
-      //                           : null,
-      //                       // trailing: OutlinedButton(
-      //                       //   onPressed: selectedPrinter == null ||
-      //                       //           device.deviceName !=
-      //                       //               selectedPrinter?.deviceName
-      //                       //       ? null
-      //                       //       : () async {
-      //                       //           _printReceiveTest();
-      //                       //         },
-      //                       //   child: const Padding(
-      //                       //     padding: EdgeInsets.symmetric(
-      //                       //         vertical: 2, horizontal: 20),
-      //                       //     child: Text("Print test ticket",
-      //                       //         textAlign: TextAlign.center),
-      //                       //   ),
-      //                       // ),
-      //                     ),
-      //                   )
-      //                   .toList()),
-      //         ],
-      //       ),
-      //     ),
-      //   ),
-      // ),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('info: $_info\n '),
+              Text(_msj),
+              Row(
+                children: [
+                  const Text("Type print"),
+                  const SizedBox(width: 10),
+                  DropdownButton<String>(
+                    value: optionprinttype,
+                    items: options.map((String option) {
+                      return DropdownMenuItem<String>(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        optionprinttype = newValue!;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      getBluetoots();
+                    },
+                    child: Row(
+                      children: [
+                        Visibility(
+                          visible: _progress,
+                          child: const SizedBox(
+                            width: 25,
+                            height: 25,
+                            child: CircularProgressIndicator.adaptive(
+                                strokeWidth: 1, backgroundColor: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(_progress ? _msjprogress : "Search"),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: connected ? disconnect : null,
+                    child: const Text("Disconnect"),
+                  ),
+                  ElevatedButton(
+                    onPressed: connected ? printTest : null,
+                    child: const Text("Test"),
+                  ),
+                ],
+              ),
+              Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    color: Colors.grey.withOpacity(0.3),
+                  ),
+                  child: ListView.builder(
+                    itemCount: items.isNotEmpty ? items.length : 0,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        onTap: () {
+                          String mac = items[index].macAdress;
+                          connect(mac);
+                        },
+                        title: Text('Name: ${items[index].name}'),
+                        subtitle: Text("macAddress: ${items[index].macAdress}"),
+                      );
+                    },
+                  )),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  color: Colors.grey.withOpacity(0.3),
+                ),
+                child: Column(children: [
+                  const Text(
+                      "Text size without the library without external packets, print images still it should not use a library"),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _txtText,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: "Text",
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      DropdownButton<String>(
+                        hint: const Text('Size'),
+                        value: _selectSize,
+                        items: <String>['1', '2', '3', '4', '5']
+                            .map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (String? select) {
+                          setState(() {
+                            _selectSize = select.toString();
+                          });
+                        },
+                      )
+                    ],
+                  ),
+                  ElevatedButton(
+                    onPressed: connected ? printWithoutPackage : null,
+                    child: const Text("Print"),
+                  ),
+                ]),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  // void _scan() {
-  //   devices.clear();
-  //   _subscription = printerManager
-  //       .discovery(type: defaultPrinterType, isBle: _isBle)
-  //       .listen((device) {
-  //     devices.add(PrinterModel(
-  //       deviceName: device.name,
-  //       address: device.address,
-  //       isBle: _isBle,
-  //       vendorId: device.vendorId,
-  //       productId: device.productId,
-  //       typePrinter: defaultPrinterType,
-  //     ));
-  //     setState(() {});
-  //   });
-  // }
+  Future<void> initPlatformState() async {
+    String platformVersion;
+    int porcentbatery = 0;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      platformVersion = await PrintBluetoothThermal.platformVersion;
+      //print("patformversion: $platformVersion");
+      porcentbatery = await PrintBluetoothThermal.batteryLevel;
+    } on PlatformException {
+      platformVersion = 'Failed to get platform version.';
+    }
 
-  // _connectDevice(PrinterModel? selectedPrinter) async {
-  //   _isConnected = false;
-  //   if (selectedPrinter == null) return;
-  //   switch (selectedPrinter.typePrinter) {
-  //     case PrinterType.usb:
-  //       await printerManager.connect(
-  //           type: selectedPrinter.typePrinter,
-  //           model: UsbPrinterInput(
-  //               name: selectedPrinter.deviceName,
-  //               productId: selectedPrinter.productId,
-  //               vendorId: selectedPrinter.vendorId));
-  //       _isConnected = true;
-  //       break;
-  //     case PrinterType.bluetooth:
-  //       await printerManager.connect(
-  //           type: selectedPrinter.typePrinter,
-  //           model: BluetoothPrinterInput(
-  //               name: selectedPrinter.deviceName,
-  //               address: selectedPrinter.address!,
-  //               isBle: selectedPrinter.isBle ?? false,
-  //               autoConnect: _reconnect));
-  //       break;
-  //     default:
-  //   }
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
 
-  //   setState(() {});
-  // }
+    final bool result = await PrintBluetoothThermal.bluetoothEnabled;
+    log("bluetooth enabled: $result");
+    if (result) {
+      _msj = "Bluetooth enabled, please search and connect";
+    } else {
+      _msj = "Bluetooth not enabled";
+    }
 
-  // void selectDevice(PrinterModel device, PrinterModel? selectedPrinter) async {
-  //   if (selectedPrinter != null) {
-  //     if ((device.address != selectedPrinter.address) ||
-  //         (device.typePrinter == PrinterType.usb &&
-  //             selectedPrinter.vendorId != device.vendorId)) {
-  //       await PrinterManager.instance
-  //           .disconnect(type: selectedPrinter.typePrinter);
-  //     }
-  //   }
+    setState(() {
+      _info = "$platformVersion ($porcentbatery% battery)";
+    });
+  }
 
-  //   getIt.get<SellingController>().selectedPrint.value = device;
-  //   setState(() {});
-  // }
+  Future<void> getBluetoots() async {
+    setState(() {
+      _progress = true;
+      _msjprogress = "Wait";
+      items = [];
+    });
+    final List<BluetoothInfo> listResult =
+        await PrintBluetoothThermal.pairedBluetooths;
+
+    /*await Future.forEach(listResult, (BluetoothInfo bluetooth) {
+      String name = bluetooth.name;
+      String mac = bluetooth.macAdress;
+    });*/
+
+    setState(() {
+      _progress = false;
+    });
+
+    if (listResult.isEmpty) {
+      _msj =
+          "There are no bluetoohs linked, go to settings and link the printer";
+    } else {
+      _msj = "Touch an item in the list to connect";
+    }
+
+    setState(() {
+      items = listResult;
+    });
+  }
+
+  Future<void> connect(String mac) async {
+    setState(() {
+      _progress = true;
+      _msjprogress = "Connecting...";
+      connected = false;
+    });
+    final bool result =
+        await PrintBluetoothThermal.connect(macPrinterAddress: mac);
+    log("state conected $result");
+    if (result) connected = true;
+    setState(() {
+      _progress = false;
+    });
+  }
+
+  Future<void> disconnect() async {
+    final bool status = await PrintBluetoothThermal.disconnect;
+    setState(() {
+      connected = false;
+    });
+    log("status disconnect $status");
+  }
+
+  Future<void> printTest() async {
+    bool conexionStatus = await PrintBluetoothThermal.connectionStatus;
+    //print("connection status: $conexionStatus");
+    if (conexionStatus) {
+      bool result = false;
+      if (Platform.isWindows) {
+        List<int> ticket = await testWindows();
+        result = await PrintBluetoothThermalWindows.writeBytes(bytes: ticket);
+      } else {
+        List<int> ticket = await testTicket();
+        result = await PrintBluetoothThermal.writeBytes(ticket);
+      }
+      log("print test result:  $result");
+    } else {
+      log("print test conexionStatus: $conexionStatus");
+      setState(() {
+        disconnect();
+      });
+      //throw Exception("Not device connected");
+    }
+  }
+
+  Future<void> printString() async {
+    bool conexionStatus = await PrintBluetoothThermal.connectionStatus;
+    if (conexionStatus) {
+      String enter = '\n';
+      await PrintBluetoothThermal.writeBytes(enter.codeUnits);
+      //size of 1-5
+      String text = "Hello";
+      await PrintBluetoothThermal.writeString(
+          printText: PrintTextSize(size: 1, text: text));
+      await PrintBluetoothThermal.writeString(
+          printText: PrintTextSize(size: 2, text: "$text size 2"));
+      await PrintBluetoothThermal.writeString(
+          printText: PrintTextSize(size: 3, text: "$text size 3"));
+    } else {
+      //desconectado
+      log("desconectado bluetooth $conexionStatus");
+    }
+  }
+
+  Future<List<int>> testTicket() async {
+    List<int> bytes = [];
+    final profile = await CapabilityProfile.load();
+    final generator = Generator(
+        optionprinttype == "58 mm" ? PaperSize.mm58 : PaperSize.mm80, profile);
+
+    bytes += generator.reset();
+
+    bytes += generator.text(
+        'Regular: aA bB cC dD eE fF gG hH iI jJ kK lL mM nN oO pP qQ rR sS tT uU vV wW xX yY zZ');
+    bytes += generator.text('Special 1: ñÑ àÀ èÈ éÉ üÜ çÇ ôÔ',
+        styles: const PosStyles(codeTable: 'CP1252'));
+    bytes += generator.text('Special 2: blåbærgrød',
+        styles: const PosStyles(codeTable: 'CP1252'));
+
+    bytes += generator.text('Bold text', styles: const PosStyles(bold: true));
+    bytes +=
+        generator.text('Reverse text', styles: const PosStyles(reverse: true));
+    bytes += generator.text('Underlined text',
+        styles: const PosStyles(underline: true), linesAfter: 1);
+    bytes += generator.text('Align left',
+        styles: const PosStyles(align: PosAlign.left));
+    bytes += generator.text('Align center',
+        styles: const PosStyles(align: PosAlign.center));
+    bytes += generator.text('Align right',
+        styles: const PosStyles(align: PosAlign.right), linesAfter: 1);
+
+    bytes += generator.row([
+      PosColumn(
+        text: 'col3',
+        width: 3,
+        styles: const PosStyles(align: PosAlign.center, underline: true),
+      ),
+      PosColumn(
+        text: 'col6',
+        width: 6,
+        styles: const PosStyles(align: PosAlign.center, underline: true),
+      ),
+      PosColumn(
+        text: 'col3',
+        width: 3,
+        styles: const PosStyles(align: PosAlign.center, underline: true),
+      ),
+    ]);
+
+    //barcode
+
+    final List<int> barData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 4];
+    bytes += generator.barcode(Barcode.upcA(barData));
+
+    //QR code
+    bytes += generator.qrcode('example.com');
+
+    bytes += generator.text(
+      'Text size 50%',
+      styles: const PosStyles(
+        fontType: PosFontType.fontB,
+      ),
+    );
+    bytes += generator.text(
+      'Text size 100%',
+      styles: const PosStyles(
+        fontType: PosFontType.fontA,
+      ),
+    );
+    bytes += generator.text(
+      'Text size 200%',
+      styles: const PosStyles(
+        height: PosTextSize.size2,
+        width: PosTextSize.size2,
+      ),
+    );
+
+    bytes += generator.feed(2);
+    //bytes += generator.cut();
+    return bytes;
+  }
+
+  Future<List<int>> testWindows() async {
+    List<int> bytes = [];
+
+    bytes +=
+        PostCode.text(text: "Size compressed", fontSize: FontSize.compressed);
+    bytes += PostCode.text(text: "Size normal", fontSize: FontSize.normal);
+    bytes += PostCode.text(text: "Bold", bold: true);
+    bytes += PostCode.text(text: "Inverse", inverse: true);
+    bytes += PostCode.text(text: "AlignPos right", align: AlignPos.right);
+    bytes += PostCode.text(text: "Size big", fontSize: FontSize.big);
+    bytes += PostCode.enter();
+
+    //List of rows
+    bytes += PostCode.row(
+        texts: ["PRODUCT", "VALUE"],
+        proportions: [60, 40],
+        fontSize: FontSize.compressed);
+    for (int i = 0; i < 3; i++) {
+      bytes += PostCode.row(
+          texts: ["Item $i", "$i,00"],
+          proportions: [60, 40],
+          fontSize: FontSize.compressed);
+    }
+
+    bytes += PostCode.line();
+
+    bytes += PostCode.barcode(barcodeData: "123456789");
+    bytes += PostCode.qr("123456789");
+
+    bytes += PostCode.enter(nEnter: 5);
+
+    return bytes;
+  }
+
+  Future<void> printWithoutPackage() async {
+    //impresion sin paquete solo de PrintBluetoothTermal
+    bool connectionStatus = await PrintBluetoothThermal.connectionStatus;
+    if (connectionStatus) {
+      String text = "${_txtText.text}\n";
+      bool result = await PrintBluetoothThermal.writeString(
+          printText: PrintTextSize(size: int.parse(_selectSize), text: text));
+      log("status print result: $result");
+      setState(() {
+        _msj = "printed status: $result";
+      });
+    } else {
+      //no conectado, reconecte
+      setState(() {
+        _msj = "no connected device";
+      });
+      log("no conectado");
+    }
+  }
 }

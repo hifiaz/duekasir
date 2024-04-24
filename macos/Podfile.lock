@@ -4,21 +4,21 @@ PODS:
   - FlutterMacOS (1.0.0)
   - isar_flutter_libs (1.0.0):
     - FlutterMacOS
-  - network_info_plus (0.0.1):
-    - FlutterMacOS
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
   - rive_common (0.0.1):
+    - FlutterMacOS
+  - share_plus (0.0.1):
     - FlutterMacOS
 
 DEPENDENCIES:
   - file_saver (from `Flutter/ephemeral/.symlinks/plugins/file_saver/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - isar_flutter_libs (from `Flutter/ephemeral/.symlinks/plugins/isar_flutter_libs/macos`)
-  - network_info_plus (from `Flutter/ephemeral/.symlinks/plugins/network_info_plus/macos`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
   - rive_common (from `Flutter/ephemeral/.symlinks/plugins/rive_common/macos`)
+  - share_plus (from `Flutter/ephemeral/.symlinks/plugins/share_plus/macos`)
 
 EXTERNAL SOURCES:
   file_saver:
@@ -27,20 +27,20 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral
   isar_flutter_libs:
     :path: Flutter/ephemeral/.symlinks/plugins/isar_flutter_libs/macos
-  network_info_plus:
-    :path: Flutter/ephemeral/.symlinks/plugins/network_info_plus/macos
   path_provider_foundation:
     :path: Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin
   rive_common:
     :path: Flutter/ephemeral/.symlinks/plugins/rive_common/macos
+  share_plus:
+    :path: Flutter/ephemeral/.symlinks/plugins/share_plus/macos
 
 SPEC CHECKSUMS:
   file_saver: 44e6fbf666677faf097302460e214e977fdd977b
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   isar_flutter_libs: 43385c99864c168fadba7c9adeddc5d38838ca6a
-  network_info_plus: f4fbc7877ab7b3294500d9441dfa53cd54972d05
   path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
-  rive_common: 90d667125afd74095b697cf7d2d2e9c50813ec8c
+  rive_common: bcc393e1c0b3b68f0c5f972c34677b0160a97ece
+  share_plus: 36537c04ce0c3e3f5bd297ce4318b6d5ee5fd6cf
 
 PODFILE CHECKSUM: 236401fc2c932af29a9fcf0e97baeeb2d750d367
 

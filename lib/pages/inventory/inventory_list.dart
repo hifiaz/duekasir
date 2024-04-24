@@ -10,6 +10,7 @@ import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -112,20 +113,20 @@ class InventoryList extends HookWidget {
                         map.createdAt
                       ]);
                     }
-
+                    final directory = await getApplicationDocumentsDirectory();
                     String csv = const ListToCsvConverter().convert(rows);
-                    String filePath = "due-kasir.csv";
+                    String filePath = "${directory.path}/due-kasir.csv";
 
                     File file = File(filePath);
                     File fileCsv = await file.writeAsString(csv);
-                    FileSaver.instance.saveFile(
-                        name: 'due-kasir-${DateTime.now().microsecond}.csv',
-                        file: fileCsv);
-                    // await FileSaver.instance.saveAs(
-                    //     name: 'due-kasir-${DateTime.now().isUtc}',
-                    //     file: fileCsv,
-                    //     ext: 'csv',
-                    //     mimeType: MimeType.csv);
+                    if (!fileCsv.existsSync()) {
+                      fileCsv.create(recursive: true);
+                    }
+                    await FileSaver.instance.saveAs(
+                        name: 'due-kasir',
+                        file: fileCsv,
+                        ext: 'csv',
+                        mimeType: MimeType.csv);
                   },
                 ),
               ],

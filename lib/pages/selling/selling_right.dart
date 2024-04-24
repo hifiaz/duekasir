@@ -17,6 +17,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:usb_esc_printer_windows/usb_esc_printer_windows.dart'
@@ -33,12 +34,15 @@ class _SellingRightState extends ConsumerState<SellingRight> {
   final String _printerName = "Xprinter XP-T371U";
   late Future<CapabilityProfile> _profile;
   final _sellingFormKey = GlobalKey<FormState>();
+  bool isConnected = false;
 
   @override
   void initState() {
     super.initState();
     if (Platform.isWindows) {
       _profile = CapabilityProfile.load();
+    } else {
+      checkConnection();
     }
   }
 
@@ -217,11 +221,12 @@ class _SellingRightState extends ConsumerState<SellingRight> {
                   }
                 },
                 text: const Text('Print'),
-                icon: const Padding(
-                  padding:  EdgeInsets.only(right: 8),
+                icon: Padding(
+                  padding: const EdgeInsets.only(right: 8),
                   child: Icon(
-                    Icons.print,
-                    //_isConnected ? Icons.print : Icons.print_disabled,
+                    isConnected && !Platform.isWindows
+                        ? Icons.print
+                        : Icons.print_disabled,
                     size: 16,
                   ),
                 ),
@@ -231,6 +236,11 @@ class _SellingRightState extends ConsumerState<SellingRight> {
         ),
       ),
     );
+  }
+
+  void checkConnection() async {
+    isConnected = await PrintBluetoothThermal.connectionStatus;
+    setState(() {});
   }
 
   Future<void> letsPrint({
@@ -351,6 +361,8 @@ class _SellingRightState extends ConsumerState<SellingRight> {
     bytes += generator.drawer();
     if (Platform.isWindows) {
       await usb_esc_printer_windows.sendPrintRequest(bytes, _printerName);
-    } 
+    } else {
+      await PrintBluetoothThermal.writeBytes(bytes);
+    }
   }
 }

@@ -101,9 +101,9 @@ class SellingLeft extends HookConsumerWidget {
                   BarcodeKeyboardListener(
                     bufferDuration: const Duration(milliseconds: 200),
                     onBarcodeScanned: (barcode) async {
-                      final data = await Database().searchByBarcode(barcode);
+                      final data = await Database().searchByBarcode(barcode.replaceAll('½','-'));
                       if (data != null) {
-                        editingBarcode.text = barcode;
+                        editingBarcode.text = barcode.replaceAll('½','-');
                         getIt
                             .get<SellingController>()
                             .dispatch(CartItemAdded(data));

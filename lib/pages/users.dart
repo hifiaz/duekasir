@@ -16,7 +16,7 @@ class Users extends StatelessWidget {
       ),
       body: const UserList(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/user/form'),
+        onPressed: () => context.push('/users/form'),
         tooltip: 'Add',
         child: const Icon(Icons.add),
       ),

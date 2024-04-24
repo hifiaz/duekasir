@@ -86,7 +86,7 @@ class InventoryForm extends HookConsumerWidget {
                     BarcodeKeyboardListener(
                       bufferDuration: const Duration(milliseconds: 200),
                       onBarcodeScanned: (barcode) async {
-                        editingCode.text = barcode;
+                        editingCode.text = barcode.replaceAll('½','-');
                       },
                       child: const Padding(
                         padding: EdgeInsets.only(bottom: 5.0),

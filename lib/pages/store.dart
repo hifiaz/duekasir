@@ -110,7 +110,7 @@ class Store extends HookWidget {
                               text: const Text('Save'),
                               onPressed: () {
                                 if (_storeFormKey.currentState!.validate()) {
-                                  if (store.hasValue) {
+                                  if (store.value != null) {
                                     final val = StoreModel()
                                       ..id = store.value!.id
                                       ..title = title.text

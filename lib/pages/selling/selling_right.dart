@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:due_kasir/controller/selling/events.dart';
@@ -183,8 +184,7 @@ class _SellingRightState extends ConsumerState<SellingRight> {
               ShadButton(
                 onPressed: () {
                   if (_sellingFormKey.currentState!.validate() &&
-                      store.hasValue &&
-                      print != null) {
+                      store.hasValue) {
                     final newItem = PenjualanModel()
                       ..items.addAll(list.value!.items)
                       ..kasir = kasir?.id ?? 1
@@ -251,6 +251,7 @@ class _SellingRightState extends ConsumerState<SellingRight> {
     String? cash,
     String? kembalian,
   }) async {
+    log('masuk');
     final profile = await CapabilityProfile.load();
     late CapabilityProfile winProfile;
     if (Platform.isWindows) {
@@ -360,6 +361,7 @@ class _SellingRightState extends ConsumerState<SellingRight> {
     bytes += generator.cut();
     bytes += generator.drawer();
     if (Platform.isWindows) {
+      log('hello windows');
       await usb_esc_printer_windows.sendPrintRequest(bytes, _printerName);
     } else {
       await PrintBluetoothThermal.writeBytes(bytes);

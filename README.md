@@ -25,17 +25,28 @@ Prerequisite: https://flutter.dev/docs/get-started/install
 ## Features
 
 1. Inventory
+    - [x] Search item
+    - [x] list item
+    - [x] CRUD item
     - [x] Export and Import CSV Inventory
-    - [ ] Scan Barcode with external device to add item
-    - [ ] Scan barcode with mobile phone to add item
+    - [x] Scan Barcode with external device to add item
+    - [x] Scan barcode with mobile phone to add item
 2. Selling
-    - [x] Print to Thermal Printer
-    - [x] Print to open cash drawer
+    - [x] Print to Thermal Printer (windows)
+    - [x] Print to open cash drawer (windows)
     - [x] Scan Barcode with external device
     - [ ] Scan barcode with mobile phone
 3. Report
+    - [x] list transaction
+    - [x] search
 4. Customer
+    - [x] list customer
+    - [x] CRUD customer
+    - [ ] Search customer
 5. User
+    - [x] List user
+    - [x] CRUD user
+    - [ ] Search user
 6. Backup & Restore Isar
 
 * MacOS Support

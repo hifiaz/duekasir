@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.4.0-282.1.beta <4.0.0'
+  sdk: '>=3.3.3 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -48,20 +48,21 @@ dependencies:
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
   shadcn_ui: ^0.3.3
-  intl: ^0.19.0
+  intl: ^0.18.1
   equatable: ^2.0.5
   collection: ^1.18.0
   csv: ^6.0.0
   file_picker: ^8.0.1
-  flutter_pos_printer_platform_image_3: #^1.1.2
-    git:
-      url: https://github.com/E-MRE/flutter_pos_printer_platform.git
-      ref: feature/version-upgrade
+  # flutter_pos_printer_platform_image_3: #^1.1.2
+  #   git:
+  #     url: https://github.com/E-MRE/flutter_pos_printer_platform.git
+  #     ref: feature/version-upgrade
   visibility_detector: ^0.4.0+2
   flutter_barcode_listener: ^0.1.4
   file_saver: ^0.2.12
   esc_pos_utils: ^1.1.0
   simple_barcode_scanner: ^0.1.1
+  usb_esc_printer_windows: ^0.0.3
 
 dev_dependencies:
   flutter_test:

@@ -7,7 +7,6 @@ import 'package:due_kasir/controller/store_controller.dart';
 import 'package:due_kasir/enum/payment_enum.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
-import 'package:due_kasir/model/printer_model.dart';
 import 'package:due_kasir/model/store_model.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/service/get_it.dart';
@@ -16,11 +15,12 @@ import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:usb_esc_printer_windows/usb_esc_printer_windows.dart'
+    as usb_esc_printer_windows;
 
 class SellingRight extends StatefulHookConsumerWidget {
   const SellingRight({super.key});
@@ -30,62 +30,20 @@ class SellingRight extends StatefulHookConsumerWidget {
 }
 
 class _SellingRightState extends ConsumerState<SellingRight> {
+  final String _printerName = "Xprinter XP-T371U";
+  late Future<CapabilityProfile> _profile;
   final _sellingFormKey = GlobalKey<FormState>();
-  StreamSubscription<BTStatus>? _subscriptionBtStatus;
-  StreamSubscription<USBStatus>? _subscriptionUsbStatus;
-  var _isConnected = false;
-
-  BTStatus _currentStatus = BTStatus.none;
-  // ignore: unused_field
-  USBStatus _currentUsbStatus = USBStatus.none;
-  List<int>? pendingTask;
 
   @override
   void initState() {
     super.initState();
-    // subscription to listen change status of bluetooth connection
-    _subscriptionBtStatus =
-        PrinterManager.instance.stateBluetooth.listen((status) {
-      _currentStatus = status;
-      if (status == BTStatus.connected) {
-        setState(() => _isConnected = true);
-      }
-      if (status == BTStatus.none) {
-        setState(() => _isConnected = false);
-      }
-      if (status == BTStatus.connected && pendingTask != null) {
-        if (Platform.isAndroid) {
-          Future.delayed(const Duration(milliseconds: 1000), () {
-            PrinterManager.instance
-                .send(type: PrinterType.bluetooth, bytes: pendingTask!);
-            pendingTask = null;
-          });
-        } else if (Platform.isIOS) {
-          PrinterManager.instance
-              .send(type: PrinterType.bluetooth, bytes: pendingTask!);
-          pendingTask = null;
-        }
-      }
-    });
-    //  PrinterManager.instance.stateUSB is only supports on Android
-    _subscriptionUsbStatus = PrinterManager.instance.stateUSB.listen((status) {
-      _currentUsbStatus = status;
-      if (Platform.isAndroid) {
-        if (status == USBStatus.connected && pendingTask != null) {
-          Future.delayed(const Duration(milliseconds: 1000), () {
-            PrinterManager.instance
-                .send(type: PrinterType.usb, bytes: pendingTask!);
-            pendingTask = null;
-          });
-        }
-      }
-    });
+    if (Platform.isWindows) {
+      _profile = CapabilityProfile.load();
+    }
   }
 
   @override
   void dispose() {
-    _subscriptionBtStatus?.cancel();
-    _subscriptionUsbStatus?.cancel();
     super.dispose();
   }
 
@@ -234,7 +192,6 @@ class _SellingRightState extends ConsumerState<SellingRight> {
                     Database().addPenjualan(newItem).whenComplete(() {
                       letsPrint(
                         store: store.value!,
-                        print: print,
                         model: newItem,
                         kasir: kasir?.nama ?? 'Umum',
                         tipe: tipeBayar,
@@ -260,10 +217,11 @@ class _SellingRightState extends ConsumerState<SellingRight> {
                   }
                 },
                 text: const Text('Print'),
-                icon: Padding(
-                  padding: const EdgeInsets.only(right: 8),
+                icon: const Padding(
+                  padding:  EdgeInsets.only(right: 8),
                   child: Icon(
-                    _isConnected ? Icons.print : Icons.print_disabled,
+                    Icons.print,
+                    //_isConnected ? Icons.print : Icons.print_disabled,
                     size: 16,
                   ),
                 ),
@@ -277,7 +235,6 @@ class _SellingRightState extends ConsumerState<SellingRight> {
 
   Future<void> letsPrint({
     required StoreModel store,
-    required PrinterModel print,
     required PenjualanModel model,
     required String kasir,
     required TypePayment tipe,
@@ -285,7 +242,12 @@ class _SellingRightState extends ConsumerState<SellingRight> {
     String? kembalian,
   }) async {
     final profile = await CapabilityProfile.load();
-    final generator = Generator(PaperSize.mm80, profile);
+    late CapabilityProfile winProfile;
+    if (Platform.isWindows) {
+      winProfile = await _profile;
+    }
+    final generator =
+        Generator(PaperSize.mm80, Platform.isWindows ? winProfile : profile);
     List<int> bytes = [];
     // Print image:
     // final ByteData data =
@@ -387,49 +349,8 @@ class _SellingRightState extends ConsumerState<SellingRight> {
     bytes += generator.feed(2);
     bytes += generator.cut();
     bytes += generator.drawer();
-    // await _flutterThermalPrinterPlugin.send(
-    //   print,
-    //   bytes,
-    // );
-    var bluetoothPrinter = print;
-
-    switch (bluetoothPrinter.typePrinter) {
-      case PrinterType.usb:
-        bytes += generator.feed(2);
-        bytes += generator.cut();
-        await PrinterManager.instance.connect(
-            type: bluetoothPrinter.typePrinter,
-            model: UsbPrinterInput(
-                name: bluetoothPrinter.deviceName,
-                productId: bluetoothPrinter.productId,
-                vendorId: bluetoothPrinter.vendorId));
-        pendingTask = null;
-        break;
-      case PrinterType.bluetooth:
-        bytes += generator.cut();
-        await PrinterManager.instance.connect(
-            type: bluetoothPrinter.typePrinter,
-            model: BluetoothPrinterInput(
-                name: bluetoothPrinter.deviceName,
-                address: bluetoothPrinter.address!,
-                isBle: bluetoothPrinter.isBle ?? false,
-                autoConnect: true));
-        pendingTask = null;
-        if (Platform.isAndroid) pendingTask = bytes;
-        break;
-
-      default:
-    }
-    if (bluetoothPrinter.typePrinter == PrinterType.bluetooth &&
-        Platform.isAndroid) {
-      if (_currentStatus == BTStatus.connected) {
-        PrinterManager.instance
-            .send(type: bluetoothPrinter.typePrinter, bytes: bytes);
-        pendingTask = null;
-      }
-    } else {
-      PrinterManager.instance
-          .send(type: bluetoothPrinter.typePrinter, bytes: bytes);
-    }
+    if (Platform.isWindows) {
+      await usb_esc_printer_windows.sendPrintRequest(bytes, _printerName);
+    } 
   }
 }

@@ -130,7 +130,7 @@ class InventoryForm extends HookConsumerWidget {
                           placeholder: const Text('Select a Stock'),
                           initialValue: item?.jumlahBarang,
                           options: List.generate(
-                              1000,
+                              200,
                               (val) =>
                                   ShadOption(value: val, child: Text('$val'))),
                           onChanged: (val) => stock.value = val,

@@ -251,7 +251,6 @@ class _SellingRightState extends ConsumerState<SellingRight> {
     String? cash,
     String? kembalian,
   }) async {
-    log('masuk');
     final profile = await CapabilityProfile.load();
     late CapabilityProfile winProfile;
     if (Platform.isWindows) {
@@ -297,12 +296,15 @@ class _SellingRightState extends ConsumerState<SellingRight> {
       bytes += generator.text(i.nama);
       bytes += generator.row([
         PosColumn(
-          text: '${i.quantity} x ${i.hargaJual}',
+          text:
+              '${i.diskonPersen != null || i.diskonPersen != 0.0 ? '' : 'Disc'} ${i.quantity} x ${i.diskonPersen != null || i.diskonPersen != 0.0 ? i.hargaJual : i.hargaJual - i.hargaJual * (i.diskonPersen! / 100)}',
           width: 6,
           styles: const PosStyles(align: PosAlign.left),
         ),
         PosColumn(
-          text: '${i.quantity * i.hargaJual}',
+          text: i.diskonPersen != null || i.diskonPersen != 0.0
+              ? '${i.quantity * i.hargaJual}'
+              : '${i.quantity * (i.hargaJual - i.hargaJual * (i.diskonPersen! / 100))}',
           width: 6,
           styles: const PosStyles(align: PosAlign.right),
         ),

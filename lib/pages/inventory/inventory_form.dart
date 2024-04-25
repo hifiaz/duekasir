@@ -21,12 +21,16 @@ class InventoryForm extends HookConsumerWidget {
     final editingName = useTextEditingController(text: item?.nama ?? '');
     final editingCode = useTextEditingController(text: item?.code ?? '');
     final editingUkuran = useTextEditingController(text: item?.ukuran ?? '');
+    final editingDiscount =
+        useTextEditingController(text: (item?.diskonPersen ?? '').toString());
     final editingHargaDasar =
         useTextEditingController(text: (item?.hargaDasar ?? '0').toString());
     final editingHargaJualPersen = useTextEditingController(
         text: (item?.hargaJualPersen?.toInt() ?? '20').toString());
     final stock = useState(item?.jumlahBarang ?? 0);
     final hargaJual = useState(0.0);
+    final hargaJualDiscount = useState(0.0);
+
     useListenableSelector(editingHargaDasar, () {
       if (editingHargaDasar.text.isNotEmpty) {
         hargaJual.value = int.parse(
@@ -40,11 +44,26 @@ class InventoryForm extends HookConsumerWidget {
                     100);
       }
     });
+    useListenableSelector(editingDiscount, () {
+      if (editingHargaDasar.text.isNotEmpty &&
+          editingDiscount.text.isNotEmpty &&
+          hargaJual.value != 0.0) {
+        hargaJualDiscount.value = hargaJual.value -
+            hargaJual.value *
+                ((int.parse(editingDiscount.text.isEmpty
+                        ? '0'
+                        : editingDiscount.text)) /
+                    100);
+      }
+    });
+
     useListenable(editingHargaJualPersen);
     useListenable(hargaJual);
     useListenable(editingName);
     useListenable(editingCode);
     useListenable(editingUkuran);
+    useListenable(editingDiscount);
+    useListenable(hargaJualDiscount);
     return Scaffold(
       body: SafeArea(
         child: Form(
@@ -86,7 +105,7 @@ class InventoryForm extends HookConsumerWidget {
                     BarcodeKeyboardListener(
                       bufferDuration: const Duration(milliseconds: 200),
                       onBarcodeScanned: (barcode) async {
-                        editingCode.text = barcode.replaceAll('½','-');
+                        editingCode.text = barcode.replaceAll('½', '-');
                       },
                       child: const Padding(
                         padding: EdgeInsets.only(bottom: 5.0),
@@ -173,6 +192,30 @@ class InventoryForm extends HookConsumerWidget {
                     )
                   ],
                 ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ShadInputFormField(
+                        controller: editingDiscount,
+                        label: const Text('Discount Percent'),
+                        placeholder: const Text('ex. 5'),
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Harga Jual Setelah Discount'),
+                          const SizedBox(height: 20),
+                          Text(editingDiscount.text.isEmpty
+                              ? '-'
+                              : '${hargaJualDiscount.value.toInt()}'),
+                          const SizedBox(height: 15),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: Row(
@@ -185,6 +228,10 @@ class InventoryForm extends HookConsumerWidget {
                             Database()
                                 .deleteInventory(item.id)
                                 .whenComplete(() {
+                              Database().searchInventorys('').then((val) {
+                                inventoryController.inventorySearch.clear();
+                                inventoryController.inventorySearch.addAll(val);
+                              });
                               Navigator.pop(context);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -194,16 +241,7 @@ class InventoryForm extends HookConsumerWidget {
                                         'Please refresh data to see changes'),
                                     action: SnackBarAction(
                                       label: 'Refresh',
-                                      onPressed: () async {
-                                        Database()
-                                            .searchInventorys('')
-                                            .then((val) {
-                                          inventoryController.inventorySearch
-                                              .clear();
-                                          inventoryController.inventorySearch
-                                              .addAll(val);
-                                        });
-                                      },
+                                      onPressed: () async {},
                                     ),
                                   ),
                                 );
@@ -220,7 +258,7 @@ class InventoryForm extends HookConsumerWidget {
                             if (item != null) {
                               final updateitem = ItemModel()
                                 ..id = item.id
-                                ..nama = editingName.text
+                                ..nama = editingName.text.replaceAll(',', ' ')
                                 ..code = editingCode.text
                                 ..quantity = 1
                                 ..hargaJual = hargaJual.value.toInt()
@@ -229,6 +267,8 @@ class InventoryForm extends HookConsumerWidget {
                                 ..hargaJualPersen =
                                     double.parse(editingHargaJualPersen.text)
                                 ..hargaDasar = int.parse(editingHargaDasar.text)
+                                ..diskonPersen =
+                                    double.parse(editingDiscount.text)
                                 ..jumlahBarang = stock.value;
                               Database()
                                   .updateInventory(updateitem)
@@ -246,7 +286,7 @@ class InventoryForm extends HookConsumerWidget {
                               });
                             } else {
                               final newItem = ItemModel()
-                                ..nama = editingName.text
+                                ..nama = editingName.text.replaceAll(',', ' ')
                                 ..code = editingCode.text
                                 ..quantity = 1
                                 ..hargaJual = hargaJual.value.toInt()
@@ -255,6 +295,8 @@ class InventoryForm extends HookConsumerWidget {
                                 ..hargaJualPersen =
                                     double.parse(editingHargaJualPersen.text)
                                 ..hargaDasar = int.parse(editingHargaDasar.text)
+                                ..diskonPersen =
+                                    double.parse(editingDiscount.text)
                                 ..jumlahBarang = stock.value;
                               Database().addInventory(newItem).whenComplete(() {
                                 Database().searchInventorys('').then((val) {

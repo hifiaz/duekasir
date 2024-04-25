@@ -101,9 +101,10 @@ class SellingLeft extends HookConsumerWidget {
                   BarcodeKeyboardListener(
                     bufferDuration: const Duration(milliseconds: 200),
                     onBarcodeScanned: (barcode) async {
-                      final data = await Database().searchByBarcode(barcode.replaceAll('½','-'));
+                      final data = await Database()
+                          .searchByBarcode(barcode.replaceAll('½', '-'));
                       if (data != null) {
-                        editingBarcode.text = barcode.replaceAll('½','-');
+                        editingBarcode.text = barcode.replaceAll('½', '-');
                         getIt
                             .get<SellingController>()
                             .dispatch(CartItemAdded(data));
@@ -170,7 +171,22 @@ class SellingLeft extends HookConsumerWidget {
                               ),
                             ListTile(
                               title: Text(val.nama),
-                              subtitle: Text(currency.format(val.hargaJual)),
+                              subtitle: Row(
+                                children: [
+                                  Text(
+                                    currency.format(val.hargaJual),
+                                    style: TextStyle(
+                                        decoration: val.diskonPersen == null ||
+                                                val.diskonPersen == 0
+                                            ? null
+                                            : TextDecoration.lineThrough),
+                                  ),
+                                  if (val.diskonPersen != null ||
+                                      val.diskonPersen != 0)
+                                    Text(
+                                        ' >> ${currency.format(val.hargaJual - val.hargaJual * (val.diskonPersen! / 100))}'),
+                                ],
+                              ),
                               trailing: Text(val.quantity.toString()),
                               leading: IconButton(
                                   onPressed: () => showShadDialog(

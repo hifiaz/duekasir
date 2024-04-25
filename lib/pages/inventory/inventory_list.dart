@@ -141,6 +141,8 @@ class InventoryList extends HookWidget {
                   DataColumn(label: Text('Stock')),
                   DataColumn(label: Text('Harga')),
                   DataColumn(label: Text('Ukuran')),
+                  DataColumn(label: Text('Disc')),
+                  DataColumn(label: Text('H. Disc')),
                   DataColumn(label: Text('More')),
                 ],
                 rows: inventorySearch
@@ -151,6 +153,16 @@ class InventoryList extends HookWidget {
                           DataCell(Text(item.jumlahBarang.toString())),
                           DataCell(Text(currency.format(item.hargaJual))),
                           DataCell(Text(item.ukuran)),
+                          DataCell(Text(item.diskonPersen == null ||
+                                  item.diskonPersen == 0
+                              ? '-'
+                              : item.diskonPersen.toString())),
+                          DataCell(Text(item.diskonPersen == null ||
+                                  item.diskonPersen == 0
+                              ? '-'
+                              : currency.format(item.hargaJual -
+                                  item.hargaJual *
+                                      (item.diskonPersen! / 100)))),
                           DataCell(
                             const Icon(Icons.more_horiz),
                             onTap: () {

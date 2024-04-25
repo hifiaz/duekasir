@@ -122,11 +122,26 @@ class InventoryList extends HookWidget {
                     if (!fileCsv.existsSync()) {
                       fileCsv.create(recursive: true);
                     }
-                    await FileSaver.instance.saveAs(
-                        name: 'due-kasir',
-                        file: fileCsv,
-                        ext: 'csv',
-                        mimeType: MimeType.csv);
+                    if (Platform.isWindows) {
+                      FileSaver.instance
+                          .saveFile(
+                              name:
+                                  'due-kasir-${DateTime.now().millisecondsSinceEpoch}.csv',
+                              file: fileCsv)
+                          .whenComplete(
+                            () => const ShadToast(
+                              title: Text('Export CSV Success!'),
+                              description: Text(
+                                  'CSV File already on your download folder'),
+                            ),
+                          );
+                    } else {
+                      await FileSaver.instance.saveAs(
+                          name: 'due-kasir',
+                          file: fileCsv,
+                          ext: 'csv',
+                          mimeType: MimeType.csv);
+                    }
                   },
                 ),
               ],
@@ -142,7 +157,7 @@ class InventoryList extends HookWidget {
                   DataColumn(label: Text('Harga')),
                   DataColumn(label: Text('Ukuran')),
                   DataColumn(label: Text('Disc')),
-                  DataColumn(label: Text('H. Disc')),
+                  DataColumn(label: Text('H.Disc')),
                   DataColumn(label: Text('More')),
                 ],
                 rows: inventorySearch

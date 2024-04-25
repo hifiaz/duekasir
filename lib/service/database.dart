@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:due_kasir/controller/selling_controller.dart';
@@ -211,7 +212,7 @@ class Database {
       File file = File(result.files.single.path!);
       await isar.close(deleteFromDisk: true).then((_) async {
         File targetFile = await file.copy("${dbDirectory.path}/default.isar");
-        print("Correctly copied to ${targetFile.path}");
+        log("Correctly copied to ${targetFile.path}");
         await Isar.open(
           [
             ItemModelSchema,

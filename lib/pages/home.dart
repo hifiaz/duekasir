@@ -57,7 +57,12 @@ class Home extends StatelessWidget {
             icon: const Padding(
                 padding: EdgeInsets.only(right: 8), child: Icon(Icons.store)),
             text: const Text('Backup'),
-            onPressed: () async => await Database().createBackUp(),
+            onPressed: () => Database().createBackUp().whenComplete(
+                  () => const ShadToast(
+                    title: Text('Backup Database Success!'),
+                    description: Text('All your data on download folder'),
+                  ),
+                ),
           ),
           ShadButton(
             icon: const Padding(

@@ -43,7 +43,7 @@ class _SellingRightState extends ConsumerState<SellingRight> {
     if (Platform.isWindows) {
       _profile = CapabilityProfile.load();
     } else {
-      checkConnection();
+      if (!Platform.isMacOS) checkConnection();
     }
   }
 
@@ -54,7 +54,7 @@ class _SellingRightState extends ConsumerState<SellingRight> {
 
   @override
   Widget build(BuildContext context) {
-    final print = getIt.get<SellingController>().selectedPrint.watch(context);
+    // final print = getIt.get<SellingController>().selectedPrint.watch(context);
     final store = storeController.store.watch(context);
     final tipeBayar = getIt.get<SellingController>().tipeBayar.watch(context);
     final pelanggan = getIt.get<SellingController>().pelanggan.watch(context);

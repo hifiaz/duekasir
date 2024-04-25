@@ -10,7 +10,6 @@ import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/service/get_it.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:isar/isar.dart';
-import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 class Database {
@@ -204,23 +203,39 @@ class Database {
   }
 
   Future<void> restoreDB() async {
+    final dbDirectory = await getApplicationDocumentsDirectory();
     final isar = await db;
 
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
       File file = File(result.files.single.path!);
-      final dbDirectory = await getApplicationDocumentsDirectory();
+      await isar.close(deleteFromDisk: true).then((_) async {
+        File targetFile = await file.copy("${dbDirectory.path}/default.isar");
+        print("Correctly copied to ${targetFile.path}");
+        await Isar.open(
+          [
+            ItemModelSchema,
+            PembeliModelSchema,
+            PenjualanModelSchema,
+            UserModelSchema,
+            AuthModelSchema,
+            StoreModelSchema
+          ],
+          directory: dbDirectory.path,
+        );
+      });
+      // final dbDirectory = await getApplicationDocumentsDirectory();
 
-      // close the database before any changes
-      await isar.close();
+      // // close the database before any changes
+      // await isar.close();
 
-      final dbFile = file;
-      final dbPath = p.join(dbDirectory.path, 'default.isar');
+      // final dbFile = file;
+      // final dbPath = p.join(dbDirectory.path, 'default.isar');
 
-      if (await dbFile.exists()) {
-        // here we overwrite the backup file on the database file
-        await dbFile.copy(dbPath);
-      }
+      // if (await dbFile.exists()) {
+      //   // here we overwrite the backup file on the database file
+      //   await dbFile.copy(dbPath);
+      // }
     }
   }
 

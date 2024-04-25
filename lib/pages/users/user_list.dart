@@ -64,7 +64,7 @@ class UserList extends StatelessWidget {
                                 const Icon(Icons.keyboard_arrow_right_outlined),
                                 onTap: () {
                                   userController.userSelected.value = user;
-                                  context.push('/user/form');
+                                  context.push('/users/form');
                                 },
                               ),
                             ])

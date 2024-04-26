@@ -1,6 +1,19 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:esc_pos_utils/esc_pos_utils.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image/image.dart' as img;
+import 'package:intl/intl.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:signals/signals_flutter.dart';
+import 'package:usb_esc_printer_windows/usb_esc_printer_windows.dart'
+    as usb_esc_printer_windows;
+
 import 'package:due_kasir/controller/customer_controller.dart';
 import 'package:due_kasir/controller/selling/events.dart';
 import 'package:due_kasir/controller/selling_controller.dart';
@@ -13,16 +26,6 @@ import 'package:due_kasir/pages/customer/customer_sheet.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/service/get_it.dart';
 import 'package:due_kasir/utils/constant.dart';
-import 'package:esc_pos_utils/esc_pos_utils.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
-import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:signals/signals_flutter.dart';
-import 'package:usb_esc_printer_windows/usb_esc_printer_windows.dart'
-    as usb_esc_printer_windows;
 
 class SellingRight extends StatefulHookWidget {
   const SellingRight({super.key});
@@ -255,6 +258,11 @@ class SellingRightState extends State<SellingRight> {
     setState(() {});
   }
 
+  Future<Uint8List> loadImageFromAssets(String path) async {
+    final ByteData data = await rootBundle.load(path);
+    return data.buffer.asUint8List();
+  }
+
   Future<void> letsPrint({
     required StoreModel store,
     required PenjualanModel model,
@@ -272,13 +280,12 @@ class SellingRightState extends State<SellingRight> {
     final generator =
         Generator(PaperSize.mm80, Platform.isWindows ? winProfile : profile);
     List<int> bytes = [];
-    // Print image:
-    // final ByteData data =
-    //     await rootBundle.load('assets/logo.png');
-    // final Uint8List imgBytes = data.buffer.asUint8List();
-    // final image = imgs.decodeImage(imgBytes)!;
-    // bytes += generator.image(image);
-    // Print image using an alternative (obsolette) command
+    final Uint8List data = await loadImageFromAssets('assets/logo.png');
+
+    img.Image originalImage = img.decodeImage(data)!;
+
+    bytes += generator.imageRaster(originalImage, align: PosAlign.center);
+    bytes += generator.feed(1);
     // bytes += generator.imageRaster(image);
     bytes += generator.text(store.title,
         styles: const PosStyles(
@@ -291,17 +298,38 @@ class SellingRightState extends State<SellingRight> {
         styles: const PosStyles(align: PosAlign.center));
     bytes += generator.text(store.phone,
         styles: const PosStyles(align: PosAlign.center));
+    bytes += generator.feed(1);
     bytes += generator.hr();
+    bytes += generator.text(
+        'Date/Time : ${DateFormat.yMd().add_jm().format(DateTime.now())}');
+    bytes += generator.text('Cashier : $kasir');
+    bytes += generator.feed(1);
+
+    bytes += [27, 97, 0];
     bytes += generator.row([
       PosColumn(
-        text: '${DateTime.now()}',
-        width: 6,
-        styles: const PosStyles(align: PosAlign.left),
+        text: 'QTY',
+        width: 1,
+        styles: const PosStyles(
+          align: PosAlign.left,
+          bold: true,
+        ),
       ),
       PosColumn(
-        text: kasir,
-        width: 6,
-        styles: const PosStyles(align: PosAlign.right),
+        text: 'S/T/DESCRIPTION',
+        width: 8,
+        styles: const PosStyles(
+          align: PosAlign.left,
+          bold: true,
+        ),
+      ),
+      PosColumn(
+        text: 'TOTAL',
+        width: 3,
+        styles: const PosStyles(
+          align: PosAlign.left,
+          bold: true,
+        ),
       ),
     ]);
     bytes += generator.hr();
@@ -325,18 +353,17 @@ class SellingRightState extends State<SellingRight> {
     }
 
     bytes += generator.hr();
-    bytes += generator.row([
-      PosColumn(
-        text: 'Total',
-        width: 6,
-        styles: const PosStyles(align: PosAlign.left),
+    bytes += [27, 97, 2];
+    bytes += generator.text(
+      'Total ${currency.format(model.totalHarga)}',
+      styles: const PosStyles(
+        height: PosTextSize.size2,
+        bold: true,
       ),
-      PosColumn(
-        text: model.totalHarga.toString(),
-        width: 6,
-        styles: const PosStyles(align: PosAlign.right),
-      ),
-    ]);
+    );
+    bytes += [27, 97, 1];
+    bytes += generator.text('Transaction details');
+    bytes += generator.text('*****************************************');
     bytes += generator.row([
       PosColumn(
         text: 'Bayar',

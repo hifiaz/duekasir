@@ -60,6 +60,7 @@ dependencies:
   usb_esc_printer_windows: ^0.0.3
   print_bluetooth_thermal: ^1.1.0
   share_plus: ^9.0.0
+  image: ^3.3.0
 
 dev_dependencies:
   flutter_test:
@@ -87,8 +88,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/logo.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

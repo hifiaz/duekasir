@@ -192,7 +192,7 @@ class SellingLeft extends HookWidget {
                                         context: context,
                                         builder: (context) => ShadDialog.alert(
                                           title: const Text(
-                                              'Apakah kamu yakin akan menghapusnya??'),
+                                              'Apakah kamu yakin akan menghapusnya?'),
                                           description: const Padding(
                                             padding: EdgeInsets.only(bottom: 8),
                                             child: Text(

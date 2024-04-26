@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:due_kasir/controller/selling/events.dart';
@@ -9,6 +8,7 @@ import 'package:due_kasir/enum/payment_enum.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/store_model.dart';
+import 'package:due_kasir/pages/users/user_sheet.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/service/get_it.dart';
 import 'package:due_kasir/utils/constant.dart';
@@ -17,22 +17,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:usb_esc_printer_windows/usb_esc_printer_windows.dart'
     as usb_esc_printer_windows;
 
-class SellingRight extends StatefulHookConsumerWidget {
+class SellingRight extends StatefulHookWidget {
   const SellingRight({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _SellingRightState();
+  SellingRightState createState() => SellingRightState();
 }
 
-class _SellingRightState extends ConsumerState<SellingRight> {
-  final String _printerName = "Xprinter XP-T371U";
+class SellingRightState extends State<SellingRight> {
   late Future<CapabilityProfile> _profile;
   final _sellingFormKey = GlobalKey<FormState>();
   bool isConnected = false;
@@ -54,7 +52,7 @@ class _SellingRightState extends ConsumerState<SellingRight> {
 
   @override
   Widget build(BuildContext context) {
-    // final print = getIt.get<SellingController>().selectedPrint.watch(context);
+    final print = getIt.get<SellingController>().selectedPrint.watch(context);
     final store = storeController.store.watch(context);
     final tipeBayar = getIt.get<SellingController>().tipeBayar.watch(context);
     final pelanggan = getIt.get<SellingController>().pelanggan.watch(context);
@@ -89,6 +87,13 @@ class _SellingRightState extends ConsumerState<SellingRight> {
                   title: Text(pelanggan?.nama ?? 'Mommy'),
                   subtitle: const Text('Pelanggan'),
                   trailing: const Icon(Icons.arrow_right),
+                  onTap: () {
+                    showShadSheet(
+                      side: ShadSheetSide.right,
+                      context: context,
+                      builder: (context) => const UserSheet(),
+                    );
+                  },
                 ),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
@@ -195,17 +200,19 @@ class _SellingRightState extends ConsumerState<SellingRight> {
                       ..pembeli = pelanggan?.id;
                     Database().addPenjualan(newItem).whenComplete(() {
                       letsPrint(
-                        store: store.value!,
-                        model: newItem,
-                        kasir: kasir?.nama ?? 'Umum',
-                        tipe: tipeBayar,
-                        cash: cashEditing.text,
-                        kembalian: (double.parse(cashEditing.text.isNotEmpty
-                                    ? cashEditing.text
-                                    : '0') -
-                                (list.value?.totalPrice ?? 0.0))
-                            .toString(),
-                      ).whenComplete(() {
+                              store: store.value!,
+                              model: newItem,
+                              kasir: kasir?.nama ?? 'Umum',
+                              tipe: tipeBayar,
+                              cash: cashEditing.text,
+                              kembalian: (double.parse(
+                                          cashEditing.text.isNotEmpty
+                                              ? cashEditing.text
+                                              : '0') -
+                                      (list.value?.totalPrice ?? 0.0))
+                                  .toString(),
+                              printName: print)
+                          .whenComplete(() {
                         cashEditing.clear();
                         note.clear();
                         getIt.get<SellingController>().tipeBayar.value =
@@ -250,6 +257,7 @@ class _SellingRightState extends ConsumerState<SellingRight> {
     required TypePayment tipe,
     String? cash,
     String? kembalian,
+    String? printName,
   }) async {
     final profile = await CapabilityProfile.load();
     late CapabilityProfile winProfile;
@@ -362,9 +370,8 @@ class _SellingRightState extends ConsumerState<SellingRight> {
     bytes += generator.feed(2);
     bytes += generator.cut();
     bytes += generator.drawer();
-    if (Platform.isWindows) {
-      log('hello windows');
-      await usb_esc_printer_windows.sendPrintRequest(bytes, _printerName);
+    if (Platform.isWindows && printName != null) {
+      await usb_esc_printer_windows.sendPrintRequest(bytes, printName);
     } else {
       await PrintBluetoothThermal.writeBytes(bytes);
     }

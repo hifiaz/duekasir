@@ -6,17 +6,73 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
-class InventoryForm extends HookConsumerWidget {
+// class InventoryForm extends StatefulWidget {
+//   const InventoryForm({super.key});
+
+//   @override
+//   State<InventoryForm> createState() => _InventoryFormState();
+// }
+
+// class _InventoryFormState extends State<InventoryForm> {
+//   final _inventoryFormKey = GlobalKey<FormState>();
+//   final statusData = {true: 'Active', false: 'Non Active'};
+
+//   TextEditingController editingName = TextEditingController();
+//   TextEditingController editingCode = TextEditingController();
+//   TextEditingController editingUkuran = TextEditingController();
+//   TextEditingController editingDiscount = TextEditingController();
+//   TextEditingController editingHargaDasar = TextEditingController();
+//   TextEditingController editingHargaJualPersen = TextEditingController();
+//   int stock = 0;
+//   double hargaJual = 0.0;
+//   double hargaJualDiscount = 0.0;
+
+//   @override
+//   void initState() {
+//     final item = inventoryController.inventorySelected.watch(context);
+//     if (item != null) {
+//       editingName = TextEditingController(text: item.nama);
+//       editingCode = TextEditingController(text: item.code);
+//       editingUkuran = TextEditingController(text: item.ukuran);
+//       editingDiscount =
+//           TextEditingController(text: (item.diskonPersen ?? '').toString());
+//       editingHargaDasar =
+//           TextEditingController(text: item.hargaDasar.toString());
+//       editingHargaJualPersen = TextEditingController(
+//           text: (item.hargaJualPersen?.toInt() ?? '20').toString());
+//       stock = item.jumlahBarang;
+//     }
+//     super.initState();
+//   }
+
+//   @override
+//   void dispose() {
+//     editingName.dispose();
+//     editingCode.dispose();
+//     editingUkuran.dispose();
+//     editingDiscount.dispose();
+//     editingHargaDasar.dispose();
+//     editingHargaJualPersen.dispose();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final item = inventoryController.inventorySelected.watch(context);
+//     return const Placeholder();
+//   }
+// }
+
+class InventoryForm extends HookWidget {
   InventoryForm({super.key});
   final statusData = {true: 'Active', false: 'Non Active'};
   final _inventoryFormKey = GlobalKey<FormState>();
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(context) {
     final item = inventoryController.inventorySelected.watch(context);
     final editingName = useTextEditingController(text: item?.nama ?? '');
     final editingCode = useTextEditingController(text: item?.code ?? '');
@@ -50,7 +106,7 @@ class InventoryForm extends HookConsumerWidget {
           hargaJual.value != 0.0) {
         hargaJualDiscount.value = hargaJual.value -
             hargaJual.value *
-                ((int.parse(editingDiscount.text.isEmpty
+                ((double.parse(editingDiscount.text.isEmpty
                         ? '0'
                         : editingDiscount.text)) /
                     100);
@@ -160,6 +216,7 @@ class InventoryForm extends HookConsumerWidget {
                   ],
                 ),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: ShadInputFormField(
@@ -176,13 +233,14 @@ class InventoryForm extends HookConsumerWidget {
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly
                         ],
-                        label: const Text('Harga Jual Persen'),
+                        label: const Text('H Jual Persen'),
                       ),
                     ),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const SizedBox(height: 5),
                           const Text('Harga Jual'),
                           const SizedBox(height: 20),
                           Text('${hargaJual.value.toInt()}'),
@@ -197,6 +255,9 @@ class InventoryForm extends HookConsumerWidget {
                     Expanded(
                       child: ShadInputFormField(
                         controller: editingDiscount,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
                         label: const Text('Discount Percent'),
                         placeholder: const Text('ex. 5'),
                       ),
@@ -205,7 +266,7 @@ class InventoryForm extends HookConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Harga Jual Setelah Discount'),
+                          const Text('H Jual Setelah Discount'),
                           const SizedBox(height: 20),
                           Text(editingDiscount.text.isEmpty
                               ? '-'
@@ -268,7 +329,7 @@ class InventoryForm extends HookConsumerWidget {
                                     double.parse(editingHargaJualPersen.text)
                                 ..hargaDasar = int.parse(editingHargaDasar.text)
                                 ..diskonPersen =
-                                    double.parse(editingDiscount.text)
+                                    double.tryParse(editingDiscount.text)
                                 ..jumlahBarang = stock.value;
                               Database()
                                   .updateInventory(updateitem)
@@ -296,7 +357,7 @@ class InventoryForm extends HookConsumerWidget {
                                     double.parse(editingHargaJualPersen.text)
                                 ..hargaDasar = int.parse(editingHargaDasar.text)
                                 ..diskonPersen =
-                                    double.parse(editingDiscount.text)
+                                    double.tryParse(editingDiscount.text)
                                 ..jumlahBarang = stock.value;
                               Database().addInventory(newItem).whenComplete(() {
                                 Database().searchInventorys('').then((val) {

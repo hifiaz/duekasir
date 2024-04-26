@@ -1,12 +1,17 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+
+import 'package:due_kasir/controller/selling_controller.dart';
+import 'package:due_kasir/service/get_it.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:print_bluetooth_thermal/post_code.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal_windows.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:signals/signals_flutter.dart';
 
 class PrintSetting extends StatefulWidget {
   const PrintSetting({super.key});
@@ -16,6 +21,7 @@ class PrintSetting extends StatefulWidget {
 }
 
 class PrintSettingState extends State<PrintSetting> {
+  TextEditingController printName = TextEditingController();
   String _info = "";
   String _msj = '';
   bool connected = false;
@@ -37,6 +43,10 @@ class PrintSettingState extends State<PrintSetting> {
 
   @override
   void initState() {
+    final print = getIt.get<SellingController>().selectedPrint.watch(context);
+    if (print != null) {
+      printName = TextEditingController(text: print);
+    }
     super.initState();
     initPlatformState();
   }
@@ -45,7 +55,7 @@ class PrintSettingState extends State<PrintSetting> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Plugin example app'),
+        title: const Text('Print Settings'),
         actions: [
           PopupMenuButton(
             elevation: 3.2,
@@ -90,12 +100,36 @@ class PrintSettingState extends State<PrintSetting> {
         ],
       ),
       body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
         child: Container(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: ShadInputFormField(
+                      controller: printName,
+                      label: const Text('Print Name'),
+                      placeholder: const Text('Epson'),
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ShadButton(
+                        text: const Text('Save'),
+                        onPressed: () => getIt
+                            .get<SellingController>()
+                            .selectedPrint
+                            .value = printName.text,
+                      ),
+                      const SizedBox(height: 3),
+                    ],
+                  ),
+                ],
+              ),
               Text('info: $_info\n '),
               Text(_msj),
               Row(
@@ -151,6 +185,7 @@ class PrintSettingState extends State<PrintSetting> {
                   ),
                 ],
               ),
+              const SizedBox(height: 20),
               Container(
                   height: 200,
                   decoration: BoxDecoration(
@@ -159,6 +194,8 @@ class PrintSettingState extends State<PrintSetting> {
                   ),
                   child: ListView.builder(
                     itemCount: items.isNotEmpty ? items.length : 0,
+                    shrinkWrap: true,
+                    physics: const ScrollPhysics(),
                     itemBuilder: (context, index) {
                       return ListTile(
                         onTap: () {
@@ -211,6 +248,7 @@ class PrintSettingState extends State<PrintSetting> {
                       )
                     ],
                   ),
+                  const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: connected ? printWithoutPackage : null,
                     child: const Text("Print"),

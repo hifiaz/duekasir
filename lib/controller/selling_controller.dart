@@ -18,7 +18,7 @@ class SellingController {
   final tipeBayar = Signal(TypePayment.qris);
   final pelanggan = Signal<PembeliModel?>(null);
   final kasir = Signal<UserModel?>(null);
-  final selectedPrint = Signal<String?>(null);
+  final selectedPrint = Signal<String?>( "Xprinter XP-T371U");
 
   late final _cart = signal<AsyncState<Cart>>(const AsyncLoading());
   ReadonlySignal<AsyncState<Cart>> get cart => _cart;

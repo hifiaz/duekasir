@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -12,10 +11,10 @@ import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/service/get_it.dart';
 import 'package:due_kasir/utils/constant.dart';
 
-class SellingLeft extends HookConsumerWidget {
+class SellingLeft extends HookWidget {
   const SellingLeft({super.key});
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(context) {
     final editingBarcode = useTextEditingController(text: 'Scan Barcode...');
     final list = getIt.get<SellingController>().cart.watch(context);
     final isSearch = getIt.get<SellingController>().isSearch.watch(context);
@@ -181,7 +180,7 @@ class SellingLeft extends HookConsumerWidget {
                                             ? null
                                             : TextDecoration.lineThrough),
                                   ),
-                                  if (val.diskonPersen != null ||
+                                  if (val.diskonPersen != null &&
                                       val.diskonPersen != 0)
                                     Text(
                                         ' >> ${currency.format(val.hargaJual - val.hargaJual * (val.diskonPersen! / 100))}'),

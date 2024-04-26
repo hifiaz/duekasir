@@ -280,7 +280,7 @@ class SellingRightState extends State<SellingRight> {
     final generator =
         Generator(PaperSize.mm80, Platform.isWindows ? winProfile : profile);
     List<int> bytes = [];
-    final Uint8List data = await loadImageFromAssets('assets/logo.png');
+    final Uint8List data = await loadImageFromAssets('assets/langit.png');
 
     img.Image originalImage = img.decodeImage(data)!;
 
@@ -302,7 +302,7 @@ class SellingRightState extends State<SellingRight> {
     bytes += generator.hr();
     bytes += generator.text(
         'Date/Time : ${DateFormat.yMd().add_jm().format(DateTime.now())}');
-    bytes += generator.text('Cashier : $kasir');
+    bytes += generator.text('Cashier   : $kasir');
     bytes += generator.feed(1);
 
     bytes += [27, 97, 0];
@@ -317,7 +317,7 @@ class SellingRightState extends State<SellingRight> {
       ),
       PosColumn(
         text: 'S/T/DESCRIPTION',
-        width: 8,
+        width: 9,
         styles: const PosStyles(
           align: PosAlign.left,
           bold: true,
@@ -325,7 +325,7 @@ class SellingRightState extends State<SellingRight> {
       ),
       PosColumn(
         text: 'TOTAL',
-        width: 3,
+        width: 2,
         styles: const PosStyles(
           align: PosAlign.left,
           bold: true,

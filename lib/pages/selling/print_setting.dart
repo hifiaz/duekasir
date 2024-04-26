@@ -27,10 +27,10 @@ class PrintSettingState extends State<PrintSetting> {
   bool connected = false;
   List<BluetoothInfo> items = [];
   final List<String> _options = [
-    "permission bluetooth granted",
-    "bluetooth enabled",
-    "connection status",
-    "update info"
+    "Permission bluetooth granted",
+    "Bluetooth enabled",
+    "Connection status",
+    "Update info"
   ];
 
   String _selectSize = "2";
@@ -44,9 +44,7 @@ class PrintSettingState extends State<PrintSetting> {
   @override
   void initState() {
     final print = getIt.get<SellingController>().selectedPrint.watch(context);
-    if (print != null) {
-      printName = TextEditingController(text: print);
-    }
+    printName = TextEditingController(text: print);
     super.initState();
     initPlatformState();
   }
@@ -130,28 +128,39 @@ class PrintSettingState extends State<PrintSetting> {
                   ),
                 ],
               ),
-              Text('info: $_info\n '),
-              Text(_msj),
               Row(
                 children: [
-                  const Text("Type print"),
-                  const SizedBox(width: 10),
-                  DropdownButton<String>(
-                    value: optionprinttype,
-                    items: options.map((String option) {
-                      return DropdownMenuItem<String>(
-                        value: option,
-                        child: Text(option),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        optionprinttype = newValue!;
-                      });
-                    },
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Info: $_info\n '),
+                        Text(_msj),
+                      ],
+                    ),
                   ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Type Print',
+                            style: ShadTheme.of(context).textTheme.p),
+                        const SizedBox(height: 2),
+                        ShadSelect<String>(
+                          placeholder: const Text('Type Print'),
+                          initialValue: optionprinttype,
+                          options: options
+                              .map((e) => ShadOption(value: e, child: Text(e)))
+                              .toList(),
+                          selectedOptionBuilder: (context, value) =>
+                              Text(value),
+                        ),
+                      ],
+                    ),
+                  )
                 ],
               ),
+              const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -190,7 +199,8 @@ class PrintSettingState extends State<PrintSetting> {
                   height: 200,
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    color: Colors.grey.withOpacity(0.3),
+                    color:
+                        const Color.fromARGB(255, 69, 51, 51).withOpacity(0.3),
                   ),
                   child: ListView.builder(
                     itemCount: items.isNotEmpty ? items.length : 0,

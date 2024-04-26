@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:due_kasir/controller/customer_controller.dart';
 import 'package:due_kasir/controller/selling/events.dart';
 import 'package:due_kasir/controller/selling_controller.dart';
 import 'package:due_kasir/controller/store_controller.dart';
@@ -8,7 +9,7 @@ import 'package:due_kasir/enum/payment_enum.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/store_model.dart';
-import 'package:due_kasir/pages/users/user_sheet.dart';
+import 'package:due_kasir/pages/customer/customer_sheet.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/service/get_it.dart';
 import 'package:due_kasir/utils/constant.dart';
@@ -32,7 +33,6 @@ class SellingRight extends StatefulHookWidget {
 
 class SellingRightState extends State<SellingRight> {
   late Future<CapabilityProfile> _profile;
-  final _sellingFormKey = GlobalKey<FormState>();
   bool isConnected = false;
 
   @override
@@ -52,6 +52,7 @@ class SellingRightState extends State<SellingRight> {
 
   @override
   Widget build(BuildContext context) {
+    final sellingFormKey = useMemoized(GlobalKey<FormState>.new);
     final print = getIt.get<SellingController>().selectedPrint.watch(context);
     final store = storeController.store.watch(context);
     final tipeBayar = getIt.get<SellingController>().tipeBayar.watch(context);
@@ -65,7 +66,7 @@ class SellingRightState extends State<SellingRight> {
     useListenable(note);
     return SingleChildScrollView(
       child: Form(
-        key: _sellingFormKey,
+        key: sellingFormKey,
         child: ShadCard(
           title: Text('Payment', style: ShadTheme.of(context).textTheme.h4),
           description: Text('Rangkuman belanja ${store.value?.title ?? ''}'),
@@ -88,10 +89,14 @@ class SellingRightState extends State<SellingRight> {
                   subtitle: const Text('Pelanggan'),
                   trailing: const Icon(Icons.arrow_right),
                   onTap: () {
+                    Database().searchCustomers().then((val) {
+                      customerController.customer.clear();
+                      customerController.customer.addAll(val);
+                    });
                     showShadSheet(
                       side: ShadSheetSide.right,
                       context: context,
-                      builder: (context) => const UserSheet(),
+                      builder: (context) => const CustomerSheet(),
                     );
                   },
                 ),
@@ -188,7 +193,7 @@ class SellingRightState extends State<SellingRight> {
               ),
               ShadButton(
                 onPressed: () {
-                  if (_sellingFormKey.currentState!.validate() &&
+                  if (sellingFormKey.currentState!.validate() &&
                       store.hasValue) {
                     final newItem = PenjualanModel()
                       ..items.addAll(list.value!.items)

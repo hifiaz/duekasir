@@ -41,7 +41,7 @@ class SellingLeft extends HookWidget {
                           return const Iterable<ItemModel>.empty();
                         }
                         final data = await Database()
-                            .searchInventorys(textEditingValue.text);
+                            .searchInventorys(value: textEditingValue.text);
                         return data;
                       },
                       onSelected: (ItemModel value) {

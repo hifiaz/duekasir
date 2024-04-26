@@ -10,69 +10,12 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
-// class InventoryForm extends StatefulWidget {
-//   const InventoryForm({super.key});
-
-//   @override
-//   State<InventoryForm> createState() => _InventoryFormState();
-// }
-
-// class _InventoryFormState extends State<InventoryForm> {
-//   final _inventoryFormKey = GlobalKey<FormState>();
-//   final statusData = {true: 'Active', false: 'Non Active'};
-
-//   TextEditingController editingName = TextEditingController();
-//   TextEditingController editingCode = TextEditingController();
-//   TextEditingController editingUkuran = TextEditingController();
-//   TextEditingController editingDiscount = TextEditingController();
-//   TextEditingController editingHargaDasar = TextEditingController();
-//   TextEditingController editingHargaJualPersen = TextEditingController();
-//   int stock = 0;
-//   double hargaJual = 0.0;
-//   double hargaJualDiscount = 0.0;
-
-//   @override
-//   void initState() {
-//     final item = inventoryController.inventorySelected.watch(context);
-//     if (item != null) {
-//       editingName = TextEditingController(text: item.nama);
-//       editingCode = TextEditingController(text: item.code);
-//       editingUkuran = TextEditingController(text: item.ukuran);
-//       editingDiscount =
-//           TextEditingController(text: (item.diskonPersen ?? '').toString());
-//       editingHargaDasar =
-//           TextEditingController(text: item.hargaDasar.toString());
-//       editingHargaJualPersen = TextEditingController(
-//           text: (item.hargaJualPersen?.toInt() ?? '20').toString());
-//       stock = item.jumlahBarang;
-//     }
-//     super.initState();
-//   }
-
-//   @override
-//   void dispose() {
-//     editingName.dispose();
-//     editingCode.dispose();
-//     editingUkuran.dispose();
-//     editingDiscount.dispose();
-//     editingHargaDasar.dispose();
-//     editingHargaJualPersen.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final item = inventoryController.inventorySelected.watch(context);
-//     return const Placeholder();
-//   }
-// }
-
 class InventoryForm extends HookWidget {
   InventoryForm({super.key});
   final statusData = {true: 'Active', false: 'Non Active'};
-  final _inventoryFormKey = GlobalKey<FormState>();
   @override
   Widget build(context) {
+    final inventoryFormKey = useMemoized(GlobalKey<FormState>.new);
     final item = inventoryController.inventorySelected.watch(context);
     final editingName = useTextEditingController(text: item?.nama ?? '');
     final editingCode = useTextEditingController(text: item?.code ?? '');
@@ -123,7 +66,7 @@ class InventoryForm extends HookWidget {
     return Scaffold(
       body: SafeArea(
         child: Form(
-          key: _inventoryFormKey,
+          key: inventoryFormKey,
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
@@ -289,7 +232,7 @@ class InventoryForm extends HookWidget {
                             Database()
                                 .deleteInventory(item.id)
                                 .whenComplete(() {
-                              Database().searchInventorys('').then((val) {
+                              Database().searchInventorys().then((val) {
                                 inventoryController.inventorySearch.clear();
                                 inventoryController.inventorySearch.addAll(val);
                               });
@@ -313,7 +256,7 @@ class InventoryForm extends HookWidget {
                       ShadButton(
                         text: const Text('Save changes'),
                         onPressed: () {
-                          if (!_inventoryFormKey.currentState!.validate()) {
+                          if (!inventoryFormKey.currentState!.validate()) {
                             return;
                           } else {
                             if (item != null) {
@@ -336,7 +279,7 @@ class InventoryForm extends HookWidget {
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
                                   context.pop();
-                                  Database().searchInventorys('').then((val) {
+                                  Database().searchInventorys().then((val) {
                                     inventoryController.inventorySearch.clear();
                                     inventoryController.inventorySearch
                                         .addAll(val);
@@ -360,7 +303,7 @@ class InventoryForm extends HookWidget {
                                     double.tryParse(editingDiscount.text)
                                 ..jumlahBarang = stock.value;
                               Database().addInventory(newItem).whenComplete(() {
-                                Database().searchInventorys('').then((val) {
+                                Database().searchInventorys().then((val) {
                                   inventoryController.inventorySearch.clear();
                                   inventoryController.inventorySearch
                                       .addAll(val);

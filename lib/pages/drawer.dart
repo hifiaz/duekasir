@@ -1,4 +1,5 @@
 import 'package:due_kasir/controller/auth_controller.dart';
+import 'package:due_kasir/controller/customer_controller.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/date_utils.dart';
@@ -46,7 +47,7 @@ class NavDrawer extends StatelessWidget {
             title: const Text('Inventory'),
             leading: const Icon(Icons.inventory),
             onTap: () {
-              Database().searchInventorys('').then((val) {
+              Database().searchInventorys().then((val) {
                 inventoryController.inventorySearch.clear();
                 inventoryController.inventorySearch.addAll(val);
               });
@@ -66,7 +67,13 @@ class NavDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Customer'),
             leading: const Icon(Icons.people),
-            onTap: () => context.go('/customer'),
+            onTap: () {
+              Database().searchCustomers().then((val) {
+                customerController.customer.clear();
+                customerController.customer.addAll(val);
+              });
+              context.go('/customer');
+            },
           ),
           const Spacer(),
           ListTile(

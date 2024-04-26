@@ -25,12 +25,12 @@ class InventoryList extends HookWidget {
     useListenable(search);
     useListenableSelector(search, () {
       if (search.text.length > 2) {
-        Database().searchInventorys(search.text).then((val) {
+        Database().searchInventorys(value: search.text).then((val) {
           inventoryController.inventorySearch.clear();
           inventoryController.inventorySearch.addAll(val);
         });
       } else if (search.text.length == 1) {
-        Database().searchInventorys('').then((val) {
+        Database().searchInventorys().then((val) {
           inventoryController.inventorySearch.clear();
           inventoryController.inventorySearch.addAll(val);
         });

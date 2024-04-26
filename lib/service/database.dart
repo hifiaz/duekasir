@@ -93,6 +93,17 @@ class Database {
     return customer;
   }
 
+  Future<List<PembeliModel>> searchCustomers({String? value}) async {
+    final isar = await db;
+    IsarCollection<PembeliModel> customerCollection =
+        isar.collection<PembeliModel>();
+    final items = customerCollection
+        .filter()
+        .group((q) => q.namaContains(value ?? '', caseSensitive: false))
+        .findAll();
+    return items;
+  }
+
   Future<PembeliModel?> getCustomerById(int id) async {
     final isar = await db;
     IsarCollection<PembeliModel> customerCollection =
@@ -131,16 +142,16 @@ class Database {
     return items;
   }
 
-  Future<List<ItemModel>> searchInventorys(String value) async {
+  Future<List<ItemModel>> searchInventorys({String? value}) async {
     final isar = await db;
     IsarCollection<ItemModel> inventoryCollection =
         isar.collection<ItemModel>();
     final items = inventoryCollection
         .filter()
         .group((q) => q
-            .namaContains(value, caseSensitive: false)
+            .namaContains(value ?? '', caseSensitive: false)
             .or()
-            .codeContains(value, caseSensitive: false))
+            .codeContains(value ?? '', caseSensitive: false))
         .findAll();
     return items;
   }

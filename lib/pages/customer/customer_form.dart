@@ -3,6 +3,7 @@ import 'package:due_kasir/model/pembeli_model.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -14,8 +15,11 @@ class CustomerForm extends HookWidget {
   final statusData = {true: 'Active', false: 'Non Active'};
   @override
   Widget build(BuildContext context) {
+    final customerFormKey = useMemoized(GlobalKey<FormState>.new);
     final customer = customerController.customerSelected.watch(context);
     final editingName = useTextEditingController(text: customer?.nama ?? '');
+    final editingPhone =
+        useTextEditingController(text: (customer?.phone ?? '').toString());
     final editingKtp = useTextEditingController(text: customer?.ktp ?? '');
     final editingKeterangan =
         useTextEditingController(text: customer?.keterangan ?? '');
@@ -25,149 +29,172 @@ class CustomerForm extends HookWidget {
             : '');
     final lahir = useState(customer?.dob ?? DateTime.now());
     final status = useState(customer?.status ?? true);
-    return SingleChildScrollView(
-      child: Container(
-        decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8), topRight: Radius.circular(8))),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Align(
-              alignment: Alignment.centerRight,
-              child: ShadButton.ghost(
-                  text: const Text('Close'), onPressed: () => context.pop()),
-            ),
-            ShadInputFormField(
-              controller: editingName,
-              validator: (val) =>
-                  val.isEmpty == true ? 'Name is required' : null,
-              label: const Text('Nama'),
-              placeholder: const Text('Jhon Doe'),
-            ),
-            ShadInputFormField(
-              controller: editingKtp,
-              label: const Text('Identity (KTP)'),
-              placeholder: const Text('67128912038123'),
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () async {
-                      DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: customer?.dob ?? DateTime.now(),
-                          firstDate: DateTime(1950),
-                          //DateTime.now() - not to allow to choose before today.
-                          lastDate: DateTime(2100));
-
-                      if (pickedDate != null) {
-                        lahirTemp.text = dateWithoutTime.format(lahir.value);
-                        lahir.value = pickedDate;
-                      }
-                    },
-                    child: ShadInputFormField(
-                      controller: lahirTemp,
-                      label: const Text('Date of Birth'),
-                      placeholder: const Text('24-5-2003'),
-                      readOnly: true,
-                      enabled: false,
-                    ),
-                  ),
+    return Scaffold(
+      body: Form(
+        key: customerFormKey,
+        child: SingleChildScrollView(
+          child: Container(
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(8), topRight: Radius.circular(8))),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ShadButton.ghost(
+                      text: const Text('Close'),
+                      onPressed: () => context.pop()),
                 ),
-                Column(
+                ShadInputFormField(
+                  controller: editingName,
+                  validator: (val) =>
+                      val.isEmpty == true ? 'Name is required' : null,
+                  label: const Text('Nama'),
+                  placeholder: const Text('Jhon Doe'),
+                ),
+                ShadInputFormField(
+                  controller: editingPhone,
+                  label: const Text('Phone'),
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  placeholder: const Text('ex: 085648129312'),
+                ),
+                ShadInputFormField(
+                  controller: editingKtp,
+                  label: const Text('Identity (KTP)'),
+                  placeholder: const Text('67128912038123'),
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    ShadSelect<bool>(
-                      initialValue: customer?.status,
-                      placeholder: const Text('Select a Status'),
-                      options: [
-                        ...statusData.entries.map(
-                          (e) => ShadOption(
-                            value: e.key,
-                            child: Text(e.value),
-                          ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: customer?.dob ?? DateTime.now(),
+                              firstDate: DateTime(1950),
+                              //DateTime.now() - not to allow to choose before today.
+                              lastDate: DateTime(2100));
+
+                          if (pickedDate != null) {
+                            lahirTemp.text =
+                                dateWithoutTime.format(lahir.value);
+                            lahir.value = pickedDate;
+                          }
+                        },
+                        child: ShadInputFormField(
+                          controller: lahirTemp,
+                          label: const Text('Date of Birth'),
+                          placeholder: const Text('24-5-2003'),
+                          readOnly: true,
+                          enabled: false,
                         ),
-                      ],
-                      onChanged: (bool? value) => status.value = value!,
-                      selectedOptionBuilder: (context, value) =>
-                          Text(statusData[value]!),
+                      ),
                     ),
-                    const SizedBox(height: 5),
+                    Column(
+                      children: [
+                        ShadSelect<bool>(
+                          initialValue: customer?.status,
+                          placeholder: const Text('Select a Status'),
+                          options: [
+                            ...statusData.entries.map(
+                              (e) => ShadOption(
+                                value: e.key,
+                                child: Text(e.value),
+                              ),
+                            ),
+                          ],
+                          onChanged: (bool? value) => status.value = value!,
+                          selectedOptionBuilder: (context, value) =>
+                              Text(statusData[value]!),
+                        ),
+                        const SizedBox(height: 5),
+                      ],
+                    ),
                   ],
                 ),
+                ShadInputFormField(
+                  controller: editingKeterangan,
+                  maxLines: 3,
+                  label: const Text('Description'),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (customer != null)
+                        ShadButton.destructive(
+                          text: const Text('Delete'),
+                          onPressed: () {
+                            Database()
+                                .deleteCustomer(customer.id)
+                                .whenComplete(() {
+                              Database().searchCustomers().then((val) {
+                                customerController.customer.clear();
+                                customerController.customer.addAll(val);
+                              });
+                              Navigator.pop(context);
+                            });
+                          },
+                        ),
+                      ShadButton(
+                        text: const Text('Save changes'),
+                        onPressed: () {
+                          if (customerFormKey.currentState!.validate()) {
+                            if (customer != null) {
+                              final updateCustomer = PembeliModel()
+                                ..id = customer.id
+                                ..nama = editingName.text
+                                ..dob = lahir.value
+                                ..ktp = editingKtp.text
+                                ..status = status.value
+                                ..phone = editingPhone.text
+                                ..keterangan = editingKeterangan.text;
+                              Database()
+                                  .updateCustomer(updateCustomer)
+                                  .whenComplete(() {
+                                Future.delayed(Durations.short1).then((_) {
+                                  Database().searchCustomers().then((val) {
+                                    customerController.customer.clear();
+                                    customerController.customer.addAll(val);
+                                  });
+                                  context.pop();
+                                });
+                              });
+                            } else {
+                              final newCustomer = PembeliModel()
+                                ..nama = editingName.text
+                                ..dob = lahir.value
+                                ..ktp = editingKtp.text
+                                ..status = status.value
+                                ..phone = editingPhone.text
+                                ..keterangan = editingKeterangan.text
+                                ..masuk = DateTime.now();
+                              Database()
+                                  .addNewCustomer(newCustomer)
+                                  .whenComplete(() {
+                                Database().searchCustomers().then((val) {
+                                  customerController.customer.clear();
+                                  customerController.customer.addAll(val);
+                                });
+                                context.pop();
+                              });
+                            }
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
               ],
             ),
-            ShadInputFormField(
-              controller: editingKeterangan,
-              maxLines: 3,
-              label: const Text('Description'),
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (customer != null)
-                    ShadButton.destructive(
-                      text: const Text('Delete'),
-                      onPressed: () {
-                        Database().deleteCustomer(customer.id).whenComplete(() {
-                          customerController.customer.refresh();
-                          Navigator.pop(context);
-                        });
-                      },
-                    ),
-                  ShadButton(
-                    text: const Text('Save changes'),
-                    onPressed: () {
-                      if (editingName.text.isEmpty) {
-                        return;
-                      } else {
-                        if (customer != null) {
-                          final updateCustomer = PembeliModel()
-                            ..id = customer.id
-                            ..nama = editingName.text
-                            ..dob = lahir.value
-                            ..ktp = editingKtp.text
-                            ..status = status.value
-                            ..keterangan = editingKeterangan.text;
-                          Database()
-                              .updateCustomer(updateCustomer)
-                              .whenComplete(() {
-                            Future.delayed(Durations.short1).then((_) {
-                              customerController.customer.refresh();
-                              context.pop();
-                            });
-                          });
-                        } else {
-                          final newCustomer = PembeliModel()
-                            ..id = customer!.id
-                            ..nama = editingName.text
-                            ..dob = lahir.value
-                            ..ktp = editingKtp.text
-                            ..status = status.value
-                            ..keterangan = editingKeterangan.text
-                            ..masuk = DateTime.now();
-                          Database()
-                              .addNewCustomer(newCustomer)
-                              .whenComplete(() {
-                            customerController.customer.reset();
-                            context.pop();
-                          });
-                        }
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-          ],
+          ),
         ),
       ),
     );

@@ -15,9 +15,11 @@ class Cart extends Equatable {
         0,
         (total, current) =>
             total +
-            (current.diskonPersen == null && current.diskonPersen == 0.0
+            (current.diskonPersen == null
                 ? (current.quantity * current.hargaJual)
-                : (current.quantity * (current.hargaJual - current.hargaJual * (current.diskonPersen! / 100)))));
+                : (current.quantity *
+                    (current.hargaJual -
+                        current.hargaJual * (current.diskonPersen! / 100)))));
   }
 
   @override

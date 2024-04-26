@@ -19,7 +19,7 @@ class Inventory extends StatelessWidget {
         actions: [
           ShadButton.ghost(
             onPressed: () {
-              Database().searchInventorys('').then((val) {
+              Database().searchInventorys().then((val) {
                 inventoryController.inventorySearch.clear();
                 inventoryController.inventorySearch.addAll(val);
               });

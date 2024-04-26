@@ -18,7 +18,7 @@ class SellingController {
   final tipeBayar = Signal(TypePayment.qris);
   final pelanggan = Signal<PembeliModel?>(null);
   final kasir = Signal<UserModel?>(null);
-  final selectedPrint = Signal<String?>( "Xprinter XP-T371U");
+  final selectedPrint = Signal<String>("Xprinter XP-T371U");
 
   late final _cart = signal<AsyncState<Cart>>(const AsyncLoading());
   ReadonlySignal<AsyncState<Cart>> get cart => _cart;
@@ -81,7 +81,7 @@ class SellingController {
       await Database().updateInventory(item);
     });
     Future.delayed(Durations.short1).then((_) {
-      Database().searchInventorys('').then((val) {
+      Database().searchInventorys().then((val) {
         inventoryController.inventorySearch.clear();
         inventoryController.inventorySearch.addAll(val);
       });

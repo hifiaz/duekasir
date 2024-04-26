@@ -6,6 +6,7 @@ part 'pembeli_model.g.dart';
 class PembeliModel {
   Id id = Isar.autoIncrement;
   late String nama;
+  String? phone;
   String? ktp;
   late DateTime? dob;
   String? keterangan;

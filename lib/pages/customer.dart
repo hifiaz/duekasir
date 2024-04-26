@@ -17,7 +17,7 @@ class Customer extends HookWidget {
       ),
       body: const CustomerList(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/customer/from'),
+        onPressed: () => context.push('/customer/form'),
         tooltip: 'Add',
         child: const Icon(Icons.add),
       ),

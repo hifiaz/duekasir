@@ -47,8 +47,13 @@ const PembeliModelSchema = CollectionSchema(
       name: r'nama',
       type: IsarType.string,
     ),
-    r'status': PropertySchema(
+    r'phone': PropertySchema(
       id: 6,
+      name: r'phone',
+      type: IsarType.string,
+    ),
+    r'status': PropertySchema(
+      id: 7,
       name: r'status',
       type: IsarType.bool,
     )
@@ -86,6 +91,12 @@ int _pembeliModelEstimateSize(
     }
   }
   bytesCount += 3 + object.nama.length * 3;
+  {
+    final value = object.phone;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -101,7 +112,8 @@ void _pembeliModelSerialize(
   writer.writeString(offsets[3], object.ktp);
   writer.writeDateTime(offsets[4], object.masuk);
   writer.writeString(offsets[5], object.nama);
-  writer.writeBool(offsets[6], object.status);
+  writer.writeString(offsets[6], object.phone);
+  writer.writeBool(offsets[7], object.status);
 }
 
 PembeliModel _pembeliModelDeserialize(
@@ -118,7 +130,8 @@ PembeliModel _pembeliModelDeserialize(
   object.ktp = reader.readStringOrNull(offsets[3]);
   object.masuk = reader.readDateTimeOrNull(offsets[4]);
   object.nama = reader.readString(offsets[5]);
-  object.status = reader.readBool(offsets[6]);
+  object.phone = reader.readStringOrNull(offsets[6]);
+  object.status = reader.readBool(offsets[7]);
   return object;
 }
 
@@ -142,6 +155,8 @@ P _pembeliModelDeserializeProp<P>(
     case 5:
       return (reader.readString(offset)) as P;
     case 6:
+      return (reader.readStringOrNull(offset)) as P;
+    case 7:
       return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -931,6 +946,158 @@ extension PembeliModelQueryFilter
     });
   }
 
+  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+      phoneIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'phone',
+      ));
+    });
+  }
+
+  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+      phoneIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'phone',
+      ));
+    });
+  }
+
+  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> phoneEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'phone',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+      phoneGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'phone',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> phoneLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'phone',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> phoneBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'phone',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+      phoneStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'phone',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> phoneEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'phone',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> phoneContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'phone',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> phoneMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'phone',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+      phoneIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'phone',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+      phoneIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'phone',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> statusEqualTo(
       bool value) {
     return QueryBuilder.apply(this, (query) {
@@ -1020,6 +1187,18 @@ extension PembeliModelQuerySortBy
   QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByNamaDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nama', Sort.desc);
+    });
+  }
+
+  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByPhone() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'phone', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByPhoneDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'phone', Sort.desc);
     });
   }
 
@@ -1123,6 +1302,18 @@ extension PembeliModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByPhone() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'phone', Sort.asc);
+    });
+  }
+
+  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByPhoneDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'phone', Sort.desc);
+    });
+  }
+
   QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByStatus() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'status', Sort.asc);
@@ -1177,6 +1368,13 @@ extension PembeliModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<PembeliModel, PembeliModel, QDistinct> distinctByPhone(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'phone', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<PembeliModel, PembeliModel, QDistinct> distinctByStatus() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'status');
@@ -1225,6 +1423,12 @@ extension PembeliModelQueryProperty
   QueryBuilder<PembeliModel, String, QQueryOperations> namaProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'nama');
+    });
+  }
+
+  QueryBuilder<PembeliModel, String?, QQueryOperations> phoneProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'phone');
     });
   }
 

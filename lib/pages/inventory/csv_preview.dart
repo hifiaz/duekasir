@@ -53,7 +53,7 @@ class _CsvPreviewState extends State<CsvPreview> {
             onPressed: () => d.isNotEmpty
                 ? Database().addAllInventory(d).whenComplete(() {
                     inventoryController.listItemFromCsv.clear();
-                    Database().searchInventorys('').then((val) {
+                    Database().searchInventorys().then((val) {
                       inventoryController.inventorySearch.clear();
                       inventoryController.inventorySearch.addAll(val);
                     });
@@ -87,8 +87,7 @@ class _CsvPreviewState extends State<CsvPreview> {
                           value: selectAll,
                           onChanged: (v) {
                             if (v) {
-                              inventoryController.listItemFromCsv
-                                  .addAll(data);
+                              inventoryController.listItemFromCsv.addAll(data);
                             } else {
                               inventoryController.listItemFromCsv.clear();
                             }
@@ -132,8 +131,7 @@ class _CsvPreviewState extends State<CsvPreview> {
                                       .removeWhere(
                                           (val) => val.code == item.code);
                                 } else {
-                                  inventoryController.listItemFromCsv
-                                      .add(item);
+                                  inventoryController.listItemFromCsv.add(item);
                                 }
                               },
                             ),

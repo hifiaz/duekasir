@@ -212,7 +212,7 @@ class SellingRightState extends State<SellingRight> {
                               model: newItem,
                               kasir: kasir?.nama ?? 'Umum',
                               tipe: tipeBayar,
-                              cash: cashEditing.text,
+                              total: cashEditing.text,
                               kembalian: (double.parse(
                                           cashEditing.text.isNotEmpty
                                               ? cashEditing.text
@@ -268,7 +268,7 @@ class SellingRightState extends State<SellingRight> {
     required PenjualanModel model,
     required String kasir,
     required TypePayment tipe,
-    String? cash,
+    String? total,
     String? kembalian,
     String? printName,
   }) async {
@@ -280,7 +280,7 @@ class SellingRightState extends State<SellingRight> {
     final generator =
         Generator(PaperSize.mm80, Platform.isWindows ? winProfile : profile);
     List<int> bytes = [];
-    final Uint8List data = await loadImageFromAssets('assets/langit.png');
+    final Uint8List data = await loadImageFromAssets('assets/logo.jpeg');
 
     img.Image originalImage = img.decodeImage(data)!;
 
@@ -371,7 +371,7 @@ class SellingRightState extends State<SellingRight> {
         styles: const PosStyles(align: PosAlign.left),
       ),
       PosColumn(
-        text: tipe == TypePayment.cash ? cash! : tipe.name,
+        text: tipe == TypePayment.cash ? total! : tipe.name,
         width: 6,
         styles: const PosStyles(align: PosAlign.right),
       ),

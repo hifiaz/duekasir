@@ -17,11 +17,27 @@ class Inventory extends StatelessWidget {
         title: const Text('Inventory'),
         centerTitle: false,
         actions: [
-          TextButton(
-              onPressed: () => Database().checkIsInventorySynced(),
-              child: const Text('Sync')),
-          TextButton(
-              onPressed: () {
+          ShadButton.ghost(
+            onPressed: () {
+              Database().searchInventorys().then((val) {
+                inventoryController.inventorys.clear();
+                inventoryController.inventorys.addAll(val);
+              });
+            },
+            text: const Text('Refresh'),
+            icon: const Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Icon(
+                Icons.refresh,
+                size: 16,
+              ),
+            ),
+          ),
+          PopupMenuButton<String>(
+            onSelected: (item) async {
+              if (item == 'sync') {
+                Database().checkIsInventorySynced();
+              } else if (item == 'clear') {
                 showShadDialog(
                   context: context,
                   builder: (context) => ShadDialog.alert(
@@ -49,24 +65,19 @@ class Inventory extends StatelessWidget {
                     ],
                   ),
                 );
-              },
-              child: const Text('Clear')),
-          ShadButton.ghost(
-            onPressed: () {
-              Database().searchInventorys().then((val) {
-                inventoryController.inventorys.clear();
-                inventoryController.inventorys.addAll(val);
-              });
+              }
             },
-            text: const Text('Refresh'),
-            icon: const Padding(
-              padding: EdgeInsets.only(right: 8),
-              child: Icon(
-                Icons.refresh,
-                size: 16,
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'sync',
+                child: Text('Restore'),
               ),
-            ),
-          )
+              const PopupMenuItem<String>(
+                value: 'clear',
+                child: Text('Clear'),
+              ),
+            ],
+          ),
         ],
       ),
       body: const InventoryList(),

@@ -147,49 +147,63 @@ class InventoryList extends HookWidget {
               ],
             ),
             const SizedBox(height: 20),
-            Watch(
-              (context) => DataTable(
-                columns: const [
-                  DataColumn(label: Text('ID')),
-                  DataColumn(label: Text('Nama')),
-                  DataColumn(label: Text('Code')),
-                  DataColumn(label: Text('Stock')),
-                  DataColumn(label: Text('Harga')),
-                  DataColumn(label: Text('Ukuran')),
-                  DataColumn(label: Text('Disc')),
-                  DataColumn(label: Text('H.Disc')),
-                  DataColumn(label: Text('More')),
-                ],
-                rows: inventorySearch
-                    .map((item) => DataRow(cells: [
-                          DataCell(Text(item.id.toString())),
-                          DataCell(Text(item.nama)),
-                          DataCell(Text(item.code)),
-                          DataCell(Text(item.jumlahBarang.toString())),
-                          DataCell(Text(currency.format(item.hargaJual))),
-                          DataCell(Text(item.ukuran)),
-                          DataCell(Text(item.diskonPersen == null ||
-                                  item.diskonPersen == 0
-                              ? '-'
-                              : item.diskonPersen.toString())),
-                          DataCell(Text(item.diskonPersen == null ||
-                                  item.diskonPersen == 0
-                              ? '-'
-                              : currency.format(item.hargaJual -
-                                  item.hargaJual *
-                                      (item.diskonPersen! / 100)))),
-                          DataCell(
-                            const Icon(Icons.more_horiz),
-                            onTap: () {
-                              inventoryController.inventorySelected.value =
-                                  item;
-                              context.go('/inventory/form');
-                            },
-                          ),
-                        ]))
-                    .toList(),
+            if (Platform.isAndroid)
+              for (ItemModel i in inventorySearch)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Text(i.id.toString()),
+                  title: Text(i.nama),
+                  subtitle: Text('${currency.format(i.hargaJual)} - ${i.code}'),
+                  trailing: const Icon(Icons.arrow_right_outlined),
+                  onTap: () {
+                    inventoryController.inventorySelected.value = i;
+                    context.go('/inventory/form');
+                  },
+                )
+            else
+              Watch(
+                (context) => DataTable(
+                  columns: const [
+                    DataColumn(label: Text('ID')),
+                    DataColumn(label: Text('Nama')),
+                    DataColumn(label: Text('Code')),
+                    DataColumn(label: Text('Stock')),
+                    DataColumn(label: Text('Harga')),
+                    DataColumn(label: Text('Ukuran')),
+                    DataColumn(label: Text('Disc')),
+                    DataColumn(label: Text('H.Disc')),
+                    DataColumn(label: Text('More')),
+                  ],
+                  rows: inventorySearch
+                      .map((item) => DataRow(cells: [
+                            DataCell(Text(item.id.toString())),
+                            DataCell(Text(item.nama)),
+                            DataCell(Text(item.code)),
+                            DataCell(Text(item.jumlahBarang.toString())),
+                            DataCell(Text(currency.format(item.hargaJual))),
+                            DataCell(Text(item.ukuran)),
+                            DataCell(Text(item.diskonPersen == null ||
+                                    item.diskonPersen == 0
+                                ? '-'
+                                : item.diskonPersen.toString())),
+                            DataCell(Text(item.diskonPersen == null ||
+                                    item.diskonPersen == 0
+                                ? '-'
+                                : currency.format(item.hargaJual -
+                                    item.hargaJual *
+                                        (item.diskonPersen! / 100)))),
+                            DataCell(
+                              const Icon(Icons.more_horiz),
+                              onTap: () {
+                                inventoryController.inventorySelected.value =
+                                    item;
+                                context.go('/inventory/form');
+                              },
+                            ),
+                          ]))
+                      .toList(),
+                ),
               ),
-            ),
           ],
         ),
       ),

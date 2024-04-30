@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -10,6 +12,7 @@ import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/service/get_it.dart';
 import 'package:due_kasir/utils/constant.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class SellingLeft extends HookWidget {
   const SellingLeft({super.key});
@@ -26,6 +29,40 @@ class SellingLeft extends HookWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                if (Platform.isAndroid)
+                  ShadButton.ghost(
+                    icon: const Icon(Icons.camera_alt),
+                    onPressed: () async {
+                      var res = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const SimpleBarcodeScannerPage(),
+                          ));
+                      final data = await Database().searchByBarcode(res);
+                      if (data != null) {
+                        editingBarcode.text = res;
+                        getIt
+                            .get<SellingController>()
+                            .dispatch(CartItemAdded(data));
+                      } else {
+                        if (context.mounted) {
+                          ShadToaster.of(context).show(
+                            ShadToast(
+                              backgroundColor: Colors.red,
+                              title: const Text('Item Not Found'),
+                              description:
+                                  const Text('You can add it on inventory'),
+                              action: ShadButton.outline(
+                                text: const Text('Ok'),
+                                onPressed: () => ShadToaster.of(context).hide(),
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                  ),
                 IconButton(
                   color: !isSearch ? Colors.blue : null,
                   onPressed: () =>

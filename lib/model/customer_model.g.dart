@@ -27,33 +27,38 @@ const CustomerModelSchema = CollectionSchema(
       name: r'dob',
       type: IsarType.dateTime,
     ),
-    r'keterangan': PropertySchema(
+    r'isSynced': PropertySchema(
       id: 2,
+      name: r'isSynced',
+      type: IsarType.bool,
+    ),
+    r'keterangan': PropertySchema(
+      id: 3,
       name: r'keterangan',
       type: IsarType.string,
     ),
     r'ktp': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'ktp',
       type: IsarType.string,
     ),
     r'masuk': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'masuk',
       type: IsarType.dateTime,
     ),
     r'nama': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'nama',
       type: IsarType.string,
     ),
     r'phone': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'phone',
       type: IsarType.string,
     ),
     r'status': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'status',
       type: IsarType.bool,
     )
@@ -108,12 +113,13 @@ void _customerModelSerialize(
 ) {
   writer.writeDateTime(offsets[0], object.createdAt);
   writer.writeDateTime(offsets[1], object.dob);
-  writer.writeString(offsets[2], object.keterangan);
-  writer.writeString(offsets[3], object.ktp);
-  writer.writeDateTime(offsets[4], object.masuk);
-  writer.writeString(offsets[5], object.nama);
-  writer.writeString(offsets[6], object.phone);
-  writer.writeBool(offsets[7], object.status);
+  writer.writeBool(offsets[2], object.isSynced);
+  writer.writeString(offsets[3], object.keterangan);
+  writer.writeString(offsets[4], object.ktp);
+  writer.writeDateTime(offsets[5], object.masuk);
+  writer.writeString(offsets[6], object.nama);
+  writer.writeString(offsets[7], object.phone);
+  writer.writeBool(offsets[8], object.status);
 }
 
 CustomerModel _customerModelDeserialize(
@@ -122,16 +128,18 @@ CustomerModel _customerModelDeserialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = CustomerModel();
-  object.createdAt = reader.readDateTime(offsets[0]);
-  object.dob = reader.readDateTimeOrNull(offsets[1]);
-  object.id = id;
-  object.keterangan = reader.readStringOrNull(offsets[2]);
-  object.ktp = reader.readStringOrNull(offsets[3]);
-  object.masuk = reader.readDateTimeOrNull(offsets[4]);
-  object.nama = reader.readString(offsets[5]);
-  object.phone = reader.readStringOrNull(offsets[6]);
-  object.status = reader.readBool(offsets[7]);
+  final object = CustomerModel(
+    createdAt: reader.readDateTimeOrNull(offsets[0]) ?? DateTime.now(),
+    dob: reader.readDateTimeOrNull(offsets[1]),
+    id: id,
+    isSynced: reader.readBoolOrNull(offsets[2]) ?? true,
+    keterangan: reader.readStringOrNull(offsets[3]),
+    ktp: reader.readStringOrNull(offsets[4]),
+    masuk: reader.readDateTimeOrNull(offsets[5]),
+    nama: reader.readString(offsets[6]),
+    phone: reader.readStringOrNull(offsets[7]),
+    status: reader.readBool(offsets[8]),
+  );
   return object;
 }
 
@@ -143,20 +151,22 @@ P _customerModelDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readDateTimeOrNull(offset) ?? DateTime.now()) as P;
     case 1:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 2:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readBoolOrNull(offset) ?? true) as P;
     case 3:
       return (reader.readStringOrNull(offset)) as P;
     case 4:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 5:
-      return (reader.readString(offset)) as P;
-    case 6:
       return (reader.readStringOrNull(offset)) as P;
+    case 5:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 6:
+      return (reader.readString(offset)) as P;
     case 7:
+      return (reader.readStringOrNull(offset)) as P;
+    case 8:
       return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -164,7 +174,7 @@ P _customerModelDeserializeProp<P>(
 }
 
 Id _customerModelGetId(CustomerModel object) {
-  return object.id;
+  return object.id ?? Isar.autoIncrement;
 }
 
 List<IsarLinkBase<dynamic>> _customerModelGetLinks(CustomerModel object) {
@@ -387,8 +397,25 @@ extension CustomerModelQueryFilter
     });
   }
 
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> idIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'id',
+      ));
+    });
+  }
+
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      idIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'id',
+      ));
+    });
+  }
+
   QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> idEqualTo(
-      Id value) {
+      Id? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
@@ -399,7 +426,7 @@ extension CustomerModelQueryFilter
 
   QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       idGreaterThan(
-    Id value, {
+    Id? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -412,7 +439,7 @@ extension CustomerModelQueryFilter
   }
 
   QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> idLessThan(
-    Id value, {
+    Id? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -425,8 +452,8 @@ extension CustomerModelQueryFilter
   }
 
   QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> idBetween(
-    Id lower,
-    Id upper, {
+    Id? lower,
+    Id? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -437,6 +464,16 @@ extension CustomerModelQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      isSyncedEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isSynced',
+        value: value,
       ));
     });
   }
@@ -1154,6 +1191,19 @@ extension CustomerModelQuerySortBy
     });
   }
 
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByIsSynced() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isSynced', Sort.asc);
+    });
+  }
+
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy>
+      sortByIsSyncedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isSynced', Sort.desc);
+    });
+  }
+
   QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByKeterangan() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'keterangan', Sort.asc);
@@ -1267,6 +1317,19 @@ extension CustomerModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByIsSynced() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isSynced', Sort.asc);
+    });
+  }
+
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy>
+      thenByIsSyncedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isSynced', Sort.desc);
+    });
+  }
+
   QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByKeterangan() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'keterangan', Sort.asc);
@@ -1355,6 +1418,12 @@ extension CustomerModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<CustomerModel, CustomerModel, QDistinct> distinctByIsSynced() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isSynced');
+    });
+  }
+
   QueryBuilder<CustomerModel, CustomerModel, QDistinct> distinctByKeterangan(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1413,6 +1482,12 @@ extension CustomerModelQueryProperty
   QueryBuilder<CustomerModel, DateTime?, QQueryOperations> dobProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'dob');
+    });
+  }
+
+  QueryBuilder<CustomerModel, bool, QQueryOperations> isSyncedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isSynced');
     });
   }
 

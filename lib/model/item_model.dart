@@ -18,7 +18,7 @@ class ItemModel {
   bool isHargaJualPersen;
   DateTime? barangMasuk;
   DateTime? barangKeluar;
-  DateTime? createdAt = DateTime.now();
+  DateTime? createdAt;
   bool isSynced;
 
   ItemModel({
@@ -56,6 +56,7 @@ class ItemModel {
       'isHargaJualPersen': isHargaJualPersen,
       'barangMasuk': barangMasuk?.millisecondsSinceEpoch,
       'barangKeluar': barangKeluar?.millisecondsSinceEpoch,
+      'createdAt': createdAt
     };
   }
 
@@ -82,6 +83,7 @@ class ItemModel {
       barangKeluar: json['barangKeluar'] != null
           ? DateTime.fromMillisecondsSinceEpoch(json['barangKeluar'] as int)
           : null,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
     );
   }
 }

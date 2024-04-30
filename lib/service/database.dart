@@ -173,8 +173,14 @@ class Database {
 
   insertFresh(List<ItemModel> inventoryList) async {
     final isar = await db;
-    for (ItemModel element in inventoryList) {
-      isar.writeTxnSync<int>(() => isar.itemModels.putSync(element));
+    await clearInventory();
+    if (inventoryList.isNotEmpty) {
+      await Future.forEach(
+          inventoryList,
+          (val) async =>
+              await isar.writeTxn<int>(() => isar.itemModels.put(val)));
+      // inventoryList.forEach((val) async =>
+      //     await isar.writeTxn<int>(() => isar.itemModels.put(val)));
     }
   }
 

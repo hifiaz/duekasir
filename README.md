@@ -35,7 +35,7 @@ Prerequisite: https://flutter.dev/docs/get-started/install
     - [x] Print to Thermal Printer (windows)
     - [x] Print to open cash drawer (windows)
     - [x] Scan Barcode with external device
-    - [ ] Scan barcode with mobile phone
+    - [x] Scan barcode with mobile phone
 3. Report
     - [x] list transaction
     - [x] search
@@ -48,12 +48,12 @@ Prerequisite: https://flutter.dev/docs/get-started/install
     - [x] CRUD user
     - [ ] Search user
 6. Backup & Restore Isar
-
+7. Sync with firebase
 * MacOS Support
 
 ## Author
 
 👤 **Luthfi**
 
-* Twitter: [@1hanzla100](https://twitter.com/hifiaz)
-* LinkedIn: [@1hanzla100](https://linkedin.com/in/luthfiazhari)
+* Twitter: [@hifiaz](https://twitter.com/hifiaz)
+* LinkedIn: [@luthfiazhari](https://linkedin.com/in/luthfiazhari)

@@ -132,7 +132,7 @@ class CustomerForm extends HookWidget {
                           text: const Text('Delete'),
                           onPressed: () {
                             Database()
-                                .deleteCustomer(customer.id)
+                                .deleteCustomer(customer.id!)
                                 .whenComplete(() {
                               Database().searchCustomers().then((val) {
                                 customerController.customer.clear();
@@ -147,14 +147,16 @@ class CustomerForm extends HookWidget {
                         onPressed: () {
                           if (customerFormKey.currentState!.validate()) {
                             if (customer != null) {
-                              final updateCustomer = CustomerModel()
-                                ..id = customer.id
-                                ..nama = editingName.text
-                                ..dob = lahir.value
-                                ..ktp = editingKtp.text
-                                ..status = status.value
-                                ..phone = editingPhone.text
-                                ..keterangan = editingKeterangan.text;
+                              final updateCustomer = CustomerModel(
+                                id: customer.id,
+                                nama: editingName.text,
+                                dob: lahir.value,
+                                ktp: editingKtp.text,
+                                status: status.value,
+                                phone: editingPhone.text,
+                                keterangan: editingKeterangan.text,
+                              );
+
                               Database()
                                   .updateCustomer(updateCustomer)
                                   .whenComplete(() {
@@ -167,14 +169,17 @@ class CustomerForm extends HookWidget {
                                 });
                               });
                             } else {
-                              final newCustomer = CustomerModel()
-                                ..nama = editingName.text
-                                ..dob = lahir.value
-                                ..ktp = editingKtp.text
-                                ..status = status.value
-                                ..phone = editingPhone.text
-                                ..keterangan = editingKeterangan.text
-                                ..masuk = DateTime.now();
+                              final newCustomer = CustomerModel(
+                                nama: editingName.text,
+                                dob: lahir.value,
+                                ktp: editingKtp.text,
+                                status: status.value,
+                                phone: editingPhone.text,
+                                keterangan: editingKeterangan.text,
+                                masuk: DateTime.now(),
+                                createdAt: DateTime.now(),
+                              );
+
                               Database()
                                   .addNewCustomer(newCustomer)
                                   .whenComplete(() {

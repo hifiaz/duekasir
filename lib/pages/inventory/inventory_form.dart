@@ -1,4 +1,5 @@
 import 'package:due_kasir/controller/inventory_controller.dart';
+import 'package:due_kasir/main.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:flutter/material.dart';
@@ -63,6 +64,8 @@ class InventoryForm extends HookWidget {
     useListenable(editingUkuran);
     useListenable(editingDiscount);
     useListenable(hargaJualDiscount);
+
+    final isConnected = isDeviceConnected.watch(context);
     return Scaffold(
       body: SafeArea(
         child: Form(
@@ -74,15 +77,19 @@ class InventoryForm extends HookWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: ShadButton.ghost(
-                    text: const Text('Close'),
-                    onPressed: () {
-                      inventoryController.inventorySelected.value = null;
-                      context.pop();
-                    },
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Icon(Icons.circle,
+                        color: isConnected ? Colors.green : null),
+                    ShadButton.ghost(
+                      text: const Text('Close'),
+                      onPressed: () {
+                        inventoryController.inventorySelected.value = null;
+                        context.pop();
+                      },
+                    ),
+                  ],
                 ),
                 ShadInputFormField(
                   controller: editingName,
@@ -230,11 +237,11 @@ class InventoryForm extends HookWidget {
                           text: const Text('Delete'),
                           onPressed: () {
                             Database()
-                                .deleteInventory(item.id)
+                                .deleteInventory(item.id!)
                                 .whenComplete(() {
                               Database().searchInventorys().then((val) {
-                                inventoryController.inventorySearch.clear();
-                                inventoryController.inventorySearch.addAll(val);
+                                inventoryController.inventorys.clear();
+                                inventoryController.inventorys.addAll(val);
                               });
                               Navigator.pop(context);
                               if (context.mounted) {
@@ -260,53 +267,55 @@ class InventoryForm extends HookWidget {
                             return;
                           } else {
                             if (item != null) {
-                              final updateitem = ItemModel()
-                                ..id = item.id
-                                ..nama = editingName.text.replaceAll(',', ' ')
-                                ..code = editingCode.text
-                                ..quantity = 1
-                                ..hargaJual = hargaJual.value.toInt()
-                                ..ukuran = editingUkuran.text
-                                ..isHargaJualPersen = true
-                                ..hargaJualPersen =
-                                    double.parse(editingHargaJualPersen.text)
-                                ..hargaDasar = int.parse(editingHargaDasar.text)
-                                ..diskonPersen =
-                                    double.tryParse(editingDiscount.text)
-                                ..jumlahBarang = stock.value;
+                              final updateitem = ItemModel(
+                                id: item.id,
+                                nama: editingName.text.replaceAll(',', ' '),
+                                code: editingCode.text,
+                                quantity: 1,
+                                hargaJual: hargaJual.value.toInt(),
+                                ukuran: editingUkuran.text,
+                                isHargaJualPersen: true,
+                                hargaJualPersen:
+                                    double.parse(editingHargaJualPersen.text),
+                                hargaDasar: int.parse(editingHargaDasar.text),
+                                diskonPersen:
+                                    double.tryParse(editingDiscount.text),
+                                jumlahBarang: stock.value,
+                              );
+
                               Database()
                                   .updateInventory(updateitem)
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
                                   context.pop();
                                   Database().searchInventorys().then((val) {
-                                    inventoryController.inventorySearch.clear();
-                                    inventoryController.inventorySearch
-                                        .addAll(val);
+                                    inventoryController.inventorys.clear();
+                                    inventoryController.inventorys.addAll(val);
                                   });
                                   inventoryController.inventorySelected.value =
                                       null;
                                 });
                               });
                             } else {
-                              final newItem = ItemModel()
-                                ..nama = editingName.text.replaceAll(',', ' ')
-                                ..code = editingCode.text
-                                ..quantity = 1
-                                ..hargaJual = hargaJual.value.toInt()
-                                ..ukuran = editingUkuran.text
-                                ..isHargaJualPersen = true
-                                ..hargaJualPersen =
-                                    double.parse(editingHargaJualPersen.text)
-                                ..hargaDasar = int.parse(editingHargaDasar.text)
-                                ..diskonPersen =
-                                    double.tryParse(editingDiscount.text)
-                                ..jumlahBarang = stock.value;
+                              final newItem = ItemModel(
+                                nama: editingName.text.replaceAll(',', ' '),
+                                code: editingCode.text,
+                                quantity: 1,
+                                hargaJual: hargaJual.value.toInt(),
+                                ukuran: editingUkuran.text,
+                                isHargaJualPersen: true,
+                                hargaJualPersen:
+                                    double.parse(editingHargaJualPersen.text),
+                                hargaDasar: int.parse(editingHargaDasar.text),
+                                diskonPersen:
+                                    double.tryParse(editingDiscount.text),
+                                jumlahBarang: stock.value,
+                              );
+
                               Database().addInventory(newItem).whenComplete(() {
                                 Database().searchInventorys().then((val) {
-                                  inventoryController.inventorySearch.clear();
-                                  inventoryController.inventorySearch
-                                      .addAll(val);
+                                  inventoryController.inventorys.clear();
+                                  inventoryController.inventorys.addAll(val);
                                 });
                                 context.pop();
                               });

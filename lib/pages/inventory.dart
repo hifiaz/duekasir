@@ -17,11 +17,45 @@ class Inventory extends StatelessWidget {
         title: const Text('Inventory'),
         centerTitle: false,
         actions: [
+          TextButton(
+              onPressed: () => Database().checkIsInventorySynced(),
+              child: const Text('Sync')),
+          TextButton(
+              onPressed: () {
+                showShadDialog(
+                  context: context,
+                  builder: (context) => ShadDialog.alert(
+                    title: const Text('Are you absolutely sure?'),
+                    description: const Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        'This action will delete your local data',
+                      ),
+                    ),
+                    actions: [
+                      ShadButton.outline(
+                        text: const Text('Cancel'),
+                        onPressed: () => Navigator.of(context).pop(false),
+                      ),
+                      ShadButton(
+                        text: const Text('Continue'),
+                        onPressed: () {
+                          Database()
+                              .clearInventory()
+                              .whenComplete(() => context.go('/'));
+                          Navigator.of(context).pop(true);
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+              child: const Text('Clear')),
           ShadButton.ghost(
             onPressed: () {
               Database().searchInventorys().then((val) {
-                inventoryController.inventorySearch.clear();
-                inventoryController.inventorySearch.addAll(val);
+                inventoryController.inventorys.clear();
+                inventoryController.inventorys.addAll(val);
               });
             },
             text: const Text('Refresh'),

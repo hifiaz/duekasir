@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "141487263884",
+    "project_id": "due-kasir",
+    "storage_bucket": "due-kasir.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:141487263884:android:b3509b8e220e65808b2ba9",
+        "android_client_info": {
+          "package_name": "com.devindo.due_kasir"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiGeO2GSCEN0mtNtRFYgo2OuxqWBNwT84"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

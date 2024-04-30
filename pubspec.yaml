@@ -61,6 +61,16 @@ dependencies:
   print_bluetooth_thermal: ^1.1.0
   share_plus: ^9.0.0
   image: ^3.3.0
+  cloud_firestore: ^4.9.3
+  connectivity_plus: ^6.0.3
+  firebase_core: ^2.17.0
+  internet_connection_checker: ^1.0.0+1
+  firebase_core_desktop: ^1.0.2
+  firebase_auth: ^4.10.1
+      
+
+windows:
+  default_package: firebase_core_desktop
 
 dev_dependencies:
   flutter_test:

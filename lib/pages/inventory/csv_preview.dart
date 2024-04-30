@@ -27,18 +27,20 @@ class _CsvPreviewState extends State<CsvPreview> {
         .transform(const CsvToListConverter())
         .skip(1)
         .map((val) {
-      return ItemModel()
-        ..nama = val[1]
-        ..code = val[2].toString()
-        ..deskripsi = val[3] == 'null' ? null : val[3]
-        ..jumlahBarang = val[4]
-        ..quantity = 1
-        ..ukuran = val[6].toString()
-        ..hargaDasar = val[7]
-        ..hargaJual = val[8]
-        ..hargaJualPersen = double.parse(val[9].toString())
-        ..diskonPersen = double.tryParse(val[10].toString())
-        ..isHargaJualPersen = val[11] == 'TRUE' ? true : false;
+      return ItemModel(
+        nama: val[1],
+        code: val[2].toString(),
+        deskripsi: val[3] == 'null' ? null : val[3],
+        jumlahBarang: val[4],
+        quantity: 1,
+        ukuran: val[6].toString(),
+        hargaDasar: val[7],
+        hargaJual: val[8],
+        hargaJualPersen: double.parse(val[9].toString()),
+        diskonPersen: double.tryParse(val[10].toString()),
+        isHargaJualPersen: val[11] == 'TRUE' ? true : false,
+        isSynced: false
+      );
     }).toList();
   }
 
@@ -54,8 +56,8 @@ class _CsvPreviewState extends State<CsvPreview> {
                 ? Database().addAllInventory(d).whenComplete(() {
                     inventoryController.listItemFromCsv.clear();
                     Database().searchInventorys().then((val) {
-                      inventoryController.inventorySearch.clear();
-                      inventoryController.inventorySearch.addAll(val);
+                      inventoryController.inventorys.clear();
+                      inventoryController.inventorys.addAll(val);
                     });
                     context.pop();
                   })

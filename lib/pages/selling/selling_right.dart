@@ -1,19 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:esc_pos_utils/esc_pos_utils.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
-import 'package:image/image.dart' as img;
-import 'package:intl/intl.dart';
-import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:signals/signals_flutter.dart';
-import 'package:usb_esc_printer_windows/usb_esc_printer_windows.dart'
-    as usb_esc_printer_windows;
-
 import 'package:due_kasir/controller/customer_controller.dart';
 import 'package:due_kasir/controller/selling/events.dart';
 import 'package:due_kasir/controller/selling_controller.dart';
@@ -26,6 +13,17 @@ import 'package:due_kasir/pages/customer/customer_sheet.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/service/get_it.dart';
 import 'package:due_kasir/utils/constant.dart';
+import 'package:esc_pos_utils/esc_pos_utils.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:signals/signals_flutter.dart';
+import 'package:usb_esc_printer_windows/usb_esc_printer_windows.dart'
+    as usb_esc_printer_windows;
 
 class SellingRight extends StatefulHookWidget {
   const SellingRight({super.key});
@@ -280,12 +278,12 @@ class SellingRightState extends State<SellingRight> {
     final generator =
         Generator(PaperSize.mm80, Platform.isWindows ? winProfile : profile);
     List<int> bytes = [];
-    final Uint8List data = await loadImageFromAssets('assets/logo.jpeg');
+    // final Uint8List data = await loadImageFromAssets('assets/logo.jpeg');
 
-    img.Image originalImage = img.decodeImage(data)!;
+    // img.Image originalImage = img.decodeImage(data)!;
 
-    bytes += generator.imageRaster(originalImage, align: PosAlign.center);
-    bytes += generator.feed(1);
+    // bytes += generator.imageRaster(originalImage, align: PosAlign.center);
+    // bytes += generator.feed(1);
     // bytes += generator.imageRaster(image);
     bytes += generator.text(store.title,
         styles: const PosStyles(

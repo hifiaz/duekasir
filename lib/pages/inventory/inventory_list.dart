@@ -21,18 +21,18 @@ class InventoryList extends HookWidget {
   Widget build(BuildContext context) {
     final search = useTextEditingController();
     // final inventory = inventoryController.inventory.watch(context);
-    final inventorySearch = inventoryController.inventorySearch.watch(context);
+    final inventorySearch = inventoryController.inventorys.watch(context);
     useListenable(search);
     useListenableSelector(search, () {
       if (search.text.length > 2) {
         Database().searchInventorys(value: search.text).then((val) {
-          inventoryController.inventorySearch.clear();
-          inventoryController.inventorySearch.addAll(val);
+          inventoryController.inventorys.clear();
+          inventoryController.inventorys.addAll(val);
         });
       } else if (search.text.length == 1) {
         Database().searchInventorys().then((val) {
-          inventoryController.inventorySearch.clear();
-          inventoryController.inventorySearch.addAll(val);
+          inventoryController.inventorys.clear();
+          inventoryController.inventorys.addAll(val);
         });
       }
     });

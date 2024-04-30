@@ -1,9 +1,9 @@
 import 'package:isar/isar.dart';
 
-part 'pembeli_model.g.dart';
+part 'customer_model.g.dart';
 
 @collection
-class PembeliModel {
+class CustomerModel {
   Id id = Isar.autoIncrement;
   late String nama;
   String? phone;

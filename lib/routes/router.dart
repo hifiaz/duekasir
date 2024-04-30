@@ -4,6 +4,8 @@ import 'package:due_kasir/pages/home.dart';
 import 'package:due_kasir/pages/inventory.dart';
 import 'package:due_kasir/pages/inventory/csv_preview.dart';
 import 'package:due_kasir/pages/inventory/inventory_form.dart';
+import 'package:due_kasir/pages/login.dart';
+import 'package:due_kasir/pages/register.dart';
 import 'package:due_kasir/pages/report.dart';
 import 'package:due_kasir/pages/selling.dart';
 import 'package:due_kasir/pages/selling/print_setting.dart';
@@ -135,6 +137,22 @@ class PrintSettingRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       const PrintSetting();
+}
+
+@TypedGoRoute<LoginRoute>(path: '/login')
+class LoginRoute extends GoRouteData {
+  const LoginRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const Login();
+}
+
+@TypedGoRoute<RegisterRoute>(path: '/register')
+class RegisterRoute extends GoRouteData {
+  const RegisterRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const Register();
 }
 
 @TypedGoRoute<TestingRoute>(path: '/testing')

@@ -1,5 +1,5 @@
 import 'package:due_kasir/controller/report_controller.dart';
-import 'package:due_kasir/model/pembeli_model.dart';
+import 'package:due_kasir/model/customer_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/pages/drawer.dart';
@@ -74,7 +74,7 @@ class Report extends StatelessWidget {
                                   })),
                               DataCell(
                                 item.pembeli != null
-                                    ? FutureBuilder<PembeliModel?>(
+                                    ? FutureBuilder<CustomerModel?>(
                                         future: Database()
                                             .getCustomerById(item.pembeli!),
                                         builder: (context, snapshot) {

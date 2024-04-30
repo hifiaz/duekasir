@@ -67,23 +67,28 @@ const ItemModelSchema = CollectionSchema(
       name: r'isHargaJualPersen',
       type: IsarType.bool,
     ),
-    r'jumlahBarang': PropertySchema(
+    r'isSynced': PropertySchema(
       id: 10,
+      name: r'isSynced',
+      type: IsarType.bool,
+    ),
+    r'jumlahBarang': PropertySchema(
+      id: 11,
       name: r'jumlahBarang',
       type: IsarType.long,
     ),
     r'nama': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'nama',
       type: IsarType.string,
     ),
     r'quantity': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'quantity',
       type: IsarType.long,
     ),
     r'ukuran': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'ukuran',
       type: IsarType.string,
     )
@@ -136,10 +141,11 @@ void _itemModelSerialize(
   writer.writeLong(offsets[7], object.hargaJual);
   writer.writeDouble(offsets[8], object.hargaJualPersen);
   writer.writeBool(offsets[9], object.isHargaJualPersen);
-  writer.writeLong(offsets[10], object.jumlahBarang);
-  writer.writeString(offsets[11], object.nama);
-  writer.writeLong(offsets[12], object.quantity);
-  writer.writeString(offsets[13], object.ukuran);
+  writer.writeBool(offsets[10], object.isSynced);
+  writer.writeLong(offsets[11], object.jumlahBarang);
+  writer.writeString(offsets[12], object.nama);
+  writer.writeLong(offsets[13], object.quantity);
+  writer.writeString(offsets[14], object.ukuran);
 }
 
 ItemModel _itemModelDeserialize(
@@ -148,22 +154,24 @@ ItemModel _itemModelDeserialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = ItemModel();
-  object.barangKeluar = reader.readDateTimeOrNull(offsets[0]);
-  object.barangMasuk = reader.readDateTimeOrNull(offsets[1]);
-  object.code = reader.readString(offsets[2]);
-  object.createdAt = reader.readDateTime(offsets[3]);
-  object.deskripsi = reader.readStringOrNull(offsets[4]);
-  object.diskonPersen = reader.readDoubleOrNull(offsets[5]);
-  object.hargaDasar = reader.readLong(offsets[6]);
-  object.hargaJual = reader.readLong(offsets[7]);
-  object.hargaJualPersen = reader.readDoubleOrNull(offsets[8]);
-  object.id = id;
-  object.isHargaJualPersen = reader.readBool(offsets[9]);
-  object.jumlahBarang = reader.readLong(offsets[10]);
-  object.nama = reader.readString(offsets[11]);
-  object.quantity = reader.readLong(offsets[12]);
-  object.ukuran = reader.readString(offsets[13]);
+  final object = ItemModel(
+    barangKeluar: reader.readDateTimeOrNull(offsets[0]),
+    barangMasuk: reader.readDateTimeOrNull(offsets[1]),
+    code: reader.readString(offsets[2]),
+    createdAt: reader.readDateTimeOrNull(offsets[3]),
+    deskripsi: reader.readStringOrNull(offsets[4]),
+    diskonPersen: reader.readDoubleOrNull(offsets[5]),
+    hargaDasar: reader.readLong(offsets[6]),
+    hargaJual: reader.readLong(offsets[7]),
+    hargaJualPersen: reader.readDoubleOrNull(offsets[8]),
+    id: id,
+    isHargaJualPersen: reader.readBool(offsets[9]),
+    isSynced: reader.readBoolOrNull(offsets[10]) ?? true,
+    jumlahBarang: reader.readLong(offsets[11]),
+    nama: reader.readString(offsets[12]),
+    quantity: reader.readLong(offsets[13]),
+    ukuran: reader.readString(offsets[14]),
+  );
   return object;
 }
 
@@ -181,7 +189,7 @@ P _itemModelDeserializeProp<P>(
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 4:
       return (reader.readStringOrNull(offset)) as P;
     case 5:
@@ -195,12 +203,14 @@ P _itemModelDeserializeProp<P>(
     case 9:
       return (reader.readBool(offset)) as P;
     case 10:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBoolOrNull(offset) ?? true) as P;
     case 11:
-      return (reader.readString(offset)) as P;
-    case 12:
       return (reader.readLong(offset)) as P;
+    case 12:
+      return (reader.readString(offset)) as P;
     case 13:
+      return (reader.readLong(offset)) as P;
+    case 14:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -208,7 +218,7 @@ P _itemModelDeserializeProp<P>(
 }
 
 Id _itemModelGetId(ItemModel object) {
-  return object.id;
+  return object.id ?? Isar.autoIncrement;
 }
 
 List<IsarLinkBase<dynamic>> _itemModelGetLinks(ItemModel object) {
@@ -573,8 +583,25 @@ extension ItemModelQueryFilter
     });
   }
 
+  QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> createdAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'createdAt',
+      ));
+    });
+  }
+
+  QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition>
+      createdAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'createdAt',
+      ));
+    });
+  }
+
   QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> createdAtEqualTo(
-      DateTime value) {
+      DateTime? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'createdAt',
@@ -585,7 +612,7 @@ extension ItemModelQueryFilter
 
   QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition>
       createdAtGreaterThan(
-    DateTime value, {
+    DateTime? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -598,7 +625,7 @@ extension ItemModelQueryFilter
   }
 
   QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> createdAtLessThan(
-    DateTime value, {
+    DateTime? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -611,8 +638,8 @@ extension ItemModelQueryFilter
   }
 
   QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> createdAtBetween(
-    DateTime lower,
-    DateTime upper, {
+    DateTime? lower,
+    DateTime? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -1050,8 +1077,24 @@ extension ItemModelQueryFilter
     });
   }
 
+  QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> idIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'id',
+      ));
+    });
+  }
+
+  QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> idIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'id',
+      ));
+    });
+  }
+
   QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> idEqualTo(
-      Id value) {
+      Id? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
@@ -1061,7 +1104,7 @@ extension ItemModelQueryFilter
   }
 
   QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> idGreaterThan(
-    Id value, {
+    Id? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -1074,7 +1117,7 @@ extension ItemModelQueryFilter
   }
 
   QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> idLessThan(
-    Id value, {
+    Id? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -1087,8 +1130,8 @@ extension ItemModelQueryFilter
   }
 
   QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> idBetween(
-    Id lower,
-    Id upper, {
+    Id? lower,
+    Id? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -1108,6 +1151,16 @@ extension ItemModelQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'isHargaJualPersen',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> isSyncedEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isSynced',
         value: value,
       ));
     });
@@ -1610,6 +1663,18 @@ extension ItemModelQuerySortBy on QueryBuilder<ItemModel, ItemModel, QSortBy> {
     });
   }
 
+  QueryBuilder<ItemModel, ItemModel, QAfterSortBy> sortByIsSynced() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isSynced', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ItemModel, ItemModel, QAfterSortBy> sortByIsSyncedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isSynced', Sort.desc);
+    });
+  }
+
   QueryBuilder<ItemModel, ItemModel, QAfterSortBy> sortByJumlahBarang() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'jumlahBarang', Sort.asc);
@@ -1794,6 +1859,18 @@ extension ItemModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<ItemModel, ItemModel, QAfterSortBy> thenByIsSynced() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isSynced', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ItemModel, ItemModel, QAfterSortBy> thenByIsSyncedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isSynced', Sort.desc);
+    });
+  }
+
   QueryBuilder<ItemModel, ItemModel, QAfterSortBy> thenByJumlahBarang() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'jumlahBarang', Sort.asc);
@@ -1907,6 +1984,12 @@ extension ItemModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<ItemModel, ItemModel, QDistinct> distinctByIsSynced() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isSynced');
+    });
+  }
+
   QueryBuilder<ItemModel, ItemModel, QDistinct> distinctByJumlahBarang() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'jumlahBarang');
@@ -1960,7 +2043,7 @@ extension ItemModelQueryProperty
     });
   }
 
-  QueryBuilder<ItemModel, DateTime, QQueryOperations> createdAtProperty() {
+  QueryBuilder<ItemModel, DateTime?, QQueryOperations> createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
     });
@@ -1999,6 +2082,12 @@ extension ItemModelQueryProperty
   QueryBuilder<ItemModel, bool, QQueryOperations> isHargaJualPersenProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isHargaJualPersen');
+    });
+  }
+
+  QueryBuilder<ItemModel, bool, QQueryOperations> isSyncedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isSynced');
     });
   }
 

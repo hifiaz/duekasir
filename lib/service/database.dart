@@ -1,13 +1,16 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/controller/selling_controller.dart';
+import 'package:due_kasir/main.dart';
 import 'package:due_kasir/model/auth_model.dart';
+import 'package:due_kasir/model/customer_model.dart';
 import 'package:due_kasir/model/item_model.dart';
-import 'package:due_kasir/model/pembeli_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/store_model.dart';
 import 'package:due_kasir/model/user_model.dart';
+import 'package:due_kasir/service/firebase_service.dart';
 import 'package:due_kasir/service/get_it.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:isar/isar.dart';
@@ -20,6 +23,9 @@ class Database {
     db = openDB();
   }
 
+  final CloudFirestoreHelper _cloudFirestoreHelper = CloudFirestoreHelper();
+
+  // Auth Local
   Future<void> loginUser(AuthModel val) async {
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.authModels.putSync(val));
@@ -33,6 +39,7 @@ class Database {
     });
   }
 
+  // User
   Future<AuthModel> authUser() async {
     final isar = await db;
     IsarCollection<AuthModel> authCollection = isar.collection<AuthModel>();
@@ -70,33 +77,34 @@ class Database {
     return users;
   }
 
-  Future<void> addNewCustomer(PembeliModel val) async {
+  // Customer
+  Future<void> addNewCustomer(CustomerModel val) async {
     final isar = await db;
-    isar.writeTxnSync<int>(() => isar.pembeliModels.putSync(val));
+    isar.writeTxnSync<int>(() => isar.customerModels.putSync(val));
   }
 
   Future<void> deleteCustomer(int val) async {
     final isar = await db;
-    isar.writeTxn<bool>(() async => await isar.pembeliModels.delete(val));
+    isar.writeTxn<bool>(() async => await isar.customerModels.delete(val));
   }
 
-  Future<void> updateCustomer(PembeliModel val) async {
+  Future<void> updateCustomer(CustomerModel val) async {
     final isar = await db;
-    isar.writeTxn<int>(() async => await isar.pembeliModels.put(val));
+    isar.writeTxn<int>(() async => await isar.customerModels.put(val));
   }
 
-  Future<List<PembeliModel>> getCustomers() async {
+  Future<List<CustomerModel>> getCustomers() async {
     final isar = await db;
-    IsarCollection<PembeliModel> customerCollection =
-        isar.collection<PembeliModel>();
+    IsarCollection<CustomerModel> customerCollection =
+        isar.collection<CustomerModel>();
     final customer = customerCollection.where().findAll();
     return customer;
   }
 
-  Future<List<PembeliModel>> searchCustomers({String? value}) async {
+  Future<List<CustomerModel>> searchCustomers({String? value}) async {
     final isar = await db;
-    IsarCollection<PembeliModel> customerCollection =
-        isar.collection<PembeliModel>();
+    IsarCollection<CustomerModel> customerCollection =
+        isar.collection<CustomerModel>();
     final items = customerCollection
         .filter()
         .group((q) => q.namaContains(value ?? '', caseSensitive: false))
@@ -104,42 +112,70 @@ class Database {
     return items;
   }
 
-  Future<PembeliModel?> getCustomerById(int id) async {
+  Future<CustomerModel?> getCustomerById(int id) async {
     final isar = await db;
-    IsarCollection<PembeliModel> customerCollection =
-        isar.collection<PembeliModel>();
+    IsarCollection<CustomerModel> customerCollection =
+        isar.collection<CustomerModel>();
     final users = customerCollection.get(id);
     return users;
   }
 
   Future<void> addInventory(ItemModel val) async {
+    val.isSynced = isDeviceConnected.value;
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.itemModels.putSync(val));
+    if (isDeviceConnected.value) {
+      _cloudFirestoreHelper.addInventory(val.toJson());
+    }
   }
 
   Future<void> addAllInventory(List<ItemModel> vals) async {
     final isar = await db;
     for (var val in vals) {
+      val.isSynced = isDeviceConnected.value;
       isar.writeTxnSync<int>(() => isar.itemModels.putSync(val));
+      if (isDeviceConnected.value) {
+        _cloudFirestoreHelper.addInventory(val.toJson());
+      }
     }
   }
 
   Future<void> deleteInventory(int val) async {
     final isar = await db;
     isar.writeTxn<bool>(() async => await isar.itemModels.delete(val));
+    if (isDeviceConnected.value) {
+      _cloudFirestoreHelper.removeInventory(val);
+    }
   }
 
   Future<void> updateInventory(ItemModel val) async {
     final isar = await db;
     isar.writeTxn<int>(() async => await isar.itemModels.put(val));
+    if (isDeviceConnected.value) {
+      _cloudFirestoreHelper.updateInventory(val);
+    }
   }
 
-  Future<List<ItemModel>> getInventorys() async {
+  Future<void> getInventorys() async {
     final isar = await db;
     IsarCollection<ItemModel> inventoryCollection =
         isar.collection<ItemModel>();
-    final items = inventoryCollection.where().findAll();
-    return items;
+    if (isDeviceConnected.value) {
+      inventoryController.inventorys.value =
+          await _cloudFirestoreHelper.getInventoryAll();
+
+      insertFresh(inventoryController.inventorys.value);
+    } else {
+      inventoryController.inventorys.value =
+          await inventoryCollection.where().findAll();
+    }
+  }
+
+  insertFresh(List<ItemModel> inventoryList) async {
+    final isar = await db;
+    for (ItemModel element in inventoryList) {
+      isar.writeTxnSync<int>(() => isar.itemModels.putSync(element));
+    }
   }
 
   Future<List<ItemModel>> searchInventorys({String? value}) async {
@@ -165,6 +201,52 @@ class Database {
         .group((q) => q.codeContains(value, caseSensitive: false))
         .findFirst();
     return items;
+  }
+
+  void updateInventorySync(ItemModel inventory) async {
+    final isar = await db;
+    inventory.isSynced = true;
+    await isar.writeTxn(() async {
+      await isar.itemModels.put(inventory);
+    });
+  }
+
+  getUnsyncedInventoryData() async {
+    final isar = await db;
+    IsarCollection<ItemModel> inventoryCollection =
+        isar.collection<ItemModel>();
+    List<ItemModel?> items =
+        await inventoryCollection.filter().isSyncedEqualTo(false).findAll();
+    return items;
+  }
+
+  Future<void> checkIsInventorySynced() async {
+    final inventorys = await searchInventorys();
+    if (inventorys.isNotEmpty) {
+      List<ItemModel> unsyncedInventory = await getUnsyncedInventoryData();
+      if (inventoryController.deleteItemList.value.isNotEmpty) {
+        for (ItemModel element in inventoryController.deleteItemList.value) {
+          _cloudFirestoreHelper.removeInventory(element.id!);
+        }
+        inventoryController.deleteItemList.value.clear();
+      }
+      if (unsyncedInventory.isNotEmpty) {
+        for (ItemModel element in unsyncedInventory) {
+          element.isSynced = true;
+          await _cloudFirestoreHelper.updateInventory(element);
+          updateInventorySync(element);
+        }
+      }
+    } else {
+      getInventorys();
+    }
+  }
+
+  Future<void> clearInventory() async {
+    final isar = await db;
+    IsarCollection<ItemModel> inventoryCollection =
+        isar.collection<ItemModel>();
+    isar.writeTxn<void>(() => inventoryCollection.clear());
   }
 
   Future<void> addPenjualan(PenjualanModel val) async {
@@ -227,7 +309,7 @@ class Database {
         await Isar.open(
           [
             ItemModelSchema,
-            PembeliModelSchema,
+            CustomerModelSchema,
             PenjualanModelSchema,
             UserModelSchema,
             AuthModelSchema,
@@ -236,18 +318,6 @@ class Database {
           directory: dbDirectory.path,
         );
       });
-      // final dbDirectory = await getApplicationDocumentsDirectory();
-
-      // // close the database before any changes
-      // await isar.close();
-
-      // final dbFile = file;
-      // final dbPath = p.join(dbDirectory.path, 'default.isar');
-
-      // if (await dbFile.exists()) {
-      //   // here we overwrite the backup file on the database file
-      //   await dbFile.copy(dbPath);
-      // }
     }
   }
 
@@ -263,7 +333,7 @@ class Database {
       final isar = await Isar.open(
         [
           ItemModelSchema,
-          PembeliModelSchema,
+          CustomerModelSchema,
           PenjualanModelSchema,
           UserModelSchema,
           AuthModelSchema,

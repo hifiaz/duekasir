@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'pembeli_model.dart';
+part of 'customer_model.dart';
 
 // **************************************************************************
 // IsarCollectionGenerator
@@ -9,13 +9,13 @@ part of 'pembeli_model.dart';
 // coverage:ignore-file
 // ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
-extension GetPembeliModelCollection on Isar {
-  IsarCollection<PembeliModel> get pembeliModels => this.collection();
+extension GetCustomerModelCollection on Isar {
+  IsarCollection<CustomerModel> get customerModels => this.collection();
 }
 
-const PembeliModelSchema = CollectionSchema(
-  name: r'PembeliModel',
-  id: 6418880069316430973,
+const CustomerModelSchema = CollectionSchema(
+  name: r'CustomerModel',
+  id: -2515451200106855952,
   properties: {
     r'createdAt': PropertySchema(
       id: 0,
@@ -58,22 +58,22 @@ const PembeliModelSchema = CollectionSchema(
       type: IsarType.bool,
     )
   },
-  estimateSize: _pembeliModelEstimateSize,
-  serialize: _pembeliModelSerialize,
-  deserialize: _pembeliModelDeserialize,
-  deserializeProp: _pembeliModelDeserializeProp,
+  estimateSize: _customerModelEstimateSize,
+  serialize: _customerModelSerialize,
+  deserialize: _customerModelDeserialize,
+  deserializeProp: _customerModelDeserializeProp,
   idName: r'id',
   indexes: {},
   links: {},
   embeddedSchemas: {},
-  getId: _pembeliModelGetId,
-  getLinks: _pembeliModelGetLinks,
-  attach: _pembeliModelAttach,
+  getId: _customerModelGetId,
+  getLinks: _customerModelGetLinks,
+  attach: _customerModelAttach,
   version: '3.1.0+1',
 );
 
-int _pembeliModelEstimateSize(
-  PembeliModel object,
+int _customerModelEstimateSize(
+  CustomerModel object,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
@@ -100,8 +100,8 @@ int _pembeliModelEstimateSize(
   return bytesCount;
 }
 
-void _pembeliModelSerialize(
-  PembeliModel object,
+void _customerModelSerialize(
+  CustomerModel object,
   IsarWriter writer,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
@@ -116,13 +116,13 @@ void _pembeliModelSerialize(
   writer.writeBool(offsets[7], object.status);
 }
 
-PembeliModel _pembeliModelDeserialize(
+CustomerModel _customerModelDeserialize(
   Id id,
   IsarReader reader,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = PembeliModel();
+  final object = CustomerModel();
   object.createdAt = reader.readDateTime(offsets[0]);
   object.dob = reader.readDateTimeOrNull(offsets[1]);
   object.id = id;
@@ -135,7 +135,7 @@ PembeliModel _pembeliModelDeserialize(
   return object;
 }
 
-P _pembeliModelDeserializeProp<P>(
+P _customerModelDeserializeProp<P>(
   IsarReader reader,
   int propertyId,
   int offset,
@@ -163,31 +163,32 @@ P _pembeliModelDeserializeProp<P>(
   }
 }
 
-Id _pembeliModelGetId(PembeliModel object) {
+Id _customerModelGetId(CustomerModel object) {
   return object.id;
 }
 
-List<IsarLinkBase<dynamic>> _pembeliModelGetLinks(PembeliModel object) {
+List<IsarLinkBase<dynamic>> _customerModelGetLinks(CustomerModel object) {
   return [];
 }
 
-void _pembeliModelAttach(
-    IsarCollection<dynamic> col, Id id, PembeliModel object) {
+void _customerModelAttach(
+    IsarCollection<dynamic> col, Id id, CustomerModel object) {
   object.id = id;
 }
 
-extension PembeliModelQueryWhereSort
-    on QueryBuilder<PembeliModel, PembeliModel, QWhere> {
-  QueryBuilder<PembeliModel, PembeliModel, QAfterWhere> anyId() {
+extension CustomerModelQueryWhereSort
+    on QueryBuilder<CustomerModel, CustomerModel, QWhere> {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
     });
   }
 }
 
-extension PembeliModelQueryWhere
-    on QueryBuilder<PembeliModel, PembeliModel, QWhereClause> {
-  QueryBuilder<PembeliModel, PembeliModel, QAfterWhereClause> idEqualTo(Id id) {
+extension CustomerModelQueryWhere
+    on QueryBuilder<CustomerModel, CustomerModel, QWhereClause> {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterWhereClause> idEqualTo(
+      Id id) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IdWhereClause.between(
         lower: id,
@@ -196,7 +197,7 @@ extension PembeliModelQueryWhere
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterWhereClause> idNotEqualTo(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterWhereClause> idNotEqualTo(
       Id id) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
@@ -219,7 +220,7 @@ extension PembeliModelQueryWhere
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterWhereClause> idGreaterThan(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterWhereClause> idGreaterThan(
       Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
@@ -229,7 +230,8 @@ extension PembeliModelQueryWhere
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterWhereClause> idLessThan(Id id,
+  QueryBuilder<CustomerModel, CustomerModel, QAfterWhereClause> idLessThan(
+      Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -238,7 +240,7 @@ extension PembeliModelQueryWhere
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterWhereClause> idBetween(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterWhereClause> idBetween(
     Id lowerId,
     Id upperId, {
     bool includeLower = true,
@@ -255,9 +257,9 @@ extension PembeliModelQueryWhere
   }
 }
 
-extension PembeliModelQueryFilter
-    on QueryBuilder<PembeliModel, PembeliModel, QFilterCondition> {
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+extension CustomerModelQueryFilter
+    on QueryBuilder<CustomerModel, CustomerModel, QFilterCondition> {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       createdAtEqualTo(DateTime value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -267,7 +269,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       createdAtGreaterThan(
     DateTime value, {
     bool include = false,
@@ -281,7 +283,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       createdAtLessThan(
     DateTime value, {
     bool include = false,
@@ -295,7 +297,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       createdAtBetween(
     DateTime lower,
     DateTime upper, {
@@ -313,7 +315,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> dobIsNull() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      dobIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
         property: r'dob',
@@ -321,7 +324,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       dobIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
@@ -330,7 +333,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> dobEqualTo(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> dobEqualTo(
       DateTime? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -340,7 +343,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       dobGreaterThan(
     DateTime? value, {
     bool include = false,
@@ -354,7 +357,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> dobLessThan(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> dobLessThan(
     DateTime? value, {
     bool include = false,
   }) {
@@ -367,7 +370,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> dobBetween(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> dobBetween(
     DateTime? lower,
     DateTime? upper, {
     bool includeLower = true,
@@ -384,7 +387,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> idEqualTo(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> idEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -394,7 +397,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> idGreaterThan(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      idGreaterThan(
     Id value, {
     bool include = false,
   }) {
@@ -407,7 +411,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> idLessThan(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> idLessThan(
     Id value, {
     bool include = false,
   }) {
@@ -420,7 +424,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> idBetween(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> idBetween(
     Id lower,
     Id upper, {
     bool includeLower = true,
@@ -437,7 +441,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       keteranganIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -446,7 +450,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       keteranganIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
@@ -455,7 +459,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       keteranganEqualTo(
     String? value, {
     bool caseSensitive = true,
@@ -469,7 +473,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       keteranganGreaterThan(
     String? value, {
     bool include = false,
@@ -485,7 +489,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       keteranganLessThan(
     String? value, {
     bool include = false,
@@ -501,7 +505,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       keteranganBetween(
     String? lower,
     String? upper, {
@@ -521,7 +525,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       keteranganStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -535,7 +539,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       keteranganEndsWith(
     String value, {
     bool caseSensitive = true,
@@ -549,7 +553,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       keteranganContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
@@ -560,7 +564,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       keteranganMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
@@ -571,7 +575,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       keteranganIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -581,7 +585,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       keteranganIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -591,7 +595,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> ktpIsNull() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      ktpIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
         property: r'ktp',
@@ -599,7 +604,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       ktpIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
@@ -608,7 +613,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> ktpEqualTo(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> ktpEqualTo(
     String? value, {
     bool caseSensitive = true,
   }) {
@@ -621,7 +626,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       ktpGreaterThan(
     String? value, {
     bool include = false,
@@ -637,7 +642,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> ktpLessThan(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> ktpLessThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -652,7 +657,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> ktpBetween(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> ktpBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -671,7 +676,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> ktpStartsWith(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      ktpStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -684,7 +690,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> ktpEndsWith(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> ktpEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -697,7 +703,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> ktpContains(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> ktpContains(
       String value,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -709,7 +715,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> ktpMatches(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> ktpMatches(
       String pattern,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -721,7 +727,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> ktpIsEmpty() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      ktpIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'ktp',
@@ -730,7 +737,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       ktpIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -740,7 +747,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       masukIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -749,7 +756,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       masukIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
@@ -758,8 +765,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> masukEqualTo(
-      DateTime? value) {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      masukEqualTo(DateTime? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'masuk',
@@ -768,7 +775,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       masukGreaterThan(
     DateTime? value, {
     bool include = false,
@@ -782,7 +789,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> masukLessThan(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      masukLessThan(
     DateTime? value, {
     bool include = false,
   }) {
@@ -795,7 +803,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> masukBetween(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      masukBetween(
     DateTime? lower,
     DateTime? upper, {
     bool includeLower = true,
@@ -812,7 +821,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> namaEqualTo(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> namaEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -825,7 +834,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       namaGreaterThan(
     String value, {
     bool include = false,
@@ -841,7 +850,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> namaLessThan(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      namaLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -856,7 +866,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> namaBetween(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> namaBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -875,7 +885,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       namaStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -889,7 +899,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> namaEndsWith(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      namaEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -902,9 +913,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> namaContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      namaContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
         property: r'nama',
@@ -914,7 +924,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> namaMatches(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition> namaMatches(
       String pattern,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -926,7 +936,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       namaIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -936,7 +946,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       namaIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -946,7 +956,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       phoneIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -955,7 +965,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       phoneIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
@@ -964,7 +974,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> phoneEqualTo(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      phoneEqualTo(
     String? value, {
     bool caseSensitive = true,
   }) {
@@ -977,7 +988,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       phoneGreaterThan(
     String? value, {
     bool include = false,
@@ -993,7 +1004,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> phoneLessThan(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      phoneLessThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -1008,7 +1020,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> phoneBetween(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      phoneBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -1027,7 +1040,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       phoneStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -1041,7 +1054,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> phoneEndsWith(
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      phoneEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1054,9 +1068,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> phoneContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      phoneContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
         property: r'phone',
@@ -1066,9 +1079,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> phoneMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      phoneMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
         property: r'phone',
@@ -1078,7 +1090,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       phoneIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1088,7 +1100,7 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       phoneIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -1098,8 +1110,8 @@ extension PembeliModelQueryFilter
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterFilterCondition> statusEqualTo(
-      bool value) {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      statusEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'status',
@@ -1109,330 +1121,332 @@ extension PembeliModelQueryFilter
   }
 }
 
-extension PembeliModelQueryObject
-    on QueryBuilder<PembeliModel, PembeliModel, QFilterCondition> {}
+extension CustomerModelQueryObject
+    on QueryBuilder<CustomerModel, CustomerModel, QFilterCondition> {}
 
-extension PembeliModelQueryLinks
-    on QueryBuilder<PembeliModel, PembeliModel, QFilterCondition> {}
+extension CustomerModelQueryLinks
+    on QueryBuilder<CustomerModel, CustomerModel, QFilterCondition> {}
 
-extension PembeliModelQuerySortBy
-    on QueryBuilder<PembeliModel, PembeliModel, QSortBy> {
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByCreatedAt() {
+extension CustomerModelQuerySortBy
+    on QueryBuilder<CustomerModel, CustomerModel, QSortBy> {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByCreatedAtDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy>
+      sortByCreatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByDob() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByDob() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'dob', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByDobDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByDobDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'dob', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByKeterangan() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByKeterangan() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'keterangan', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy>
       sortByKeteranganDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'keterangan', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByKtp() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByKtp() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'ktp', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByKtpDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByKtpDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'ktp', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByMasuk() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByMasuk() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'masuk', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByMasukDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByMasukDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'masuk', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByNama() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByNama() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nama', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByNamaDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByNamaDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nama', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByPhone() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByPhone() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'phone', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByPhoneDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByPhoneDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'phone', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByStatus() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByStatus() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'status', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> sortByStatusDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> sortByStatusDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'status', Sort.desc);
     });
   }
 }
 
-extension PembeliModelQuerySortThenBy
-    on QueryBuilder<PembeliModel, PembeliModel, QSortThenBy> {
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByCreatedAt() {
+extension CustomerModelQuerySortThenBy
+    on QueryBuilder<CustomerModel, CustomerModel, QSortThenBy> {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByCreatedAtDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy>
+      thenByCreatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByDob() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByDob() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'dob', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByDobDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByDobDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'dob', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenById() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByIdDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByKeterangan() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByKeterangan() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'keterangan', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy>
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy>
       thenByKeteranganDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'keterangan', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByKtp() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByKtp() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'ktp', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByKtpDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByKtpDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'ktp', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByMasuk() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByMasuk() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'masuk', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByMasukDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByMasukDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'masuk', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByNama() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByNama() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nama', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByNamaDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByNamaDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nama', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByPhone() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByPhone() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'phone', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByPhoneDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByPhoneDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'phone', Sort.desc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByStatus() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByStatus() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'status', Sort.asc);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QAfterSortBy> thenByStatusDesc() {
+  QueryBuilder<CustomerModel, CustomerModel, QAfterSortBy> thenByStatusDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'status', Sort.desc);
     });
   }
 }
 
-extension PembeliModelQueryWhereDistinct
-    on QueryBuilder<PembeliModel, PembeliModel, QDistinct> {
-  QueryBuilder<PembeliModel, PembeliModel, QDistinct> distinctByCreatedAt() {
+extension CustomerModelQueryWhereDistinct
+    on QueryBuilder<CustomerModel, CustomerModel, QDistinct> {
+  QueryBuilder<CustomerModel, CustomerModel, QDistinct> distinctByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'createdAt');
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QDistinct> distinctByDob() {
+  QueryBuilder<CustomerModel, CustomerModel, QDistinct> distinctByDob() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'dob');
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QDistinct> distinctByKeterangan(
+  QueryBuilder<CustomerModel, CustomerModel, QDistinct> distinctByKeterangan(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'keterangan', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QDistinct> distinctByKtp(
+  QueryBuilder<CustomerModel, CustomerModel, QDistinct> distinctByKtp(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'ktp', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QDistinct> distinctByMasuk() {
+  QueryBuilder<CustomerModel, CustomerModel, QDistinct> distinctByMasuk() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'masuk');
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QDistinct> distinctByNama(
+  QueryBuilder<CustomerModel, CustomerModel, QDistinct> distinctByNama(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'nama', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QDistinct> distinctByPhone(
+  QueryBuilder<CustomerModel, CustomerModel, QDistinct> distinctByPhone(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'phone', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<PembeliModel, PembeliModel, QDistinct> distinctByStatus() {
+  QueryBuilder<CustomerModel, CustomerModel, QDistinct> distinctByStatus() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'status');
     });
   }
 }
 
-extension PembeliModelQueryProperty
-    on QueryBuilder<PembeliModel, PembeliModel, QQueryProperty> {
-  QueryBuilder<PembeliModel, int, QQueryOperations> idProperty() {
+extension CustomerModelQueryProperty
+    on QueryBuilder<CustomerModel, CustomerModel, QQueryProperty> {
+  QueryBuilder<CustomerModel, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
     });
   }
 
-  QueryBuilder<PembeliModel, DateTime, QQueryOperations> createdAtProperty() {
+  QueryBuilder<CustomerModel, DateTime, QQueryOperations> createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
     });
   }
 
-  QueryBuilder<PembeliModel, DateTime?, QQueryOperations> dobProperty() {
+  QueryBuilder<CustomerModel, DateTime?, QQueryOperations> dobProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'dob');
     });
   }
 
-  QueryBuilder<PembeliModel, String?, QQueryOperations> keteranganProperty() {
+  QueryBuilder<CustomerModel, String?, QQueryOperations> keteranganProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'keterangan');
     });
   }
 
-  QueryBuilder<PembeliModel, String?, QQueryOperations> ktpProperty() {
+  QueryBuilder<CustomerModel, String?, QQueryOperations> ktpProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'ktp');
     });
   }
 
-  QueryBuilder<PembeliModel, DateTime?, QQueryOperations> masukProperty() {
+  QueryBuilder<CustomerModel, DateTime?, QQueryOperations> masukProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'masuk');
     });
   }
 
-  QueryBuilder<PembeliModel, String, QQueryOperations> namaProperty() {
+  QueryBuilder<CustomerModel, String, QQueryOperations> namaProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'nama');
     });
   }
 
-  QueryBuilder<PembeliModel, String?, QQueryOperations> phoneProperty() {
+  QueryBuilder<CustomerModel, String?, QQueryOperations> phoneProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'phone');
     });
   }
 
-  QueryBuilder<PembeliModel, bool, QQueryOperations> statusProperty() {
+  QueryBuilder<CustomerModel, bool, QQueryOperations> statusProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'status');
     });

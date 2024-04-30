@@ -3,6 +3,7 @@ import 'package:due_kasir/controller/customer_controller.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/date_utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -13,15 +14,17 @@ class NavDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
     final auth = authController.customer.watch(context);
     return Drawer(
       child: Column(
         children: <Widget>[
           UserAccountsDrawerHeader(
             decoration: const BoxDecoration(color: Color(0xff71C9CE)),
-            accountName: Text(auth.value?.user.value?.nama ?? "Kasir",
+            accountName: Text(
+                '${auth.value?.user.value?.nama ?? "Kasir"} - ${auth.value?.user.value?.keterangan ?? "Role"}',
                 style: ShadTheme.of(context).textTheme.h4),
-            accountEmail: Text(auth.value?.user.value?.keterangan ?? "Role",
+            accountEmail: Text(user?.email ?? '',
                 style: ShadTheme.of(context).textTheme.p),
             currentAccountPictureSize: const Size(200, 80),
             currentAccountPicture: Column(
@@ -48,8 +51,8 @@ class NavDrawer extends StatelessWidget {
             leading: const Icon(Icons.inventory),
             onTap: () {
               Database().searchInventorys().then((val) {
-                inventoryController.inventorySearch.clear();
-                inventoryController.inventorySearch.addAll(val);
+                inventoryController.inventorys.clear();
+                inventoryController.inventorys.addAll(val);
               });
               context.go('/inventory');
             },
@@ -79,8 +82,9 @@ class NavDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Account'),
             leading: const Icon(Icons.account_circle),
-            trailing: IconButton(
-                onPressed: () {
+            trailing: PopupMenuButton<String>(
+              onSelected: (item) async {
+                if (item == 'restore') {
                   ShadToaster.of(context).show(
                     ShadToast(
                       title: const Text('Restore Backup?'),
@@ -100,8 +104,76 @@ class NavDrawer extends StatelessWidget {
                       ),
                     ),
                   );
-                },
-                icon: const Icon(Icons.more_vert)),
+                } else if (item == 'login') {
+                  context.pop();
+                  context.push('/login');
+                } else if (item == 'backup') {
+                  context.pop();
+                  Database().createBackUp().whenComplete(() => const ShadToast(
+                        title: Text('Backup Database Success!'),
+                        description: Text('All your data on download folder'),
+                      ));
+                } else if (item == 'clear') {
+                  context.pop();
+                  showShadDialog(
+                    context: context,
+                    builder: (context) => ShadDialog.alert(
+                      title: const Text('Are you absolutely sure?'),
+                      description: const Padding(
+                        padding: EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          'This action cannot be undone. This will permanently delete your data.',
+                        ),
+                      ),
+                      actions: [
+                        ShadButton.outline(
+                          text: const Text('Cancel'),
+                          onPressed: () => Navigator.of(context).pop(false),
+                        ),
+                        ShadButton(
+                          text: const Text('Continue'),
+                          onPressed: () async {
+                            await Database().clearAllData().whenComplete(
+                                () => Navigator.of(context).pop(true));
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                } else if (item == 'logout') {
+                  context.pop();
+                  await FirebaseAuth.instance.signOut();
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'restore',
+                  child: Text('Restore'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'backup',
+                  child: Text('Backup'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'clear',
+                  child: Text('Clear/Reset'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'store',
+                  child: Text('Store'),
+                ),
+                if (user == null)
+                  const PopupMenuItem<String>(
+                    value: 'login',
+                    child: Text('Login'),
+                  )
+                else
+                  const PopupMenuItem<String>(
+                    value: 'logout',
+                    child: Text('Logout'),
+                  ),
+              ],
+            ),
             onTap: () => context.go('/home'),
           ),
         ],

@@ -1,5 +1,5 @@
 import 'package:due_kasir/controller/customer_controller.dart';
-import 'package:due_kasir/model/pembeli_model.dart';
+import 'package:due_kasir/model/customer_model.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
@@ -147,7 +147,7 @@ class CustomerForm extends HookWidget {
                         onPressed: () {
                           if (customerFormKey.currentState!.validate()) {
                             if (customer != null) {
-                              final updateCustomer = PembeliModel()
+                              final updateCustomer = CustomerModel()
                                 ..id = customer.id
                                 ..nama = editingName.text
                                 ..dob = lahir.value
@@ -167,7 +167,7 @@ class CustomerForm extends HookWidget {
                                 });
                               });
                             } else {
-                              final newCustomer = PembeliModel()
+                              final newCustomer = CustomerModel()
                                 ..nama = editingName.text
                                 ..dob = lahir.value
                                 ..ktp = editingKtp.text

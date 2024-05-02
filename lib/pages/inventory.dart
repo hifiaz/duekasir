@@ -64,11 +64,25 @@ class Inventory extends StatelessWidget {
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(
                 value: 'sync',
-                child: Text('Restore'),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.restore),
+                    SizedBox(width: 8),
+                    Text('Restore'),
+                  ],
+                ),
               ),
               const PopupMenuItem<String>(
                 value: 'clear',
-                child: Text('Clear'),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.clear_all),
+                    SizedBox(width: 8),
+                    Text('Clear'),
+                  ],
+                ),
               ),
             ],
           ),

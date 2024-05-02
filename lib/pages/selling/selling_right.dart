@@ -54,7 +54,7 @@ class SellingRightState extends State<SellingRight> {
   @override
   Widget build(BuildContext context) {
     final sellingFormKey = useMemoized(GlobalKey<FormState>.new);
-    final print = getIt.get<SellingController>().selectedPrint.watch(context);
+    final printName = getIt.get<SellingController>().selectedPrint.watch(context);
     final store = storeController.store.watch(context);
     final tipeBayar = getIt.get<SellingController>().tipeBayar.watch(context);
     final pelanggan = getIt.get<SellingController>().pelanggan.watch(context);
@@ -217,7 +217,7 @@ class SellingRightState extends State<SellingRight> {
                                               : '0') -
                                       (list.value?.totalPrice ?? 0.0))
                                   .toString(),
-                              printName: print)
+                              printName: printName)
                           .whenComplete(() {
                         cashEditing.clear();
                         note.clear();
@@ -400,8 +400,8 @@ class SellingRightState extends State<SellingRight> {
     bytes += generator.feed(2);
     bytes += generator.cut();
     bytes += generator.drawer();
-    if (Platform.isWindows && printName != null) {
-      await usb_esc_printer_windows.sendPrintRequest(bytes, printName);
+    if (Platform.isWindows) {
+      await usb_esc_printer_windows.sendPrintRequest(bytes, printName ?? 'Xprinter XP-T371U');
     } else {
       await PrintBluetoothThermal.writeBytes(bytes);
     }

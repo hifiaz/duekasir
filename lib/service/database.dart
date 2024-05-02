@@ -79,18 +79,28 @@ class Database {
 
   // Customer
   Future<void> addNewCustomer(CustomerModel val) async {
+    val.isSynced = isDeviceConnected.value;
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.customerModels.putSync(val));
+    if (isDeviceConnected.value) {
+      _cloudFirestoreHelper.addCustomer(val.toJson());
+    }
   }
 
   Future<void> deleteCustomer(int val) async {
     final isar = await db;
     isar.writeTxn<bool>(() async => await isar.customerModels.delete(val));
+    if (isDeviceConnected.value) {
+      _cloudFirestoreHelper.removeCustomer(val);
+    }
   }
 
   Future<void> updateCustomer(CustomerModel val) async {
     final isar = await db;
     isar.writeTxn<int>(() async => await isar.customerModels.put(val));
+    if (isDeviceConnected.value) {
+      _cloudFirestoreHelper.updateCustomer(val);
+    }
   }
 
   Future<List<CustomerModel>> getCustomers() async {
@@ -120,6 +130,7 @@ class Database {
     return users;
   }
 
+  // inventory
   Future<void> addInventory(ItemModel val) async {
     val.isSynced = isDeviceConnected.value;
     final isar = await db;
@@ -164,14 +175,14 @@ class Database {
       inventoryController.inventorys.value =
           await _cloudFirestoreHelper.getInventoryAll();
 
-      insertFresh(inventoryController.inventorys.value);
+      insertInventoryFresh(inventoryController.inventorys.value);
     } else {
       inventoryController.inventorys.value =
           await inventoryCollection.where().findAll();
     }
   }
 
-  insertFresh(List<ItemModel> inventoryList) async {
+  insertInventoryFresh(List<ItemModel> inventoryList) async {
     final isar = await db;
     await clearInventory();
     if (inventoryList.isNotEmpty) {
@@ -179,8 +190,6 @@ class Database {
           inventoryList,
           (val) async =>
               await isar.writeTxn<int>(() => isar.itemModels.put(val)));
-      // inventoryList.forEach((val) async =>
-      //     await isar.writeTxn<int>(() => isar.itemModels.put(val)));
     }
   }
 
@@ -255,6 +264,7 @@ class Database {
     isar.writeTxn<void>(() => inventoryCollection.clear());
   }
 
+  // sales
   Future<void> addPenjualan(PenjualanModel val) async {
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.penjualanModels.putSync(val));

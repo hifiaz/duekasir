@@ -100,7 +100,7 @@ class CloudFirestoreHelper {
     });
   }
 
-  updateCustomer(ItemModel item) async {
+  updateCustomer(CustomerModel item) async {
     await customer.where("id", isEqualTo: item.id).get().then((value) async {
       if (value.docs.isEmpty) {
         addCustomer(item.toJson());

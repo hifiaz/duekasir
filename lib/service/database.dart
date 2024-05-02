@@ -279,7 +279,7 @@ class Database {
     final isar = await db;
     IsarCollection<PenjualanModel> inventoryCollection =
         isar.collection<PenjualanModel>();
-    final items = inventoryCollection.where().findAll();
+    final items = inventoryCollection.where().sortByCreatedAtDesc().findAll();
     return items;
   }
 

@@ -23,6 +23,23 @@ class Report extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Report'),
         centerTitle: false,
+        actions: [
+          ShadButton.ghost(
+            onPressed: () {
+              reportController.report.refresh();
+              reportController.reportToday.refresh();
+              reportController.reportYesterday.refresh();
+            },
+            text: const Text('Refresh'),
+            icon: const Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Icon(
+                Icons.refresh,
+                size: 16,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),

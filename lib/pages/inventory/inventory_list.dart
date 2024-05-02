@@ -154,7 +154,8 @@ class InventoryList extends HookWidget {
                 contentPadding: EdgeInsets.zero,
                 leading: Text(i.id.toString()),
                 title: Text(i.nama),
-                subtitle: Text('${currency.format(i.hargaJual)} - ${i.code}'),
+                subtitle: Text(
+                    '${i.diskonPersen == null || i.diskonPersen == 0 ? '-' : currency.format(i.hargaJual - i.hargaJual * (i.diskonPersen! / 100))} - ${i.code}'),
                 trailing: const Icon(Icons.arrow_right_outlined),
                 onTap: () {
                   inventoryController.inventorySelected.value = i;

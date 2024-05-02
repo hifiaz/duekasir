@@ -279,7 +279,37 @@ class Database {
     final isar = await db;
     IsarCollection<PenjualanModel> inventoryCollection =
         isar.collection<PenjualanModel>();
-    final items = inventoryCollection.where().findAll();
+    final items = inventoryCollection.where().sortByCreatedAtDesc().findAll();
+    return items;
+  }
+
+  Future<List<PenjualanModel>> getReportToday() async {
+    final isar = await db;
+    IsarCollection<PenjualanModel> inventoryCollection =
+        isar.collection<PenjualanModel>();
+    final items = inventoryCollection
+        .filter()
+        .createdAtBetween(
+            DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
+            DateTime.now().copyWith(hour: 23, minute: 59, second: 59))
+        .findAll();
+    return items;
+  }
+
+  Future<List<PenjualanModel>> getReportYesterday() async {
+    final isar = await db;
+    IsarCollection<PenjualanModel> inventoryCollection =
+        isar.collection<PenjualanModel>();
+    final items = inventoryCollection
+        .filter()
+        .createdAtBetween(
+            DateTime.now()
+                .subtract(const Duration(days: 1))
+                .copyWith(hour: 0, minute: 0, second: 0),
+            DateTime.now()
+                .subtract(const Duration(days: 1))
+                .copyWith(hour: 23, minute: 59, second: 59))
+        .findAll();
     return items;
   }
 

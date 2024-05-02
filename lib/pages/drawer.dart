@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:due_kasir/controller/auth_controller.dart';
 import 'package:due_kasir/controller/customer_controller.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
@@ -14,7 +16,8 @@ class NavDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    User? user;
+    if (!Platform.isWindows) user = FirebaseAuth.instance.currentUser;
     final auth = authController.customer.watch(context);
     return Drawer(
       child: Column(

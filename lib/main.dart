@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:due_kasir/firebase_options.dart';
@@ -12,7 +13,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
-final isDeviceConnected = signal(false, autoDispose: true);
+final isDeviceConnected = signal(false);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,12 +36,15 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    subscription = Connectivity()
-        .onConnectivityChanged
-        .listen((List<ConnectivityResult> result) async {
-      isDeviceConnected.value = await InternetConnectionChecker().hasConnection;
-      log("Internet status ====== $isDeviceConnected");
-    });
+    if (!Platform.isWindows) {
+      subscription = Connectivity()
+          .onConnectivityChanged
+          .listen((List<ConnectivityResult> result) async {
+        isDeviceConnected.value =
+            await InternetConnectionChecker().hasConnection;
+        log("Internet status ====== $isDeviceConnected");
+      });
+    }
   }
 
   @override

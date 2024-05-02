@@ -1,3 +1,4 @@
+import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -20,3 +21,12 @@ ButtonStyle nonActive = ElevatedButton.styleFrom(
     borderRadius: BorderRadius.circular(8),
   ),
 );
+
+double sumReport(List<PenjualanModel> numbers) {
+  double sum = 0;
+
+  for (var i in numbers) {
+    sum = sum + i.totalHarga;
+  }
+  return sum;
+}

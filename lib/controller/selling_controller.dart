@@ -77,7 +77,9 @@ class SellingController {
 
   Future<void> updateBatch(List<ItemModel> items) async {
     await Future.forEach<ItemModel>(items, (i) async {
-      final item = i..jumlahBarang = i.jumlahBarang - i.quantity;
+      final item = i
+        ..jumlahBarang = i.jumlahBarang - i.quantity
+        ..quantity = 1;
       await Database().updateInventory(item);
     });
     Future.delayed(Durations.short1).then((_) {

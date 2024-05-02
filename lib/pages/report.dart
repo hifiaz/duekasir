@@ -1,12 +1,12 @@
 import 'package:due_kasir/controller/report_controller.dart';
-import 'package:due_kasir/model/customer_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/pages/drawer.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/constant.dart';
+import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:get_time_ago/get_time_ago.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
 class Report extends StatelessWidget {
@@ -14,6 +14,10 @@ class Report extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final report = reportController.report.watch(context);
+    final reportToday = reportController.reportToday.watch(context);
+    final reportYesteday = reportController.reportYesterday.watch(context);
+    final theme = ShadTheme.of(context);
     return Scaffold(
       drawer: const NavDrawer(),
       appBar: AppBar(
@@ -26,77 +30,59 @@ class Report extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextFormField(
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.search),
-                  hintText: 'Search',
-                ),
+              Wrap(
+                children: [
+                  ShadCard(
+                    width: 350,
+                    title: Text(
+                        currency.format(sumReport(reportToday.value ?? [])),
+                        style: theme.textTheme.h4),
+                    description: const Text('Total Penjualan Hari ini'),
+                  ),
+                  const SizedBox(width: 20),
+                  ShadCard(
+                    width: 350,
+                    title: Text(
+                        currency.format(sumReport(reportYesteday.value ?? [])),
+                        style: theme.textTheme.h4),
+                    description: const Text('Total Penjualan Kemarin'),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
-              Watch(
-                (context) => DataTable(
-                  columns: const [
-                    DataColumn(label: Text('ID')),
-                    DataColumn(label: Text('Tanggal')),
-                    DataColumn(label: Text('Kasir')),
-                    DataColumn(label: Text('Pembeli')),
-                    DataColumn(label: Text('Total Item')),
-                    DataColumn(label: Text('Total Harga')),
-                    DataColumn(label: Text('More')),
-                  ],
-                  rows: reportController.report.value.map(
-                      loading: () => [
-                            const DataRow(cells: [
-                              DataCell(Text('Loading')),
-                              DataCell(Text('')),
-                              DataCell(Text('')),
-                              DataCell(Text('')),
-                              DataCell(Text('')),
-                              DataCell(Text('')),
-                              DataCell(Text(''))
-                            ])
-                          ],
-                      error: (e) => Text('Error $e'),
-                      data: (data) {
-                        return [
-                          for (PenjualanModel item in data)
-                            DataRow(cells: [
-                              DataCell(Text(item.id.toString())),
-                              DataCell(Text(GetTimeAgo.parse(item.createdAt))),
-                              DataCell(FutureBuilder<UserModel?>(
-                                  future: Database().getUserById(item.kasir),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      return Text(
-                                          snapshot.data?.nama ?? 'Admin');
-                                    }
-                                    return const Text('Admin');
-                                  })),
-                              DataCell(
-                                item.pembeli != null
-                                    ? FutureBuilder<CustomerModel?>(
-                                        future: Database()
-                                            .getCustomerById(item.pembeli!),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.hasData) {
-                                            return Text(
-                                                snapshot.data?.nama ?? 'Umum');
-                                          }
-                                          return const Text('Umum');
-                                        })
-                                    : const Text('Umum'),
-                              ),
-                              DataCell(Text(item.totalItem.toString())),
-                              DataCell(Text(currency.format(item.totalHarga))),
-                              DataCell(
-                                const Icon(Icons.more_horiz),
-                                onTap: () {},
-                              ),
-                            ])
-                        ];
+              for (PenjualanModel item in report.value ?? [])
+                ExpansionTile(
+                  leading: Text(item.id.toString()),
+                  title: FutureBuilder<UserModel?>(
+                      future: Database().getUserById(item.kasir),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Text(snapshot.data?.nama ?? 'Admin');
+                        }
+                        return const Text('Admin');
                       }),
+                  subtitle: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(dateWithTime.format(item.createdAt)),
+                      Text(
+                          '(${item.totalItem.toString()}) ${currency.format(item.totalHarga)}')
+                    ],
+                  ),
+                  children: item.items
+                      .map(
+                        (val) => ListTile(
+                          title: Text('${val.nama} - ${val.code}'),
+                          subtitle: Text(val.diskonPersen == null ||
+                                  val.diskonPersen == 0
+                              ? currency.format(val.hargaJual)
+                              : currency.format(val.hargaJual -
+                                  val.hargaJual * (val.diskonPersen! / 100))),
+                          trailing: Text(val.quantity.toString()),
+                        ),
+                      )
+                      .toList(),
                 ),
-              ),
             ],
           ),
         ),

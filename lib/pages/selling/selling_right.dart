@@ -54,7 +54,8 @@ class SellingRightState extends State<SellingRight> {
   @override
   Widget build(BuildContext context) {
     final sellingFormKey = useMemoized(GlobalKey<FormState>.new);
-    final printName = getIt.get<SellingController>().selectedPrint.watch(context);
+    final printName =
+        getIt.get<SellingController>().selectedPrint.watch(context);
     final store = storeController.store.watch(context);
     final tipeBayar = getIt.get<SellingController>().tipeBayar.watch(context);
     final pelanggan = getIt.get<SellingController>().pelanggan.watch(context);
@@ -336,12 +337,12 @@ class SellingRightState extends State<SellingRight> {
       bytes += generator.row([
         PosColumn(
           text:
-              '${i.diskonPersen != null || i.diskonPersen != 0.0 ? '' : 'Disc'} ${i.quantity} x ${i.diskonPersen != null || i.diskonPersen != 0.0 ? i.hargaJual : i.hargaJual - i.hargaJual * (i.diskonPersen! / 100)}',
+              '${i.diskonPersen == null || i.diskonPersen == 0.0 ? '' : 'Disc'} ${i.quantity} x ${i.diskonPersen == null || i.diskonPersen == 0.0 ? i.hargaJual : '${i.hargaJual} >> ${i.hargaJual - i.hargaJual * (i.diskonPersen! / 100)}'}',
           width: 6,
           styles: const PosStyles(align: PosAlign.left),
         ),
         PosColumn(
-          text: i.diskonPersen != null || i.diskonPersen != 0.0
+          text: i.diskonPersen == null || i.diskonPersen == 0.0
               ? '${i.quantity * i.hargaJual}'
               : '${i.quantity * (i.hargaJual - i.hargaJual * (i.diskonPersen! / 100))}',
           width: 6,
@@ -401,7 +402,8 @@ class SellingRightState extends State<SellingRight> {
     bytes += generator.cut();
     bytes += generator.drawer();
     if (Platform.isWindows) {
-      await usb_esc_printer_windows.sendPrintRequest(bytes, printName ?? 'Xprinter XP-T371U');
+      await usb_esc_printer_windows.sendPrintRequest(
+          bytes, printName ?? 'Xprinter XP-T371U');
     } else {
       await PrintBluetoothThermal.writeBytes(bytes);
     }

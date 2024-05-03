@@ -19,50 +19,6 @@ class Home extends StatelessWidget {
         title: const Text('Account'),
         centerTitle: false,
         actions: [
-          // ShadButton(
-          //   icon: const Padding(
-          //       padding: EdgeInsets.only(right: 8),
-          //       child: Icon(Icons.clear_all)),
-          //   text: const Text('Reset'),
-          //   onPressed: () {
-          //     showShadDialog(
-          //       context: context,
-          //       builder: (context) => ShadDialog.alert(
-          //         title: const Text('Are you absolutely sure?'),
-          //         description: const Padding(
-          //           padding: EdgeInsets.only(bottom: 8),
-          //           child: Text(
-          //             'This action cannot be undone. This will permanently delete your data.',
-          //           ),
-          //         ),
-          //         actions: [
-          //           ShadButton.outline(
-          //             text: const Text('Cancel'),
-          //             onPressed: () => Navigator.of(context).pop(false),
-          //           ),
-          //           ShadButton(
-          //             text: const Text('Continue'),
-          //             onPressed: () async {
-          //               await Database().clearAllData().whenComplete(
-          //                   () => Navigator.of(context).pop(true));
-          //             },
-          //           ),
-          //         ],
-          //       ),
-          //     );
-          //   },
-          // ),
-          // ShadButton(
-          //   icon: const Padding(
-          //       padding: EdgeInsets.only(right: 8), child: Icon(Icons.store)),
-          //   text: const Text('Backup'),
-          //   onPressed: () => Database().createBackUp().whenComplete(
-          //         () => const ShadToast(
-          //           title: Text('Backup Database Success!'),
-          //           description: Text('All your data on download folder'),
-          //         ),
-          //       ),
-          // ),
           ShadButton(
             icon: const Padding(
                 padding: EdgeInsets.only(right: 8), child: Icon(Icons.store)),

@@ -129,7 +129,7 @@ CustomerModel _customerModelDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = CustomerModel(
-    createdAt: reader.readDateTimeOrNull(offsets[0]) ?? DateTime.now(),
+    createdAt: reader.readDateTimeOrNull(offsets[0]),
     dob: reader.readDateTimeOrNull(offsets[1]),
     id: id,
     isSynced: reader.readBoolOrNull(offsets[2]) ?? true,
@@ -151,7 +151,7 @@ P _customerModelDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readDateTimeOrNull(offset) ?? DateTime.now()) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 1:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 2:
@@ -270,7 +270,25 @@ extension CustomerModelQueryWhere
 extension CustomerModelQueryFilter
     on QueryBuilder<CustomerModel, CustomerModel, QFilterCondition> {
   QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
-      createdAtEqualTo(DateTime value) {
+      createdAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'createdAt',
+      ));
+    });
+  }
+
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      createdAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'createdAt',
+      ));
+    });
+  }
+
+  QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
+      createdAtEqualTo(DateTime? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'createdAt',
@@ -281,7 +299,7 @@ extension CustomerModelQueryFilter
 
   QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       createdAtGreaterThan(
-    DateTime value, {
+    DateTime? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -295,7 +313,7 @@ extension CustomerModelQueryFilter
 
   QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       createdAtLessThan(
-    DateTime value, {
+    DateTime? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -309,8 +327,8 @@ extension CustomerModelQueryFilter
 
   QueryBuilder<CustomerModel, CustomerModel, QAfterFilterCondition>
       createdAtBetween(
-    DateTime lower,
-    DateTime upper, {
+    DateTime? lower,
+    DateTime? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -1473,7 +1491,7 @@ extension CustomerModelQueryProperty
     });
   }
 
-  QueryBuilder<CustomerModel, DateTime, QQueryOperations> createdAtProperty() {
+  QueryBuilder<CustomerModel, DateTime?, QQueryOperations> createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
     });

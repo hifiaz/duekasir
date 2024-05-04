@@ -158,7 +158,7 @@ ItemModel _itemModelDeserialize(
     barangKeluar: reader.readDateTimeOrNull(offsets[0]),
     barangMasuk: reader.readDateTimeOrNull(offsets[1]),
     code: reader.readString(offsets[2]),
-    createdAt: reader.readDateTimeOrNull(offsets[3]) ?? DateTime.now(),
+    createdAt: reader.readDateTimeOrNull(offsets[3]),
     deskripsi: reader.readStringOrNull(offsets[4]),
     diskonPersen: reader.readDoubleOrNull(offsets[5]),
     hargaDasar: reader.readLong(offsets[6]),
@@ -189,7 +189,7 @@ P _itemModelDeserializeProp<P>(
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
-      return (reader.readDateTimeOrNull(offset) ?? DateTime.now()) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 4:
       return (reader.readStringOrNull(offset)) as P;
     case 5:
@@ -583,8 +583,25 @@ extension ItemModelQueryFilter
     });
   }
 
+  QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> createdAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'createdAt',
+      ));
+    });
+  }
+
+  QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition>
+      createdAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'createdAt',
+      ));
+    });
+  }
+
   QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> createdAtEqualTo(
-      DateTime value) {
+      DateTime? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'createdAt',
@@ -595,7 +612,7 @@ extension ItemModelQueryFilter
 
   QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition>
       createdAtGreaterThan(
-    DateTime value, {
+    DateTime? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -608,7 +625,7 @@ extension ItemModelQueryFilter
   }
 
   QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> createdAtLessThan(
-    DateTime value, {
+    DateTime? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -621,8 +638,8 @@ extension ItemModelQueryFilter
   }
 
   QueryBuilder<ItemModel, ItemModel, QAfterFilterCondition> createdAtBetween(
-    DateTime lower,
-    DateTime upper, {
+    DateTime? lower,
+    DateTime? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -2026,7 +2043,7 @@ extension ItemModelQueryProperty
     });
   }
 
-  QueryBuilder<ItemModel, DateTime, QQueryOperations> createdAtProperty() {
+  QueryBuilder<ItemModel, DateTime?, QQueryOperations> createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
     });

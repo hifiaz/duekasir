@@ -197,8 +197,24 @@ class SellingRightState extends State<SellingRight> {
                 onPressed: () {
                   if (sellingFormKey.currentState!.validate() &&
                       store.hasValue) {
+                    List<ProductItemModel> products = [];
+                    for (ItemModel p in list.value!.items) {
+                      products.add(ProductItemModel()
+                        ..id = p.id!
+                        ..nama = p.nama
+                        ..code = p.code
+                        ..quantity = p.quantity
+                        ..hargaJual = p.hargaJual
+                        ..ukuran = p.ukuran
+                        ..isHargaJualPersen = p.isHargaJualPersen
+                        ..hargaJualPersen = p.hargaJualPersen
+                        ..hargaDasar = p.hargaDasar
+                        ..diskonPersen = p.diskonPersen
+                        ..deskripsi = p.deskripsi
+                        ..jumlahBarang = p.jumlahBarang..isSynced = p.isSynced);
+                    }
                     final newItem = PenjualanModel()
-                      ..items.addAll(list.value!.items)
+                      ..items.addAll(products)
                       ..kasir = kasir?.id ?? 1
                       ..keterangan = note.text
                       ..diskon = 0
@@ -332,7 +348,7 @@ class SellingRightState extends State<SellingRight> {
       ),
     ]);
     bytes += generator.hr();
-    for (ItemModel i in model.items) {
+    for (ProductItemModel i in model.items) {
       bytes += generator.text(i.nama);
       bytes += generator.row([
         PosColumn(

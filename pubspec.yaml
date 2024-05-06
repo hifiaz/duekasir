@@ -70,7 +70,10 @@ dependencies:
       url: https://github.com/imaldila/flutterfire_desktop.git
       path: packages/firebase_core/firebase_core_desktop
   firebase_auth: ^4.19.4
-      
+  fl_chart: ^0.67.0
+
+dependency_overrides:
+  intl: ^0.19.0
 
 windows:
   default_package: firebase_core_desktop

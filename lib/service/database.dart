@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/controller/selling_controller.dart';
 import 'package:due_kasir/main.dart';
@@ -311,6 +312,39 @@ class Database {
                 .copyWith(hour: 23, minute: 59, second: 59))
         .findAll();
     return items;
+  }
+
+  Future<Map<int, List<PenjualanModel>>> getSalesByUser() async {
+    final isar = await db;
+    IsarCollection<PenjualanModel> inventoryCollection =
+        isar.collection<PenjualanModel>();
+    final items = await inventoryCollection.where().findAll();
+
+    final Map<int, List<PenjualanModel>> listOfOrders =
+        items.groupListsBy((i) => i.kasir);
+
+    return listOfOrders;
+  }
+
+  Future<Map<DateTime, List<PenjualanModel>>> getSalesByMonth() async {
+    final isar = await db;
+    IsarCollection<PenjualanModel> inventoryCollection =
+        isar.collection<PenjualanModel>();
+    List<PenjualanModel> items = inventoryCollection
+        .where()
+        .filter()
+        .createdAtBetween(
+            DateTime.now()
+                .subtract(const Duration(days: 30))
+                .copyWith(hour: 0, minute: 0, second: 0),
+            DateTime.now().copyWith(hour: 23, minute: 59, second: 59))
+        .findAllSync();
+
+    final Map<DateTime, List<PenjualanModel>> listOfOrders = items.groupListsBy(
+        (order) => DateTime(
+            order.createdAt.year, order.createdAt.month, order.createdAt.day));
+
+    return listOfOrders;
   }
 
   Future<void> addStore(StoreModel val) async {

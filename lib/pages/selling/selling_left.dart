@@ -108,7 +108,34 @@ class SellingLeft extends HookWidget {
                                         ),
                                       ),
                                       title: Text(option.nama),
-                                      subtitle: Text(option.code),
+                                      subtitle: Row(
+                                        children: [
+                                          Text(
+                                            currency.format(option.hargaJual),
+                                            style: TextStyle(
+                                                color: option.diskonPersen ==
+                                                            null ||
+                                                        option.diskonPersen == 0
+                                                    ? Colors.green
+                                                    : Colors.red,
+                                                decoration: option
+                                                                .diskonPersen ==
+                                                            null ||
+                                                        option.diskonPersen == 0
+                                                    ? null
+                                                    : TextDecoration
+                                                        .lineThrough),
+                                          ),
+                                          if (option.diskonPersen != null &&
+                                              option.diskonPersen != 0)
+                                            Text(
+                                              ' >> ${currency.format(option.hargaJual - option.hargaJual * (option.diskonPersen! / 100))}',
+                                              style: const TextStyle(
+                                                  color: Colors.green),
+                                            ),
+                                          Text(' - ${option.code}')
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 )
@@ -212,6 +239,10 @@ class SellingLeft extends HookWidget {
                                   Text(
                                     currency.format(val.hargaJual),
                                     style: TextStyle(
+                                        color: val.diskonPersen == null ||
+                                                val.diskonPersen == 0
+                                            ? null
+                                            : Colors.red,
                                         decoration: val.diskonPersen == null ||
                                                 val.diskonPersen == 0
                                             ? null

@@ -30,3 +30,13 @@ double sumReport(List<PenjualanModel> numbers) {
   }
   return sum;
 }
+
+converColor(int index) {
+  if (index == 1) {
+    return Colors.green;
+  } else if (index == 2) {
+    return Colors.blue;
+  } else {
+    return Colors.yellow;
+  }
+}

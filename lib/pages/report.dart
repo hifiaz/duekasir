@@ -1,13 +1,17 @@
+import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/controller/report_controller.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/pages/drawer.dart';
+import 'package:due_kasir/pages/report/report_bestseller.dart';
 import 'package:due_kasir/pages/report/report_pie.dart';
 import 'package:due_kasir/pages/report/report_revenue.dart';
+import 'package:due_kasir/pages/report/report_visitors.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -25,6 +29,7 @@ class _ReportState extends State<Report> {
     final report = reportController.report.watch(context);
     final reportToday = reportController.reportToday.watch(context);
     final reportYesteday = reportController.reportYesterday.watch(context);
+    final reportOutOfStcok = reportController.reportOutOfStcok.watch(context);
     final theme = ShadTheme.of(context);
     return Scaffold(
       drawer: const NavDrawer(),
@@ -55,9 +60,10 @@ class _ReportState extends State<Report> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Wrap(
+              runSpacing: 10,
+              spacing: 10,
               children: [
                 const ReportPie(),
-                const SizedBox(width: 10, height: 10),
                 Column(
                   children: [
                     ShadCard(
@@ -78,7 +84,6 @@ class _ReportState extends State<Report> {
                     ),
                   ],
                 ),
-                const SizedBox(width: 10),
                 if (report.hasValue)
                   Column(
                     children: [
@@ -110,6 +115,66 @@ class _ReportState extends State<Report> {
                       ),
                     ],
                   ),
+                const ReportVisitors(),
+                ShadCard(
+                  width: 350,
+                  title: const Text('Out of Stock'),
+                  description: Text(
+                      'You have ${reportOutOfStcok.value?.length} item out of stock.'),
+                  content: Column(
+                    children: [
+                      const SizedBox(height: 16),
+                      if (reportOutOfStcok.hasValue)
+                        ...reportOutOfStcok.value!.take(10).map(
+                          (n) => Column(
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    margin: const EdgeInsets.only(top: 4),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 16),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                              '${n.nama} - ${n.jumlahBarang} Item Left',
+                                              style: theme.textTheme.small),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                              '${currency.format(n.hargaDasar)} - ${n.code}',
+                                              style: theme.textTheme.muted),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                      onPressed: () {
+                                        inventoryController
+                                            .inventorySelected.value = n;
+                                        context.go('/inventory/form');
+                                      },
+                                      icon: const Icon(Icons.arrow_right))
+                                ],
+                              ),
+                              const Divider(),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                if (report.hasValue) ReportBestSeller(list: report.value!),
               ],
             ),
             const SizedBox(height: 20),

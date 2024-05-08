@@ -265,6 +265,17 @@ class Database {
     isar.writeTxn<void>(() => inventoryCollection.clear());
   }
 
+  Future<List<ItemModel>> getOutStock() async {
+    final isar = await db;
+    IsarCollection<ItemModel> inventoryCollection =
+        isar.collection<ItemModel>();
+    final items = inventoryCollection
+        .filter()
+        .group((q) => q.jumlahBarangLessThan(1))
+        .findAll();
+    return items;
+  }
+
   // sales
   Future<void> addPenjualan(PenjualanModel val) async {
     final isar = await db;

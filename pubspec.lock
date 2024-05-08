@@ -333,10 +333,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: "45c70b43df893027e441a6fa0aacc8f484fb9f9c60c746dc8f1dc4f774cf55cd"
+      sha256: "29c90806ac5f5fb896547720b73b17ee9aed9bba540dc5d91fe29f8c5745b10a"
       url: "https://pub.dev"
     source: hosted
-    version: "8.0.2"
+    version: "8.0.3"
   file_saver:
     dependency: "direct main"
     description:
@@ -570,10 +570,10 @@ packages:
     dependency: "direct dev"
     description:
       name: go_router_builder
-      sha256: "4c635067a37f518f641d95c6daad924d8ba2f846513cc8286f380c047e8698fe"
+      sha256: a6f74b9f7dffe317c2479d6edb8757fde5df33a0056394d3a0d3ec44f4809210
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.1"
+    version: "2.6.2"
   graphs:
     dependency: transitive
     description:
@@ -986,10 +986,10 @@ packages:
     dependency: "direct main"
     description:
       name: shadcn_ui
-      sha256: "06c25555efbabe6d1d6acd6397bff4940e931d53ac3448e3a4f6a2287ab6798d"
+      sha256: af7956e5045ef81fbcafcce7733875e904547cd401141cd91d574ca5107392f2
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.3"
+    version: "0.4.3"
   share_plus:
     dependency: "direct main"
     description:

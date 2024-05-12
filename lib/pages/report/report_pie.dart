@@ -71,7 +71,7 @@ class ReportPie extends StatelessWidget {
         PieChartSectionData(
           color: converColor(key.key),
           value: total / key.value.length,
-          title: '${(100 * (key.value.length / total)).toInt()}%',
+          title:'${(100 * (key.value.length / total)).toStringAsFixed(2)}%',
           radius: 30,
           titleStyle: const TextStyle(
             fontSize: 16.0,

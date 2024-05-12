@@ -54,9 +54,9 @@ class ItemModel {
       'hargaJualPersen': hargaJualPersen,
       'diskonPersen': diskonPersen,
       'isHargaJualPersen': isHargaJualPersen,
-      'barangMasuk': barangMasuk?.millisecondsSinceEpoch,
-      'barangKeluar': barangKeluar?.millisecondsSinceEpoch,
-      'createdAt': createdAt
+      'barangMasuk': barangMasuk?.toIso8601String(),
+      'barangKeluar': barangKeluar?.toIso8601String(),
+      'createdAt': createdAt?.toIso8601String()
     };
   }
 
@@ -78,12 +78,12 @@ class ItemModel {
           json['diskonPersen'] != null ? json['diskonPersen'] as double : null,
       isHargaJualPersen: json['isHargaJualPersen'],
       barangMasuk: json['barangMasuk'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['barangMasuk'] as int)
+          ? DateTime.parse(json['barangMasuk'])
           : null,
       barangKeluar: json['barangKeluar'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['barangKeluar'] as int)
+          ? DateTime.parse(json['barangKeluar'])
           : null,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
+      createdAt: DateTime.parse(json['createdAt']),
     );
   }
 }

@@ -69,7 +69,7 @@ class Inventory extends StatelessWidget {
                   children: [
                     Icon(Icons.restore),
                     SizedBox(width: 8),
-                    Text('Restore'),
+                    Text('Sync'),
                   ],
                 ),
               ),

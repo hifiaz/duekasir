@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:due_kasir/controller/report_controller.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
+import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
@@ -26,7 +27,7 @@ class _ReportBestSellerState extends State<ReportBestSeller> {
           var res = itemsRes.firstWhereOrNull((v) => v.id == r.id);
           if (res != null) {
             itemsRes[itemsRes.indexWhere((element) => element.id == r.id)] = res
-              ..quantity = res.quantity + r.quantity;
+              ..quantity = (res.quantity! + r.quantity!);
           } else {
             itemsRes.add(r);
           }
@@ -41,14 +42,18 @@ class _ReportBestSellerState extends State<ReportBestSeller> {
     final items = reportController.bestSeller.watch(context);
     final theme = ShadTheme.of(context);
     return ShadCard(
-      width: 350,
+      width: context.isTablet
+          ? context.width / 2
+          : context.isMobile
+              ? context.width
+              : context.width / 3,
       title: const Text('Best Seller'),
       description: const Text('Items base on how many item sold'),
       content: Column(
         children: [
           const SizedBox(height: 16),
           ...items
-              .sorted((a, b) => b.quantity.compareTo(a.quantity))
+              .sorted((a, b) => b.quantity!.compareTo(a.quantity!))
               .take(10)
               .map(
                 (n) => Column(
@@ -71,7 +76,7 @@ class _ReportBestSellerState extends State<ReportBestSeller> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(n.nama, style: theme.textTheme.small),
+                                Text(n.nama!, style: theme.textTheme.small),
                                 const SizedBox(height: 4),
                                 Text(' ${n.quantity} Sold',
                                     style: theme.textTheme.muted),

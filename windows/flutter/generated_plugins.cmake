@@ -3,11 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  cloud_firestore
+  app_links
+  camera_windows
   connectivity_plus
   file_saver
-  firebase_auth
-  firebase_core
   isar_flutter_libs
   permission_handler_windows
   rive_common

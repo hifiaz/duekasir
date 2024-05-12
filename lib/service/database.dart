@@ -9,10 +9,11 @@ import 'package:due_kasir/model/auth_model.dart';
 import 'package:due_kasir/model/customer_model.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
+import 'package:due_kasir/model/presence_model.dart';
 import 'package:due_kasir/model/store_model.dart';
 import 'package:due_kasir/model/user_model.dart';
-import 'package:due_kasir/service/firebase_service.dart';
 import 'package:due_kasir/service/get_it.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
@@ -24,7 +25,7 @@ class Database {
     db = openDB();
   }
 
-  final CloudFirestoreHelper _cloudFirestoreHelper = CloudFirestoreHelper();
+  final SupabaseHelper _supabaseHelper = SupabaseHelper();
 
   // Auth Local
   Future<void> loginUser(AuthModel val) async {
@@ -84,7 +85,7 @@ class Database {
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.customerModels.putSync(val));
     if (isDeviceConnected.value) {
-      _cloudFirestoreHelper.addCustomer(val.toJson());
+      _supabaseHelper.addCustomer(val.toJson());
     }
   }
 
@@ -92,7 +93,7 @@ class Database {
     final isar = await db;
     isar.writeTxn<bool>(() async => await isar.customerModels.delete(val));
     if (isDeviceConnected.value) {
-      _cloudFirestoreHelper.removeCustomer(val);
+      _supabaseHelper.removeCustomer(val);
     }
   }
 
@@ -100,7 +101,7 @@ class Database {
     final isar = await db;
     isar.writeTxn<int>(() async => await isar.customerModels.put(val));
     if (isDeviceConnected.value) {
-      _cloudFirestoreHelper.updateCustomer(val);
+      _supabaseHelper.updateCustomer(val);
     }
   }
 
@@ -137,7 +138,7 @@ class Database {
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.itemModels.putSync(val));
     if (isDeviceConnected.value) {
-      _cloudFirestoreHelper.addInventory(val.toJson());
+      _supabaseHelper.addInventory(val.toJson());
     }
   }
 
@@ -147,7 +148,7 @@ class Database {
       val.isSynced = isDeviceConnected.value;
       isar.writeTxnSync<int>(() => isar.itemModels.putSync(val));
       if (isDeviceConnected.value) {
-        _cloudFirestoreHelper.addInventory(val.toJson());
+        _supabaseHelper.addInventory(val.toJson());
       }
     }
   }
@@ -156,7 +157,7 @@ class Database {
     final isar = await db;
     isar.writeTxn<bool>(() async => await isar.itemModels.delete(val));
     if (isDeviceConnected.value) {
-      _cloudFirestoreHelper.removeInventory(val);
+      _supabaseHelper.removeInventory(val);
     }
   }
 
@@ -164,7 +165,7 @@ class Database {
     final isar = await db;
     isar.writeTxn<int>(() async => await isar.itemModels.put(val));
     if (isDeviceConnected.value) {
-      _cloudFirestoreHelper.updateInventory(val);
+      _supabaseHelper.updateInventory(val);
     }
   }
 
@@ -174,7 +175,7 @@ class Database {
         isar.collection<ItemModel>();
     if (isDeviceConnected.value) {
       inventoryController.inventorys.value =
-          await _cloudFirestoreHelper.getInventoryAll();
+          await _supabaseHelper.getInventoryAll();
 
       insertInventoryFresh(inventoryController.inventorys.value);
     } else {
@@ -242,14 +243,14 @@ class Database {
       List<ItemModel> unsyncedInventory = await getUnsyncedInventoryData();
       if (inventoryController.deleteItemList.value.isNotEmpty) {
         for (ItemModel element in inventoryController.deleteItemList.value) {
-          _cloudFirestoreHelper.removeInventory(element.id!);
+          _supabaseHelper.removeInventory(element.id!);
         }
         inventoryController.deleteItemList.value.clear();
       }
       if (unsyncedInventory.isNotEmpty) {
         for (ItemModel element in unsyncedInventory) {
           element.isSynced = true;
-          await _cloudFirestoreHelper.updateInventory(element);
+          await _supabaseHelper.updateInventory(element);
           updateInventorySync(element);
         }
       }
@@ -280,6 +281,9 @@ class Database {
   Future<void> addPenjualan(PenjualanModel val) async {
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.penjualanModels.putSync(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.addReport(val.toJson());
+    }
   }
 
   Future<void> removePenjualan(int val) async {
@@ -287,19 +291,43 @@ class Database {
     isar.writeTxn<bool>(() => isar.penjualanModels.delete(val));
   }
 
-  Future<List<PenjualanModel>> getPenjualan() async {
+  Future<void> clearReport() async {
     final isar = await db;
-    IsarCollection<PenjualanModel> inventoryCollection =
+    IsarCollection<PenjualanModel> reportCollection =
         isar.collection<PenjualanModel>();
-    final items = inventoryCollection.where().sortByCreatedAtDesc().findAll();
-    return items;
+    isar.writeTxn<void>(() => reportCollection.clear());
+  }
+
+  insertReportFresh(List<PenjualanModel> reportList) async {
+    final isar = await db;
+    await clearReport();
+
+    if (reportList.isNotEmpty) {
+      await Future.forEach(
+          reportList,
+          (val) async =>
+              await isar.writeTxn<int>(() => isar.penjualanModels.put(val)));
+    }
+  }
+
+  Future<List<PenjualanModel>> getReport() async {
+    final isar = await db;
+    IsarCollection<PenjualanModel> reportCollection =
+        isar.collection<PenjualanModel>();
+    if (isDeviceConnected.value) {
+      final res = await _supabaseHelper.getRepots();
+      await insertReportFresh(res);
+      final items = await reportCollection.where().findAll();
+      return items;
+    }
+    return [];
   }
 
   Future<List<PenjualanModel>> getReportToday() async {
     final isar = await db;
     IsarCollection<PenjualanModel> inventoryCollection =
         isar.collection<PenjualanModel>();
-    final items = inventoryCollection
+    final items = await inventoryCollection
         .filter()
         .createdAtBetween(
             DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
@@ -312,7 +340,7 @@ class Database {
     final isar = await db;
     IsarCollection<PenjualanModel> inventoryCollection =
         isar.collection<PenjualanModel>();
-    final items = inventoryCollection
+    final items = await inventoryCollection
         .filter()
         .createdAtBetween(
             DateTime.now()
@@ -363,6 +391,22 @@ class Database {
     isar.writeTxnSync<int>(() => isar.storeModels.putSync(val));
   }
 
+  Future<void> checkIsReportSynced() async {
+    final reports = await getReport();
+    if (reports.isNotEmpty) {
+      for (PenjualanModel element in reports) {
+        final res = await _supabaseHelper.getReportById(element.id!);
+        if (res) {
+          await _supabaseHelper.updateReport(element);
+        } else {
+          _supabaseHelper.addReport(element.toJson());
+        }
+      }
+    } else {
+      getInventorys();
+    }
+  }
+
   Future<void> updateStore(StoreModel val) async {
     final isar = await db;
     isar.writeTxn<int>(() async => await isar.storeModels.put(val));
@@ -373,6 +417,29 @@ class Database {
     IsarCollection<StoreModel> storeCollection = isar.collection<StoreModel>();
     final store = storeCollection.get(1);
     return store;
+  }
+
+// presense
+  Future<void> addPresense(PresenceModel val) async {
+    val.isSynced = isDeviceConnected.value;
+    final isar = await db;
+    isar.writeTxnSync<int>(() => isar.presenceModels.putSync(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.addPresense(val.toJson());
+    }
+  }
+
+  Future<List<PresenceModel>> getPresense() async {
+    final isar = await db;
+    IsarCollection<PresenceModel> presenseCollection =
+        isar.collection<PresenceModel>();
+    if (isDeviceConnected.value) {
+      final res = await _supabaseHelper.getPresense();
+
+      return res;
+    } else {
+      return await presenseCollection.where().findAll();
+    }
   }
 
   Future<void> createBackUp() async {
@@ -428,7 +495,8 @@ class Database {
           PenjualanModelSchema,
           UserModelSchema,
           AuthModelSchema,
-          StoreModelSchema
+          StoreModelSchema,
+          PresenceModelSchema,
         ],
         directory: dir.path,
         inspector: true,

@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Login extends StatefulWidget {
   const Login({
@@ -69,12 +69,12 @@ class _LoginState extends State<Login> {
                   onPressed: () async {
                     if (formKey.currentState!.saveAndValidate()) {
                       try {
-                        final credential = await FirebaseAuth.instance
-                            .signInWithEmailAndPassword(
+                        final credential = await Supabase.instance.client.auth
+                            .signInWithPassword(
                           email: formKey.currentState!.value['email'],
                           password: formKey.currentState!.value['password'],
                         );
-                        if (credential.additionalUserInfo != null) {
+                        if (credential.user != null) {
                           if (context.mounted) {
                             ShadToaster.of(context).show(
                               ShadToast(
@@ -91,40 +91,15 @@ class _LoginState extends State<Login> {
                                 .then((_) => context.go('/'));
                           }
                         }
-                      } on FirebaseAuthException catch (e) {
-                        if (e.code == 'user-not-found') {
-                          if (context.mounted) {
-                            ShadToaster.of(context).show(
-                              const ShadToast(
-                                backgroundColor: Colors.red,
-                                title: Text('Error'),
-                                description:
-                                    Text('No user found for that email.'),
-                              ),
-                            );
-                          }
-                        } else if (e.code == 'wrong-password') {
-                          if (context.mounted) {
-                            ShadToaster.of(context).show(
-                              const ShadToast(
-                                backgroundColor: Colors.red,
-                                title: Text('Error'),
-                                description: Text(
-                                    'Wrong password provided for that user.'),
-                              ),
-                            );
-                          }
-                        } else {
-                          if (context.mounted) {
-                            ShadToaster.of(context).show(
-                              const ShadToast(
-                                backgroundColor: Colors.red,
-                                title: Text('Error'),
-                                description:
-                                    Text('Invalid credentials that user.'),
-                              ),
-                            );
-                          }
+                      } on AuthException catch (e) {
+                        if (context.mounted) {
+                          ShadToaster.of(context).show(
+                            ShadToast(
+                              backgroundColor: Colors.red,
+                              title: const Text('Error'),
+                              description: Text(e.message),
+                            ),
+                          );
                         }
                       }
                     }

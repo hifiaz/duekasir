@@ -199,28 +199,33 @@ class SellingRightState extends State<SellingRight> {
                       store.hasValue) {
                     List<ProductItemModel> products = [];
                     for (ItemModel p in list.value!.items) {
-                      products.add(ProductItemModel()
-                        ..id = p.id!
-                        ..nama = p.nama
-                        ..code = p.code
-                        ..quantity = p.quantity
-                        ..hargaJual = p.hargaJual
-                        ..ukuran = p.ukuran
-                        ..isHargaJualPersen = p.isHargaJualPersen
-                        ..hargaJualPersen = p.hargaJualPersen
-                        ..hargaDasar = p.hargaDasar
-                        ..diskonPersen = p.diskonPersen
-                        ..deskripsi = p.deskripsi
-                        ..jumlahBarang = p.jumlahBarang..isSynced = p.isSynced);
+                      products.add(
+                        ProductItemModel()
+                          ..id = p.id!
+                          ..nama = p.nama
+                          ..code = p.code
+                          ..quantity = p.quantity
+                          ..hargaJual = p.hargaJual
+                          ..ukuran = p.ukuran
+                          ..isHargaJualPersen = p.isHargaJualPersen
+                          ..hargaJualPersen = p.hargaJualPersen
+                          ..hargaDasar = p.hargaDasar
+                          ..diskonPersen = p.diskonPersen
+                          ..deskripsi = p.deskripsi
+                          ..jumlahBarang = p.jumlahBarang
+                          ..isSynced = p.isSynced,
+                      );
                     }
-                    final newItem = PenjualanModel()
-                      ..items.addAll(products)
-                      ..kasir = kasir?.id ?? 1
-                      ..keterangan = note.text
-                      ..diskon = 0
-                      ..totalHarga = list.value?.totalPrice ?? 0.0
-                      ..totalItem = list.value?.totalItem ?? 0
-                      ..pembeli = pelanggan?.id;
+                    final newItem = PenjualanModel(
+                      items: products,
+                      kasir: kasir?.id ?? 1,
+                      keterangan: note.text,
+                      diskon: 0,
+                      totalHarga: list.value?.totalPrice ?? 0.0,
+                      totalItem: list.value?.totalItem ?? 0,
+                      pembeli: pelanggan?.id,
+                      createdAt: DateTime.now(),
+                    );
                     Database().addPenjualan(newItem).whenComplete(() {
                       letsPrint(
                               store: store.value!,
@@ -349,18 +354,18 @@ class SellingRightState extends State<SellingRight> {
     ]);
     bytes += generator.hr();
     for (ProductItemModel i in model.items) {
-      bytes += generator.text(i.nama);
+      bytes += generator.text(i.nama!);
       bytes += generator.row([
         PosColumn(
           text:
-              '${i.diskonPersen == null || i.diskonPersen == 0.0 ? '' : 'Disc'} ${i.quantity} x ${i.diskonPersen == null || i.diskonPersen == 0.0 ? i.hargaJual : '${i.hargaJual} >> ${i.hargaJual - i.hargaJual * (i.diskonPersen! / 100)}'}',
+              '${i.diskonPersen == null || i.diskonPersen == 0.0 ? '' : 'Disc'} ${i.quantity} x ${i.diskonPersen == null || i.diskonPersen == 0.0 ? i.hargaJual : '${i.hargaJual} >> ${i.hargaJual! - i.hargaJual! * (i.diskonPersen! / 100)}'}',
           width: 6,
           styles: const PosStyles(align: PosAlign.left),
         ),
         PosColumn(
           text: i.diskonPersen == null || i.diskonPersen == 0.0
-              ? '${i.quantity * i.hargaJual}'
-              : '${i.quantity * (i.hargaJual - i.hargaJual * (i.diskonPersen! / 100))}',
+              ? '${i.quantity! * i.hargaJual!}'
+              : '${i.quantity! * (i.hargaJual! - i.hargaJual! * (i.diskonPersen! / 100))}',
           width: 6,
           styles: const PosStyles(align: PosAlign.right),
         ),

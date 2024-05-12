@@ -1,5 +1,6 @@
 import 'package:due_kasir/controller/report_controller.dart';
 import 'package:due_kasir/utils/date_utils.dart';
+import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
@@ -11,7 +12,11 @@ class ReportVisitors extends StatelessWidget {
   Widget build(BuildContext context) {
     final reportIncome = reportController.reportIncome.watch(context);
     return ShadCard(
-      width: 350,
+      width: context.isTablet
+          ? context.width / 2
+          : context.isMobile
+              ? context.width
+              : context.width / 3.5,
       title: const Text('Total Visitors'),
       description: const Text('How many people come to buy'),
       content: Column(

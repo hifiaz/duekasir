@@ -1,23 +1,20 @@
-import 'dart:io';
-
 import 'package:due_kasir/controller/auth_controller.dart';
 import 'package:due_kasir/controller/customer_controller.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/date_utils.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NavDrawer extends StatelessWidget {
   const NavDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    User? user;
-    if (!Platform.isWindows) user = FirebaseAuth.instance.currentUser;
+    User? user = Supabase.instance.client.auth.currentUser;
     final auth = authController.customer.watch(context);
     return Drawer(
       child: Column(
@@ -50,6 +47,13 @@ class NavDrawer extends StatelessWidget {
             onTap: () => context.go('/'),
           ),
           ListTile(
+            title: const Text('Rent'),
+            leading: const Icon(Icons.shopping_bag),
+            onTap: () {
+              context.go('/rent');
+            },
+          ),
+          ListTile(
             title: const Text('Inventory'),
             leading: const Icon(Icons.inventory),
             onTap: () {
@@ -58,6 +62,13 @@ class NavDrawer extends StatelessWidget {
                 inventoryController.inventorys.addAll(val);
               });
               context.go('/inventory');
+            },
+          ),
+          ListTile(
+            title: const Text('Presence'),
+            leading: const Icon(Icons.adobe_sharp),
+            onTap: () {
+              context.go('/presence');
             },
           ),
           ListTile(
@@ -112,7 +123,7 @@ class NavDrawer extends StatelessWidget {
                   context.push('/login');
                 } else if (item == 'backup') {
                   context.pop();
-                  Database().createBackUp().whenComplete(() => const ShadToast(
+                  Database().createBackUp().then((_) => const ShadToast(
                         title: Text('Backup Database Success!'),
                         description: Text('All your data on download folder'),
                       ));
@@ -145,7 +156,7 @@ class NavDrawer extends StatelessWidget {
                   );
                 } else if (item == 'logout') {
                   context.pop();
-                  await FirebaseAuth.instance.signOut();
+                  await Supabase.instance.client.auth.signOut();
                 }
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[

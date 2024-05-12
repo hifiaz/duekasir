@@ -10,6 +10,7 @@ import 'package:due_kasir/pages/report/report_visitors.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/date_utils.dart';
+import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -26,6 +27,7 @@ class _ReportState extends State<Report> {
   int touchedIndex = -1;
   @override
   Widget build(BuildContext context) {
+    final isMobile = context.isMobile;
     final report = reportController.report.watch(context);
     final reportToday = reportController.reportToday.watch(context);
     final reportYesteday = reportController.reportYesterday.watch(context);
@@ -52,6 +54,26 @@ class _ReportState extends State<Report> {
               ),
             ),
           ),
+          PopupMenuButton<String>(
+            onSelected: (item) async {
+              if (item == 'sync') {
+                Database().checkIsReportSynced();
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'sync',
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.restore),
+                    SizedBox(width: 8),
+                    Text('Sync'),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -67,7 +89,11 @@ class _ReportState extends State<Report> {
                 Column(
                   children: [
                     ShadCard(
-                      width: 350,
+                      width: context.isTablet
+                          ? context.width / 2
+                          : isMobile
+                              ? context.width
+                              : context.width / 3,
                       title: Text(
                           currency.format(sumReport(reportToday.value ?? [])),
                           style: theme.textTheme.h4),
@@ -75,7 +101,11 @@ class _ReportState extends State<Report> {
                     ),
                     const SizedBox(height: 10),
                     ShadCard(
-                      width: 350,
+                      width: context.isTablet
+                          ? context.width / 2
+                          : isMobile
+                              ? context.width
+                              : context.width / 3,
                       title: Text(
                           currency
                               .format(sumReport(reportYesteday.value ?? [])),
@@ -88,7 +118,11 @@ class _ReportState extends State<Report> {
                   Column(
                     children: [
                       ShadCard(
-                        width: 350,
+                        width: context.isTablet
+                            ? context.width / 2
+                            : isMobile
+                                ? context.width
+                                : context.width / 3,
                         title: Text(
                             currency.format(sumReport(report.value ?? [])),
                             style: theme.textTheme.h4),
@@ -98,7 +132,11 @@ class _ReportState extends State<Report> {
                         height: 10,
                       ),
                       ShadCard(
-                        width: 350,
+                        width: context.isTablet
+                            ? context.width / 2
+                            : isMobile
+                                ? context.width
+                                : context.width / 3,
                         title: Text(
                             currency.format(sumReport(report.value ?? []) -
                                 report.value!.fold(
@@ -109,7 +147,7 @@ class _ReportState extends State<Report> {
                                             0,
                                             (p, c) =>
                                                 p +
-                                                c.hargaDasar * c.quantity))),
+                                                c.hargaDasar! * c.quantity!))),
                             style: theme.textTheme.h4),
                         description: const Text('Profit'),
                       ),
@@ -117,7 +155,11 @@ class _ReportState extends State<Report> {
                   ),
                 const ReportVisitors(),
                 ShadCard(
-                  width: 350,
+                  width: context.isTablet
+                      ? context.width / 2
+                      : isMobile
+                          ? context.width
+                          : context.width / 3,
                   title: const Text('Out of Stock'),
                   description: Text(
                       'You have ${reportOutOfStcok.value?.length} item out of stock.'),
@@ -126,51 +168,53 @@ class _ReportState extends State<Report> {
                       const SizedBox(height: 16),
                       if (reportOutOfStcok.hasValue)
                         ...reportOutOfStcok.value!.take(10).map(
-                          (n) => Column(
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              (n) => Column(
                                 children: [
-                                  Container(
-                                    width: 8,
-                                    height: 8,
-                                    margin: const EdgeInsets.only(top: 4),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 16),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                              '${n.nama} - ${n.jumlahBarang} Item Left',
-                                              style: theme.textTheme.small),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                              '${currency.format(n.hargaDasar)} - ${n.code}',
-                                              style: theme.textTheme.muted),
-                                        ],
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 8,
+                                        height: 8,
+                                        margin: const EdgeInsets.only(top: 4),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
                                       ),
-                                    ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 16),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                  '${n.nama} - ${n.jumlahBarang} Item Left',
+                                                  style: theme.textTheme.small),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                  '${currency.format(n.hargaDasar)} - ${n.code}',
+                                                  style: theme.textTheme.muted),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                          onPressed: () {
+                                            inventoryController
+                                                .inventorySelected.value = n;
+                                            context.go('/inventory/form');
+                                          },
+                                          icon: const Icon(Icons.arrow_right))
+                                    ],
                                   ),
-                                  IconButton(
-                                      onPressed: () {
-                                        inventoryController
-                                            .inventorySelected.value = n;
-                                        context.go('/inventory/form');
-                                      },
-                                      icon: const Icon(Icons.arrow_right))
+                                  const Divider(),
                                 ],
                               ),
-                              const Divider(),
-                            ],
-                          ),
-                        ),
+                            ),
                     ],
                   ),
                 ),
@@ -192,27 +236,27 @@ class _ReportState extends State<Report> {
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Column(
                   children: [
-                    for (PenjualanModel item in report.value ?? [])
+                    for (PenjualanModel item in (report.value ?? []).reversed)
                       ExpansionTile(
-                        leading: Text(item.id.toString()),
-                        title: FutureBuilder<UserModel?>(
-                            future: Database().getUserById(item.kasir),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return Text(snapshot.data?.nama ?? 'Admin');
-                              }
-                              return const Text('Admin');
-                            }),
-                        subtitle: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          leading: Text(item.id.toString()),
+                          title: FutureBuilder<UserModel?>(
+                              future: Database().getUserById(item.kasir),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return Text(snapshot.data?.nama ?? 'Admin');
+                                }
+                                return const Text('Admin');
+                              }),
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(dateWithTime.format(item.createdAt)),
+                              Text(
+                                  '(${item.totalItem.toString()}) ${currency.format(item.totalHarga)}')
+                            ],
+                          ),
                           children: [
-                            Text(dateWithTime.format(item.createdAt)),
-                            Text(
-                                '(${item.totalItem.toString()}) ${currency.format(item.totalHarga)}')
-                          ],
-                        ),
-                        children: item.items
-                            .map(
+                            ...item.items.map(
                               (val) => ListTile(
                                 title: Text('${val.nama} - ${val.code}'),
                                 subtitle: Row(
@@ -221,23 +265,22 @@ class _ReportState extends State<Report> {
                                     Text(val.diskonPersen == null ||
                                             val.diskonPersen == 0
                                         ? currency.format(val.hargaJual)
-                                        : currency.format(val.hargaJual -
-                                            val.hargaJual *
+                                        : currency.format(val.hargaJual! -
+                                            val.hargaJual! *
                                                 (val.diskonPersen! / 100))),
                                   ],
                                 ),
                                 trailing: Text(val.diskonPersen == null ||
                                         val.diskonPersen == 0
                                     ? currency
-                                        .format(val.hargaJual * val.quantity)
-                                    : currency.format((val.hargaJual -
-                                            val.hargaJual *
+                                        .format(val.hargaJual! * val.quantity!)
+                                    : currency.format((val.hargaJual! -
+                                            val.hargaJual! *
                                                 (val.diskonPersen! / 100)) *
-                                        val.quantity)),
+                                        val.quantity!)),
                               ),
-                            )
-                            .toList(),
-                      ),
+                            ),
+                          ]),
                   ],
                 ),
               ),

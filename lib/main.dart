@@ -3,21 +3,24 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:due_kasir/firebase_options.dart';
 import 'package:due_kasir/routes/router.dart';
 import 'package:due_kasir/service/get_it.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:due_kasir/utils/env.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 final isDeviceConnected = signal(false);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Supabase.initialize(
+    url: Environment.url,
+    anonKey: Environment.anonKey,
+  );
   setup();
   runApp(const MyApp());
 }

@@ -17,6 +17,8 @@ List<RouteBase> get $appRoutes => [
       $printSettingRoute,
       $loginRoute,
       $registerRoute,
+      $rentRoute,
+      $presenceRoute,
       $testingRoute,
     ];
 
@@ -325,6 +327,50 @@ extension $RegisterRouteExtension on RegisterRoute {
 
   String get location => GoRouteData.$location(
         '/register',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $rentRoute => GoRouteData.$route(
+      path: '/rent',
+      factory: $RentRouteExtension._fromState,
+    );
+
+extension $RentRouteExtension on RentRoute {
+  static RentRoute _fromState(GoRouterState state) => const RentRoute();
+
+  String get location => GoRouteData.$location(
+        '/rent',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $presenceRoute => GoRouteData.$route(
+      path: '/presence',
+      factory: $PresenceRouteExtension._fromState,
+    );
+
+extension $PresenceRouteExtension on PresenceRoute {
+  static PresenceRoute _fromState(GoRouterState state) => const PresenceRoute();
+
+  String get location => GoRouteData.$location(
+        '/presence',
       );
 
   void go(BuildContext context) => context.go(location);

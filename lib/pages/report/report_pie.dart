@@ -2,6 +2,7 @@ import 'package:due_kasir/controller/report_controller.dart';
 import 'package:due_kasir/controller/user_controller.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/utils/constant.dart';
+import 'package:due_kasir/utils/extension.dart';
 import 'package:due_kasir/widget/indicator.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,11 @@ class ReportPie extends StatelessWidget {
     final reportUsers = reportController.reportUser.watch(context);
     final report = reportController.report.watch(context);
     return ShadCard(
-      width: 350,
+      width: context.isTablet
+          ? context.width / 2.5
+          : context.isMobile
+              ? context.width
+              : context.width / 3.5,
       title: const Text('Admin'),
       content: Row(
         mainAxisSize: MainAxisSize.min,

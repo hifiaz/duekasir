@@ -124,22 +124,23 @@ PenjualanModel _penjualanModelDeserialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = PenjualanModel();
-  object.createdAt = reader.readDateTime(offsets[0]);
-  object.diskon = reader.readDouble(offsets[1]);
-  object.id = id;
-  object.items = reader.readObjectList<ProductItemModel>(
-        offsets[2],
-        ProductItemModelSchema.deserialize,
-        allOffsets,
-        ProductItemModel(),
-      ) ??
-      [];
-  object.kasir = reader.readLong(offsets[3]);
-  object.keterangan = reader.readStringOrNull(offsets[4]);
-  object.pembeli = reader.readLongOrNull(offsets[5]);
-  object.totalHarga = reader.readDouble(offsets[6]);
-  object.totalItem = reader.readLong(offsets[7]);
+  final object = PenjualanModel(
+    createdAt: reader.readDateTime(offsets[0]),
+    diskon: reader.readDouble(offsets[1]),
+    id: id,
+    items: reader.readObjectList<ProductItemModel>(
+          offsets[2],
+          ProductItemModelSchema.deserialize,
+          allOffsets,
+          ProductItemModel(),
+        ) ??
+        [],
+    kasir: reader.readLong(offsets[3]),
+    keterangan: reader.readStringOrNull(offsets[4]),
+    pembeli: reader.readLongOrNull(offsets[5]),
+    totalHarga: reader.readDouble(offsets[6]),
+    totalItem: reader.readLong(offsets[7]),
+  );
   return object;
 }
 
@@ -178,7 +179,7 @@ P _penjualanModelDeserializeProp<P>(
 }
 
 Id _penjualanModelGetId(PenjualanModel object) {
-  return object.id;
+  return object.id ?? Isar.autoIncrement;
 }
 
 List<IsarLinkBase<dynamic>> _penjualanModelGetLinks(PenjualanModel object) {
@@ -395,8 +396,26 @@ extension PenjualanModelQueryFilter
     });
   }
 
+  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
+      idIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'id',
+      ));
+    });
+  }
+
+  QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
+      idIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'id',
+      ));
+    });
+  }
+
   QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition> idEqualTo(
-      Id value) {
+      Id? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
@@ -407,7 +426,7 @@ extension PenjualanModelQueryFilter
 
   QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
       idGreaterThan(
-    Id value, {
+    Id? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -421,7 +440,7 @@ extension PenjualanModelQueryFilter
 
   QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition>
       idLessThan(
-    Id value, {
+    Id? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -434,8 +453,8 @@ extension PenjualanModelQueryFilter
   }
 
   QueryBuilder<PenjualanModel, PenjualanModel, QAfterFilterCondition> idBetween(
-    Id lower,
-    Id upper, {
+    Id? lower,
+    Id? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -1372,15 +1391,30 @@ int _productItemModelEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.code.length * 3;
+  {
+    final value = object.code;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   {
     final value = object.deskripsi;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
     }
   }
-  bytesCount += 3 + object.nama.length * 3;
-  bytesCount += 3 + object.ukuran.length * 3;
+  {
+    final value = object.nama;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.ukuran;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -1414,23 +1448,24 @@ ProductItemModel _productItemModelDeserialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = ProductItemModel();
-  object.barangKeluar = reader.readDateTimeOrNull(offsets[0]);
-  object.barangMasuk = reader.readDateTimeOrNull(offsets[1]);
-  object.code = reader.readString(offsets[2]);
-  object.createdAt = reader.readDateTimeOrNull(offsets[3]);
-  object.deskripsi = reader.readStringOrNull(offsets[4]);
-  object.diskonPersen = reader.readDoubleOrNull(offsets[5]);
-  object.hargaDasar = reader.readLong(offsets[6]);
-  object.hargaJual = reader.readLong(offsets[7]);
-  object.hargaJualPersen = reader.readDoubleOrNull(offsets[8]);
-  object.id = reader.readLong(offsets[9]);
-  object.isHargaJualPersen = reader.readBool(offsets[10]);
-  object.isSynced = reader.readBool(offsets[11]);
-  object.jumlahBarang = reader.readLong(offsets[12]);
-  object.nama = reader.readString(offsets[13]);
-  object.quantity = reader.readLong(offsets[14]);
-  object.ukuran = reader.readString(offsets[15]);
+  final object = ProductItemModel(
+    barangKeluar: reader.readDateTimeOrNull(offsets[0]),
+    barangMasuk: reader.readDateTimeOrNull(offsets[1]),
+    code: reader.readStringOrNull(offsets[2]),
+    createdAt: reader.readDateTimeOrNull(offsets[3]),
+    deskripsi: reader.readStringOrNull(offsets[4]),
+    diskonPersen: reader.readDoubleOrNull(offsets[5]),
+    hargaDasar: reader.readLongOrNull(offsets[6]),
+    hargaJual: reader.readLongOrNull(offsets[7]),
+    hargaJualPersen: reader.readDoubleOrNull(offsets[8]),
+    id: reader.readLongOrNull(offsets[9]),
+    isHargaJualPersen: reader.readBoolOrNull(offsets[10]),
+    isSynced: reader.readBoolOrNull(offsets[11]),
+    jumlahBarang: reader.readLongOrNull(offsets[12]),
+    nama: reader.readStringOrNull(offsets[13]),
+    quantity: reader.readLongOrNull(offsets[14]),
+    ukuran: reader.readStringOrNull(offsets[15]),
+  );
   return object;
 }
 
@@ -1446,7 +1481,7 @@ P _productItemModelDeserializeProp<P>(
     case 1:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 2:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 3:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 4:
@@ -1454,25 +1489,25 @@ P _productItemModelDeserializeProp<P>(
     case 5:
       return (reader.readDoubleOrNull(offset)) as P;
     case 6:
-      return (reader.readLong(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 7:
-      return (reader.readLong(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 8:
       return (reader.readDoubleOrNull(offset)) as P;
     case 9:
-      return (reader.readLong(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 10:
-      return (reader.readBool(offset)) as P;
+      return (reader.readBoolOrNull(offset)) as P;
     case 11:
-      return (reader.readBool(offset)) as P;
+      return (reader.readBoolOrNull(offset)) as P;
     case 12:
-      return (reader.readLong(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 13:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 14:
-      return (reader.readLong(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 15:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -1629,8 +1664,26 @@ extension ProductItemModelQueryFilter
   }
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      codeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'code',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      codeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'code',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       codeEqualTo(
-    String value, {
+    String? value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -1644,7 +1697,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       codeGreaterThan(
-    String value, {
+    String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1660,7 +1713,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       codeLessThan(
-    String value, {
+    String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1676,8 +1729,8 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       codeBetween(
-    String lower,
-    String upper, {
+    String? lower,
+    String? upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,
@@ -2077,7 +2130,25 @@ extension ProductItemModelQueryFilter
   }
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
-      hargaDasarEqualTo(int value) {
+      hargaDasarIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'hargaDasar',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      hargaDasarIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'hargaDasar',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      hargaDasarEqualTo(int? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'hargaDasar',
@@ -2088,7 +2159,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       hargaDasarGreaterThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -2102,7 +2173,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       hargaDasarLessThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -2116,8 +2187,8 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       hargaDasarBetween(
-    int lower,
-    int upper, {
+    int? lower,
+    int? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -2133,7 +2204,25 @@ extension ProductItemModelQueryFilter
   }
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
-      hargaJualEqualTo(int value) {
+      hargaJualIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'hargaJual',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      hargaJualIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'hargaJual',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      hargaJualEqualTo(int? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'hargaJual',
@@ -2144,7 +2233,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       hargaJualGreaterThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -2158,7 +2247,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       hargaJualLessThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -2172,8 +2261,8 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       hargaJualBetween(
-    int lower,
-    int upper, {
+    int? lower,
+    int? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -2273,7 +2362,25 @@ extension ProductItemModelQueryFilter
   }
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
-      idEqualTo(int value) {
+      idIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'id',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      idIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'id',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      idEqualTo(int? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
@@ -2284,7 +2391,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       idGreaterThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -2298,7 +2405,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       idLessThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -2312,8 +2419,8 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       idBetween(
-    int lower,
-    int upper, {
+    int? lower,
+    int? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -2329,7 +2436,25 @@ extension ProductItemModelQueryFilter
   }
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
-      isHargaJualPersenEqualTo(bool value) {
+      isHargaJualPersenIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'isHargaJualPersen',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      isHargaJualPersenIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'isHargaJualPersen',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      isHargaJualPersenEqualTo(bool? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'isHargaJualPersen',
@@ -2339,7 +2464,25 @@ extension ProductItemModelQueryFilter
   }
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
-      isSyncedEqualTo(bool value) {
+      isSyncedIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'isSynced',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      isSyncedIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'isSynced',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      isSyncedEqualTo(bool? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'isSynced',
@@ -2349,7 +2492,25 @@ extension ProductItemModelQueryFilter
   }
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
-      jumlahBarangEqualTo(int value) {
+      jumlahBarangIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'jumlahBarang',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      jumlahBarangIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'jumlahBarang',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      jumlahBarangEqualTo(int? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'jumlahBarang',
@@ -2360,7 +2521,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       jumlahBarangGreaterThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -2374,7 +2535,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       jumlahBarangLessThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -2388,8 +2549,8 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       jumlahBarangBetween(
-    int lower,
-    int upper, {
+    int? lower,
+    int? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -2405,8 +2566,26 @@ extension ProductItemModelQueryFilter
   }
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      namaIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'nama',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      namaIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'nama',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       namaEqualTo(
-    String value, {
+    String? value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -2420,7 +2599,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       namaGreaterThan(
-    String value, {
+    String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -2436,7 +2615,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       namaLessThan(
-    String value, {
+    String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -2452,8 +2631,8 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       namaBetween(
-    String lower,
-    String upper, {
+    String? lower,
+    String? upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,
@@ -2541,7 +2720,25 @@ extension ProductItemModelQueryFilter
   }
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
-      quantityEqualTo(int value) {
+      quantityIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'quantity',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      quantityIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'quantity',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      quantityEqualTo(int? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'quantity',
@@ -2552,7 +2749,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       quantityGreaterThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -2566,7 +2763,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       quantityLessThan(
-    int value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -2580,8 +2777,8 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       quantityBetween(
-    int lower,
-    int upper, {
+    int? lower,
+    int? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -2597,8 +2794,26 @@ extension ProductItemModelQueryFilter
   }
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      ukuranIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'ukuran',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
+      ukuranIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'ukuran',
+      ));
+    });
+  }
+
+  QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       ukuranEqualTo(
-    String value, {
+    String? value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -2612,7 +2827,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       ukuranGreaterThan(
-    String value, {
+    String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -2628,7 +2843,7 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       ukuranLessThan(
-    String value, {
+    String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -2644,8 +2859,8 @@ extension ProductItemModelQueryFilter
 
   QueryBuilder<ProductItemModel, ProductItemModel, QAfterFilterCondition>
       ukuranBetween(
-    String lower,
-    String upper, {
+    String? lower,
+    String? upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,

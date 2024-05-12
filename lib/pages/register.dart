@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Register extends StatefulWidget {
   const Register({
@@ -61,17 +61,17 @@ class _RegisterState extends State<Register> {
                   onPressed: () async {
                     if (formKey.currentState!.saveAndValidate()) {
                       try {
-                        final credential = await FirebaseAuth.instance
-                            .createUserWithEmailAndPassword(
+                        final credential =
+                            await Supabase.instance.client.auth.signUp(
                           email: formKey.currentState!.value['email'],
                           password: formKey.currentState!.value['password'],
                         );
-                        if (credential.additionalUserInfo?.isNewUser == true) {
+                        if (credential.user != null) {
                           if (context.mounted) {
                             ShadToaster.of(context).show(
                               ShadToast(
                                 title: const Text('Register Success'),
-                                description: const Text('Enjoy Due Kasir!'),
+                                description: const Text('Login and Enjoy Due Kasir!'),
                                 action: ShadButton.outline(
                                   text: const Text('Back!'),
                                   onPressed: () =>
@@ -80,30 +80,14 @@ class _RegisterState extends State<Register> {
                               ),
                             );
                             Future.delayed(const Duration(seconds: 2))
-                                .then((_) => context.go('/'));
+                                .then((_) => context.go('/login'));
                           }
                         }
-                      } on FirebaseAuthException catch (e) {
-                        if (e.code == 'weak-password') {
-                          const ShadAlert.destructive(
-                            iconSrc: LucideIcons.circleAlert,
-                            title: Text('Error'),
-                            description:
-                                Text('The password provided is too weak.'),
-                          );
-                        } else if (e.code == 'email-already-in-use') {
-                          const ShadAlert.destructive(
-                            iconSrc: LucideIcons.circleAlert,
-                            title: Text('Error'),
-                            description: Text(
-                                'The account already exists for that email.'),
-                          );
-                        }
-                      } catch (e) {
-                         ShadAlert.destructive(
+                      } on AuthException catch (e) {
+                        ShadAlert.destructive(
                           iconSrc: LucideIcons.circleAlert,
                           title: const Text('Error'),
-                          description: Text('$e'),
+                          description: Text(e.message),
                         );
                       }
                     }

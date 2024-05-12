@@ -12,6 +12,8 @@ import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal_windows.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:usb_esc_printer_windows/usb_esc_printer_windows.dart'
+    as usb_esc_printer_windows;
 
 class PrintSetting extends StatefulWidget {
   const PrintSetting({super.key});
@@ -21,6 +23,7 @@ class PrintSetting extends StatefulWidget {
 }
 
 class PrintSettingState extends State<PrintSetting> {
+  late Future<CapabilityProfile> _profile;
   TextEditingController printName = TextEditingController();
   String _info = "";
   String _msj = '';
@@ -30,7 +33,8 @@ class PrintSettingState extends State<PrintSetting> {
     "Permission bluetooth granted",
     "Bluetooth enabled",
     "Connection status",
-    "Update info"
+    "Update info",
+    "Test Print"
   ];
 
   String _selectSize = "2";
@@ -47,6 +51,10 @@ class PrintSettingState extends State<PrintSetting> {
     printName = TextEditingController(text: print);
     super.initState();
     initPlatformState();
+
+    if (Platform.isWindows) {
+      _profile = CapabilityProfile.load();
+    }
   }
 
   @override
@@ -84,6 +92,31 @@ class PrintSettingState extends State<PrintSetting> {
                 setState(() {
                   _info = "connection status: $result";
                 });
+              } else if (sel == 'test') {
+                final profile = await CapabilityProfile.load();
+                late CapabilityProfile winProfile;
+                if (Platform.isWindows) {
+                  winProfile = await _profile;
+                }
+                final generator = Generator(
+                    PaperSize.mm80, Platform.isWindows ? winProfile : profile);
+                List<int> bytes = [];
+
+                bytes += generator.text('Langit Baby Shop',
+                    styles: const PosStyles(
+                      align: PosAlign.center,
+                      height: PosTextSize.size2,
+                      width: PosTextSize.size2,
+                    ));
+                bytes += generator.feed(2);
+                bytes += generator.cut();
+                bytes += generator.drawer();
+                if (Platform.isWindows) {
+                  await usb_esc_printer_windows.sendPrintRequest(
+                      bytes, 'Xprinter XP-T371U');
+                } else {
+                  await PrintBluetoothThermal.writeBytes(bytes);
+                }
               }
             },
             itemBuilder: (BuildContext context) {

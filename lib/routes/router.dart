@@ -5,7 +5,9 @@ import 'package:due_kasir/pages/inventory.dart';
 import 'package:due_kasir/pages/inventory/csv_preview.dart';
 import 'package:due_kasir/pages/inventory/inventory_form.dart';
 import 'package:due_kasir/pages/login.dart';
+import 'package:due_kasir/pages/presence.dart';
 import 'package:due_kasir/pages/register.dart';
+import 'package:due_kasir/pages/rent.dart';
 import 'package:due_kasir/pages/report.dart';
 import 'package:due_kasir/pages/selling.dart';
 import 'package:due_kasir/pages/selling/print_setting.dart';
@@ -153,6 +155,22 @@ class RegisterRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) => const Register();
+}
+
+@TypedGoRoute<RentRoute>(path: '/rent')
+class RentRoute extends GoRouteData {
+  const RentRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const Rent();
+}
+
+@TypedGoRoute<PresenceRoute>(path: '/presence')
+class PresenceRoute extends GoRouteData {
+  const PresenceRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const Presence();
 }
 
 @TypedGoRoute<TestingRoute>(path: '/testing')

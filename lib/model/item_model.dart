@@ -71,11 +71,8 @@ class ItemModel {
       ukuran: json['ukuran'],
       hargaDasar: json['hargaDasar'],
       hargaJual: json['hargaJual'],
-      hargaJualPersen: json['hargaJualPersen'] != null
-          ? json['hargaJualPersen'] as double
-          : null,
-      diskonPersen:
-          json['diskonPersen'] != null ? json['diskonPersen'] as double : null,
+      hargaJualPersen: json['hargaJualPersen']?.toDouble(),
+      diskonPersen: json['diskonPersen']?.toDouble(),
       isHargaJualPersen: json['isHargaJualPersen'],
       barangMasuk: json['barangMasuk'] != null
           ? DateTime.parse(json['barangMasuk'])
@@ -83,7 +80,8 @@ class ItemModel {
       barangKeluar: json['barangKeluar'] != null
           ? DateTime.parse(json['barangKeluar'])
           : null,
-      createdAt: DateTime.parse(json['createdAt']),
+      createdAt:
+          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
     );
   }
 }

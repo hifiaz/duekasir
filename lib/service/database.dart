@@ -10,6 +10,8 @@ import 'package:due_kasir/model/customer_model.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/presence_model.dart';
+import 'package:due_kasir/model/rent_item_model.dart';
+import 'package:due_kasir/model/rent_model.dart';
 import 'package:due_kasir/model/store_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/service/get_it.dart';
@@ -176,7 +178,6 @@ class Database {
     if (isDeviceConnected.value) {
       inventoryController.inventorys.value =
           await _supabaseHelper.getInventoryAll();
-
       insertInventoryFresh(inventoryController.inventorys.value);
     } else {
       inventoryController.inventorys.value =
@@ -315,10 +316,15 @@ class Database {
     IsarCollection<PenjualanModel> reportCollection =
         isar.collection<PenjualanModel>();
     if (isDeviceConnected.value) {
-      final res = await _supabaseHelper.getRepots();
-      await insertReportFresh(res);
+      final List<PenjualanModel> res = await _supabaseHelper.getRepots();
       final items = await reportCollection.where().findAll();
-      return items;
+      if (res.length == items.length || items.length >= res.length) {
+        return items;
+      } else {
+        await insertReportFresh(res);
+        final freshItems = await reportCollection.where().findAll();
+        return freshItems;
+      }
     }
     return [];
   }
@@ -396,14 +402,12 @@ class Database {
     if (reports.isNotEmpty) {
       for (PenjualanModel element in reports) {
         final res = await _supabaseHelper.getReportById(element.id!);
-        if (res) {
-          await _supabaseHelper.updateReport(element);
-        } else {
+        if (res == false) {
           _supabaseHelper.addReport(element.toJson());
         }
       }
     } else {
-      getInventorys();
+      getReport();
     }
   }
 
@@ -419,7 +423,7 @@ class Database {
     return store;
   }
 
-// presense
+  // presense
   Future<void> addPresense(PresenceModel val) async {
     val.isSynced = isDeviceConnected.value;
     final isar = await db;
@@ -439,6 +443,83 @@ class Database {
       return res;
     } else {
       return await presenseCollection.where().findAll();
+    }
+  }
+
+  // rent item
+  Future<void> addRentItem(RentItemModel val) async {
+    val.isSynced = isDeviceConnected.value;
+    final isar = await db;
+    isar.writeTxnSync<int>(() => isar.rentItemModels.putSync(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.addRentItem(val.toJson());
+    }
+  }
+
+  Future<List<RentItemModel>> getRentItem() async {
+    final isar = await db;
+    IsarCollection<RentItemModel> rentItemCollection =
+        isar.collection<RentItemModel>();
+    if (isDeviceConnected.value) {
+      final res = await _supabaseHelper.getRentItems();
+
+      return res;
+    } else {
+      return await rentItemCollection.where().findAll();
+    }
+  }
+
+  Future<RentItemModel?> getRentItemById(int id) async {
+    final isar = await db;
+    IsarCollection<RentItemModel> rentItemCollection =
+        isar.collection<RentItemModel>();
+    final rent = rentItemCollection.get(id);
+    return rent;
+  }
+
+  Future<void> deleteRentItem(int val) async {
+    final isar = await db;
+    isar.writeTxn<bool>(() async => await isar.rentItemModels.delete(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.removeRentItem(val);
+    }
+  }
+
+  Future<void> updateRentItem(RentItemModel val) async {
+    final isar = await db;
+    isar.writeTxn<int>(() async => await isar.rentItemModels.put(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.updateRentItem(val);
+    }
+  }
+
+  // rent
+  Future<void> addRent(RentModel val) async {
+    val.isSynced = isDeviceConnected.value;
+    final isar = await db;
+    isar.writeTxnSync<int>(() => isar.rentModels.putSync(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.addRent(val.toJson());
+    }
+  }
+
+  Future<List<RentModel>> getRent() async {
+    final isar = await db;
+    IsarCollection<RentModel> rentCollection = isar.collection<RentModel>();
+    if (isDeviceConnected.value) {
+      final res = await _supabaseHelper.getRent();
+
+      return res;
+    } else {
+      return await rentCollection.where().findAll();
+    }
+  }
+
+  Future<void> updateRent(RentModel val) async {
+    final isar = await db;
+    isar.writeTxn<int>(() async => await isar.rentModels.put(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.updateRent(val);
     }
   }
 
@@ -497,6 +578,8 @@ class Database {
           AuthModelSchema,
           StoreModelSchema,
           PresenceModelSchema,
+          RentItemModelSchema,
+          RentModelSchema,
         ],
         directory: dir.path,
         inspector: true,

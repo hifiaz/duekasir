@@ -8,6 +8,7 @@ import 'package:due_kasir/pages/login.dart';
 import 'package:due_kasir/pages/presence.dart';
 import 'package:due_kasir/pages/register.dart';
 import 'package:due_kasir/pages/rent.dart';
+import 'package:due_kasir/pages/rent/rent_item_form.dart';
 import 'package:due_kasir/pages/report.dart';
 import 'package:due_kasir/pages/selling.dart';
 import 'package:due_kasir/pages/selling/print_setting.dart';
@@ -157,12 +158,26 @@ class RegisterRoute extends GoRouteData {
   Widget build(BuildContext context, GoRouterState state) => const Register();
 }
 
-@TypedGoRoute<RentRoute>(path: '/rent')
+@TypedGoRoute<RentRoute>(
+  path: '/rent',
+  routes: <TypedGoRoute<GoRouteData>>[
+    TypedGoRoute<RentItemFormRoute>(
+      path: 'form',
+    )
+  ],
+)
 class RentRoute extends GoRouteData {
   const RentRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) => const Rent();
+}
+
+class RentItemFormRoute extends GoRouteData {
+  const RentItemFormRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => RentItemForm();
 }
 
 @TypedGoRoute<PresenceRoute>(path: '/presence')

@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:due_kasir/controller/inventory_controller.dart';
+import 'package:due_kasir/controller/rent_controller.dart';
 import 'package:due_kasir/main.dart';
-import 'package:due_kasir/model/item_model.dart';
+import 'package:due_kasir/model/rent_item_model.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,53 +20,23 @@ class RentItemForm extends HookWidget {
   @override
   Widget build(context) {
     final rentItemFormKey = useMemoized(GlobalKey<FormState>.new);
-    final item = inventoryController.inventorySelected.watch(context);
-    final editingName = useTextEditingController(text: item?.nama ?? '');
+    final item = rentController.rentItemSelected.watch(context);
+    final editingName = useTextEditingController(text: item?.name ?? '');
     final editingCode = useTextEditingController(text: item?.code ?? '');
-    final editingUkuran = useTextEditingController(text: item?.ukuran ?? '');
-    final editingDiscount =
-        useTextEditingController(text: (item?.diskonPersen ?? '').toString());
-    final editingHargaDasar =
-        useTextEditingController(text: (item?.hargaDasar ?? '0').toString());
-    final editingHargaJualPersen = useTextEditingController(
-        text: (item?.hargaJualPersen?.toInt() ?? '20').toString());
+    final rentThreeDay =
+        useTextEditingController(text: (item?.rentThreeDay ?? '').toString());
+    final rentOneWeek =
+        useTextEditingController(text: (item?.rentOneWeek ?? '').toString());
+    final rentOneMonth =
+        useTextEditingController(text: (item?.rentOneMonth ?? '').toString());
+    final note = useTextEditingController(text: item?.note ?? '');
     final stock = useState(item?.jumlahBarang ?? 0);
-    final hargaJual = useState(0.0);
-    final hargaJualDiscount = useState(0.0);
 
-    useListenableSelector(editingHargaDasar, () {
-      if (editingHargaDasar.text.isNotEmpty) {
-        hargaJual.value = int.parse(
-                editingHargaDasar.text.isEmpty ? '0' : editingHargaDasar.text) +
-            int.parse(editingHargaDasar.text.isEmpty
-                    ? '0'
-                    : editingHargaDasar.text) *
-                ((int.parse(editingHargaJualPersen.text.isEmpty
-                        ? '0'
-                        : editingHargaJualPersen.text)) /
-                    100);
-      }
-    });
-    useListenableSelector(editingDiscount, () {
-      if (editingHargaDasar.text.isNotEmpty &&
-          editingDiscount.text.isNotEmpty &&
-          hargaJual.value != 0.0) {
-        hargaJualDiscount.value = hargaJual.value -
-            hargaJual.value *
-                ((double.parse(editingDiscount.text.isEmpty
-                        ? '0'
-                        : editingDiscount.text)) /
-                    100);
-      }
-    });
-
-    useListenable(editingHargaJualPersen);
-    useListenable(hargaJual);
     useListenable(editingName);
     useListenable(editingCode);
-    useListenable(editingUkuran);
-    useListenable(editingDiscount);
-    useListenable(hargaJualDiscount);
+    useListenable(rentThreeDay);
+    useListenable(rentOneWeek);
+    useListenable(rentOneMonth);
 
     final isConnected = isDeviceConnected.watch(context);
     return Scaffold(
@@ -120,39 +93,27 @@ class RentItemForm extends HookWidget {
                         ),
                       ),
                     ),
-                    ShadButton.ghost(
-                      icon: const Icon(Icons.camera_alt),
-                      onPressed: () async {
-                        var res = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const SimpleBarcodeScannerPage(),
-                            ));
-                        editingCode.text = res;
-                      },
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ShadInputFormField(
-                        controller: editingUkuran,
-                        validator: (val) =>
-                            val.isEmpty == true ? 'Ukuran is required' : null,
-                        label: const Text('Ukuran Barang'),
-                        placeholder: const Text('ex. S/M/L 50ml/100ml'),
+                    if (Platform.isAndroid || Platform.isIOS)
+                      ShadButton.ghost(
+                        icon: const Icon(Icons.camera_alt),
+                        onPressed: () async {
+                          var res = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const SimpleBarcodeScannerPage(),
+                              ));
+                          editingCode.text = res;
+                        },
                       ),
-                    ),
                     Expanded(
                       child: Container(
-                        margin: const EdgeInsets.only(top: 25),
+                        margin: const EdgeInsets.only(bottom: 5),
                         child: ShadSelect<int>(
                           placeholder: const Text('Select a Stock'),
                           initialValue: item?.jumlahBarang,
                           options: List.generate(
-                              200,
+                              10,
                               (val) =>
                                   ShadOption(value: val, child: Text('$val'))),
                           onChanged: (val) => stock.value = val,
@@ -166,66 +127,43 @@ class RentItemForm extends HookWidget {
                   ],
                 ),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: ShadInputFormField(
-                        controller: editingHargaDasar,
+                        controller: rentThreeDay,
+                        validator: (val) =>
+                            val.isEmpty == true ? 'Amount is required' : null,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly
                         ],
-                        label: const Text('Harga Dasar'),
+                        label: const Text('Rent 3 Days'),
+                        placeholder: const Text('ex. 30000'),
                       ),
                     ),
                     Expanded(
                       child: ShadInputFormField(
-                        controller: editingHargaJualPersen,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        label: const Text('H Jual Persen'),
+                        controller: rentOneWeek,
+                        validator: (val) =>
+                            val.isEmpty == true ? 'Amount is required' : null,
+                        label: const Text('Rent One Week'),
+                        placeholder: const Text('ex. 80000'),
                       ),
                     ),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 5),
-                          const Text('Harga Jual'),
-                          const SizedBox(height: 20),
-                          Text('${hargaJual.value.toInt()}'),
-                          const SizedBox(height: 15),
-                        ],
+                      child: ShadInputFormField(
+                        controller: rentOneMonth,
+                        validator: (val) =>
+                            val.isEmpty == true ? 'Amount is required' : null,
+                        label: const Text('Rent One Month'),
+                        placeholder: const Text('ex. 1200000'),
                       ),
-                    )
+                    ),
                   ],
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ShadInputFormField(
-                        controller: editingDiscount,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        label: const Text('Discount Percent'),
-                        placeholder: const Text('ex. 5'),
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('H Jual Setelah Discount'),
-                          const SizedBox(height: 20),
-                          Text(editingDiscount.text.isEmpty
-                              ? '-'
-                              : '${hargaJualDiscount.value.toInt()}'),
-                          const SizedBox(height: 15),
-                        ],
-                      ),
-                    )
-                  ],
+                const Text('Catatan'),
+                ShadInput(
+                  controller: note,
+                  maxLines: 3,
                 ),
                 Align(
                   alignment: Alignment.centerRight,
@@ -237,12 +175,9 @@ class RentItemForm extends HookWidget {
                           text: const Text('Delete'),
                           onPressed: () {
                             Database()
-                                .deleteInventory(item.id!)
+                                .deleteRentItem(item.id!)
                                 .whenComplete(() {
-                              Database().searchInventorys().then((val) {
-                                inventoryController.inventorys.clear();
-                                inventoryController.inventorys.addAll(val);
-                              });
+                              rentController.rentItems.refresh();
                               Navigator.pop(context);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -267,56 +202,41 @@ class RentItemForm extends HookWidget {
                             return;
                           } else {
                             if (item != null) {
-                              final updateitem = ItemModel(
+                              final updateitem = RentItemModel(
                                 id: item.id,
-                                nama: editingName.text.replaceAll(',', ' '),
+                                name: editingName.text.replaceAll(',', ' '),
                                 code: editingCode.text,
-                                quantity: 1,
-                                hargaJual: hargaJual.value.toInt(),
-                                ukuran: editingUkuran.text,
-                                isHargaJualPersen: true,
-                                hargaJualPersen:
-                                    double.parse(editingHargaJualPersen.text),
-                                hargaDasar: int.parse(editingHargaDasar.text),
-                                diskonPersen:
-                                    double.tryParse(editingDiscount.text),
+                                rentThreeDay: int.parse(rentThreeDay.text),
+                                rentOneWeek: int.parse(rentOneWeek.text),
+                                rentOneMonth: int.parse(rentOneMonth.text),
                                 jumlahBarang: stock.value,
+                                note: note.text,
+                                createdAt: item.createdAt ?? DateTime.now(),
                               );
 
                               Database()
-                                  .updateInventory(updateitem)
+                                  .updateRentItem(updateitem)
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
                                   context.pop();
-                                  Database().searchInventorys().then((val) {
-                                    inventoryController.inventorys.clear();
-                                    inventoryController.inventorys.addAll(val);
-                                  });
-                                  inventoryController.inventorySelected.value =
-                                      null;
+                                  rentController.rentItems.refresh();
+                                  rentController.rentItemSelected.value = null;
                                 });
                               });
                             } else {
-                              final newItem = ItemModel(
-                                  nama: editingName.text.replaceAll(',', ' '),
-                                  code: editingCode.text,
-                                  quantity: 1,
-                                  hargaJual: hargaJual.value.toInt(),
-                                  ukuran: editingUkuran.text,
-                                  isHargaJualPersen: true,
-                                  hargaJualPersen:
-                                      double.parse(editingHargaJualPersen.text),
-                                  hargaDasar: int.parse(editingHargaDasar.text),
-                                  diskonPersen:
-                                      double.tryParse(editingDiscount.text),
-                                  jumlahBarang: stock.value,
-                                  createdAt: DateTime.now());
+                              final newItem = RentItemModel(
+                                name: editingName.text.replaceAll(',', ' '),
+                                code: editingCode.text,
+                                rentThreeDay: int.parse(rentThreeDay.text),
+                                rentOneWeek: int.parse(rentOneWeek.text),
+                                rentOneMonth: int.parse(rentOneMonth.text),
+                                jumlahBarang: stock.value,
+                                createdAt: DateTime.now(),
+                                note: note.text,
+                              );
 
-                              Database().addInventory(newItem).whenComplete(() {
-                                Database().searchInventorys().then((val) {
-                                  inventoryController.inventorys.clear();
-                                  inventoryController.inventorys.addAll(val);
-                                });
+                              Database().addRentItem(newItem).whenComplete(() {
+                                rentController.rentItems.refresh();
                                 context.pop();
                               });
                             }

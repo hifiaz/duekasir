@@ -1,69 +1,41 @@
 import 'package:due_kasir/controller/inventory_controller.dart';
+import 'package:due_kasir/controller/rent_controller.dart';
 import 'package:due_kasir/main.dart';
-import 'package:due_kasir/model/item_model.dart';
+import 'package:due_kasir/model/rent_item_model.dart';
+import 'package:due_kasir/model/rent_model.dart';
 import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/utils/constant.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
-import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class RentForm extends HookWidget {
-  RentForm({super.key});
-  final statusData = {true: 'Active', false: 'Non Active'};
+  final RentItemModel item;
+  final RentModel? rent;
+  const RentForm({super.key, required this.item, this.rent});
   @override
   Widget build(context) {
     final rentFormKey = useMemoized(GlobalKey<FormState>.new);
-    final item = inventoryController.inventorySelected.watch(context);
-    final editingName = useTextEditingController(text: item?.nama ?? '');
-    final editingCode = useTextEditingController(text: item?.code ?? '');
-    final editingUkuran = useTextEditingController(text: item?.ukuran ?? '');
-    final editingDiscount =
-        useTextEditingController(text: (item?.diskonPersen ?? '').toString());
-    final editingHargaDasar =
-        useTextEditingController(text: (item?.hargaDasar ?? '0').toString());
-    final editingHargaJualPersen = useTextEditingController(
-        text: (item?.hargaJualPersen?.toInt() ?? '20').toString());
-    final stock = useState(item?.jumlahBarang ?? 0);
-    final hargaJual = useState(0.0);
-    final hargaJualDiscount = useState(0.0);
+    final editingName = useTextEditingController(text: rent?.name ?? '');
+    final editingNote = useTextEditingController(text: rent?.note ?? '');
+    final days = useState(rent?.howManyDay ?? 3);
+    final amount = useState(rent?.amount ?? 0);
+    final identity = useState(rent?.identity ?? false);
+    final people = useState(rent?.picture ?? false);
+    final pinalty = useState(0);
 
-    useListenableSelector(editingHargaDasar, () {
-      if (editingHargaDasar.text.isNotEmpty) {
-        hargaJual.value = int.parse(
-                editingHargaDasar.text.isEmpty ? '0' : editingHargaDasar.text) +
-            int.parse(editingHargaDasar.text.isEmpty
-                    ? '0'
-                    : editingHargaDasar.text) *
-                ((int.parse(editingHargaJualPersen.text.isEmpty
-                        ? '0'
-                        : editingHargaJualPersen.text)) /
-                    100);
-      }
-    });
-    useListenableSelector(editingDiscount, () {
-      if (editingHargaDasar.text.isNotEmpty &&
-          editingDiscount.text.isNotEmpty &&
-          hargaJual.value != 0.0) {
-        hargaJualDiscount.value = hargaJual.value -
-            hargaJual.value *
-                ((double.parse(editingDiscount.text.isEmpty
-                        ? '0'
-                        : editingDiscount.text)) /
-                    100);
-      }
-    });
-
-    useListenable(editingHargaJualPersen);
-    useListenable(hargaJual);
     useListenable(editingName);
-    useListenable(editingCode);
-    useListenable(editingUkuran);
-    useListenable(editingDiscount);
-    useListenable(hargaJualDiscount);
+    useListenable(editingNote);
+    useState(() {
+      if (rent != null) {
+        if (!DateTime.now().difference(rent!.rentDate).inDays.isNegative) {
+          pinalty.value =
+              8000 * DateTime.now().difference(rent!.rentDate).inDays;
+        }
+      }
+    });
 
     final isConnected = isDeviceConnected.watch(context);
     return Scaffold(
@@ -92,98 +64,84 @@ class RentForm extends HookWidget {
                   ],
                 ),
                 ShadInputFormField(
-                  controller: editingName,
+                  initialValue: item.name,
+                  readOnly: true,
                   validator: (val) =>
                       val.isEmpty == true ? 'Name is required' : null,
                   label: const Text('Nama Barang'),
                   placeholder: const Text('Baju'),
                 ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Expanded(
-                      child: ShadInputFormField(
-                        controller: editingCode,
-                        label: const Text('Code'),
-                        placeholder: const Text('HP08123'),
-                      ),
+                ShadInputFormField(
+                  controller: editingName,
+                  label: const Text('Peminjam'),
+                  validator: (val) =>
+                      val.isEmpty == true ? 'Customer is required' : null,
+                  placeholder: const Text('ex: Jhon Mayer'),
+                ),
+                ShadRadioGroup<int>(
+                  onChanged: (val) {
+                    if (val == item.rentThreeDay) {
+                      days.value = 3;
+                    } else if (val == item.rentOneWeek) {
+                      days.value = 7;
+                    } else {
+                      days.value = 30;
+                    }
+                    amount.value = val!;
+                  },
+                  initialValue: amount.value,
+                  items: [
+                    ShadRadio(
+                      label: const Text('Rent for 3 Days'),
+                      value: item.rentThreeDay,
                     ),
-                    BarcodeKeyboardListener(
-                      bufferDuration: const Duration(milliseconds: 200),
-                      onBarcodeScanned: (barcode) async {
-                        editingCode.text = barcode.replaceAll('½', '-');
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.only(bottom: 5.0),
-                        child: ShadButton.ghost(
-                          icon: Icon(Icons.barcode_reader),
-                        ),
-                      ),
+                    ShadRadio(
+                      label: const Text('Rent for One Week'),
+                      value: item.rentOneWeek,
                     ),
-                    ShadButton.ghost(
-                      icon: const Icon(Icons.camera_alt),
-                      onPressed: () async {
-                        var res = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const SimpleBarcodeScannerPage(),
-                            ));
-                        editingCode.text = res;
-                      },
+                    ShadRadio(
+                      label: const Text('Rent for 1 Month'),
+                      value: item.rentOneMonth,
                     ),
                   ],
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ShadInputFormField(
-                        controller: editingUkuran,
-                        validator: (val) =>
-                            val.isEmpty == true ? 'Ukuran is required' : null,
-                        label: const Text('Ukuran Barang'),
-                        placeholder: const Text('ex. S/M/L 50ml/100ml'),
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(top: 25),
-                        child: ShadSelect<int>(
-                          placeholder: const Text('Select a Stock'),
-                          initialValue: item?.jumlahBarang,
-                          options: List.generate(
-                              200,
-                              (val) =>
-                                  ShadOption(value: val, child: Text('$val'))),
-                          onChanged: (val) => stock.value = val,
-                          selectedOptionBuilder: (context, value) {
-                            stock.value = value;
-                            return Text('$value');
-                          },
-                        ),
-                      ),
-                    )
-                  ],
+                const Text('Pinalti keterlambatan Rp. 8.000,- perhari'),
+                const SizedBox(height: 20),
+                ShadCheckbox(
+                  value: identity.value,
+                  onChanged: (v) => identity.value = v,
+                  label: const Text('Take photo Identity'),
+                  sublabel: const Text(
+                    'Have you take picture of identity customer?',
+                  ),
+                ),
+                ShadCheckbox(
+                  value: people.value,
+                  onChanged: (v) => people.value = v,
+                  label: const Text('Take photo People'),
+                  sublabel: const Text(
+                    'Have you take picture of customer and rent item?',
+                  ),
+                ),
+                ShadInputFormField(
+                  controller: editingNote,
+                  label: const Text('Note'),
+                  maxLines: 3,
+                  placeholder: const Text('ex: Barang Kondisi Bagus'),
                 ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: ShadInputFormField(
-                        controller: editingHargaDasar,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 5),
+                          const Text('Harga'),
+                          const SizedBox(height: 20),
+                          Text(currency.format(amount.value)),
+                          const SizedBox(height: 15),
                         ],
-                        label: const Text('Harga Dasar'),
-                      ),
-                    ),
-                    Expanded(
-                      child: ShadInputFormField(
-                        controller: editingHargaJualPersen,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        label: const Text('H Jual Persen'),
                       ),
                     ),
                     Expanded(
@@ -191,36 +149,24 @@ class RentForm extends HookWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 5),
-                          const Text('Harga Jual'),
+                          const Text('Pinalty'),
                           const SizedBox(height: 20),
-                          Text('${hargaJual.value.toInt()}'),
+                          if (rent != null)
+                            Text(currency.format(pinalty.value))
+                          else
+                            const Text('-'),
                           const SizedBox(height: 15),
                         ],
-                      ),
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ShadInputFormField(
-                        controller: editingDiscount,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        label: const Text('Discount Percent'),
-                        placeholder: const Text('ex. 5'),
                       ),
                     ),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('H Jual Setelah Discount'),
+                          const SizedBox(height: 5),
+                          const Text('Harga Total'),
                           const SizedBox(height: 20),
-                          Text(editingDiscount.text.isEmpty
-                              ? '-'
-                              : '${hargaJualDiscount.value.toInt()}'),
+                          Text(currency.format(amount.value + pinalty.value)),
                           const SizedBox(height: 15),
                         ],
                       ),
@@ -232,91 +178,89 @@ class RentForm extends HookWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (item != null)
-                        ShadButton.destructive(
-                          text: const Text('Delete'),
+                      if (rent != null)
+                        ShadButton.outline(
+                          text: const Text('Update'),
                           onPressed: () {
-                            Database()
-                                .deleteInventory(item.id!)
-                                .whenComplete(() {
-                              Database().searchInventorys().then((val) {
-                                inventoryController.inventorys.clear();
-                                inventoryController.inventorys.addAll(val);
-                              });
-                              Navigator.pop(context);
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    backgroundColor: Colors.blue,
-                                    content: const Text(
-                                        'Please refresh data to see changes'),
-                                    action: SnackBarAction(
-                                      label: 'Refresh',
-                                      onPressed: () async {},
-                                    ),
-                                  ),
+                            if (!rentFormKey.currentState!.validate()) {
+                              return;
+                            } else {
+                              if (rent != null) {
+                                final updateitem = RentModel(
+                                  name: editingName.text,
+                                  id: rent!.id,
+                                  item: item.id!,
+                                  amount: amount.value,
+                                  identity: identity.value,
+                                  picture: people.value,
+                                  paid: false,
+                                  note: editingNote.text,
+                                  rentDate: rent!.rentDate,
+                                  howManyDay: rent!.howManyDay,
+                                  updatedAt: DateTime.now(),
+                                  createdAt: rent!.createdAt,
                                 );
+
+                                Database()
+                                    .updateRent(updateitem)
+                                    .whenComplete(() {
+                                  Future.delayed(Durations.short1).then((_) {
+                                    context.pop();
+                                    rentController.rents.refresh();
+                                  });
+                                });
                               }
-                            });
+                            }
                           },
                         ),
                       ShadButton(
-                        text: const Text('Save changes'),
+                        text: Text(
+                            rent != null ? 'Customer Pay' : 'Save changes'),
                         onPressed: () {
                           if (!rentFormKey.currentState!.validate()) {
                             return;
                           } else {
-                            if (item != null) {
-                              final updateitem = ItemModel(
-                                id: item.id,
-                                nama: editingName.text.replaceAll(',', ' '),
-                                code: editingCode.text,
-                                quantity: 1,
-                                hargaJual: hargaJual.value.toInt(),
-                                ukuran: editingUkuran.text,
-                                isHargaJualPersen: true,
-                                hargaJualPersen:
-                                    double.parse(editingHargaJualPersen.text),
-                                hargaDasar: int.parse(editingHargaDasar.text),
-                                diskonPersen:
-                                    double.tryParse(editingDiscount.text),
-                                jumlahBarang: stock.value,
+                            if (rent != null) {
+                              final updateitem = RentModel(
+                                name: editingName.text,
+                                id: rent!.id,
+                                item: item.id!,
+                                amount: amount.value,
+                                identity: identity.value,
+                                picture: people.value,
+                                paid: true,
+                                note: editingNote.text,
+                                rentDate: rent!.rentDate,
+                                howManyDay: rent!.howManyDay,
+                                updatedAt: DateTime.now(),
+                                createdAt: rent!.createdAt,
                               );
 
                               Database()
-                                  .updateInventory(updateitem)
+                                  .updateRent(updateitem)
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
                                   context.pop();
-                                  Database().searchInventorys().then((val) {
-                                    inventoryController.inventorys.clear();
-                                    inventoryController.inventorys.addAll(val);
-                                  });
-                                  inventoryController.inventorySelected.value =
-                                      null;
+                                  rentController.rents.refresh();
                                 });
                               });
                             } else {
-                              final newItem = ItemModel(
-                                  nama: editingName.text.replaceAll(',', ' '),
-                                  code: editingCode.text,
-                                  quantity: 1,
-                                  hargaJual: hargaJual.value.toInt(),
-                                  ukuran: editingUkuran.text,
-                                  isHargaJualPersen: true,
-                                  hargaJualPersen:
-                                      double.parse(editingHargaJualPersen.text),
-                                  hargaDasar: int.parse(editingHargaDasar.text),
-                                  diskonPersen:
-                                      double.tryParse(editingDiscount.text),
-                                  jumlahBarang: stock.value,
-                                  createdAt: DateTime.now());
-
-                              Database().addInventory(newItem).whenComplete(() {
-                                Database().searchInventorys().then((val) {
-                                  inventoryController.inventorys.clear();
-                                  inventoryController.inventorys.addAll(val);
-                                });
+                              final newItem = RentModel(
+                                name: editingName.text,
+                                item: item.id!,
+                                amount: amount.value,
+                                identity: identity.value,
+                                picture: people.value,
+                                note: editingNote.text,
+                                paid: false,
+                                rentDate: DateTime.now()
+                                    .add(Duration(days: days.value)),
+                                howManyDay: days.value,
+                                createdAt: DateTime.now(),
+                              );
+                              print('hello $newItem');
+                              Database().addRent(newItem).whenComplete(() {
+                                rentController.rents.refresh();
                                 context.pop();
                               });
                             }

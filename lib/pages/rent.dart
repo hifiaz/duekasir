@@ -1,6 +1,13 @@
+import 'package:due_kasir/controller/rent_controller.dart';
+import 'package:due_kasir/model/rent_item_model.dart';
 import 'package:due_kasir/pages/drawer.dart';
+import 'package:due_kasir/pages/rent/rent_form.dart';
+import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/utils/constant.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:signals/signals_flutter.dart';
 
 class Rent extends StatefulWidget {
   const Rent({super.key});
@@ -12,74 +19,141 @@ class Rent extends StatefulWidget {
 class _RentState extends State<Rent> {
   @override
   Widget build(BuildContext context) {
+    final items = rentController.rentItems.watch(context);
+    final rents = rentController.rents.watch(context);
     return Scaffold(
       drawer: const NavDrawer(),
       appBar: AppBar(
         title: const Text('Rent'),
         centerTitle: false,
+        actions: [
+          ShadButton.ghost(
+            onPressed: () {
+              rentController.rentItems.refresh();
+              rentController.rents.refresh();
+            },
+            text: const Text('Refresh'),
+            icon: const Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Icon(
+                Icons.refresh,
+                size: 16,
+              ),
+            ),
+          ),
+        ],
       ),
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: ShadCard(
-                title: Text('Ready to Rent'),
-                description: Text('Available item to rent'),
-                content: Column(
-                  children: [
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text('Stroller Baby Elle'),
-                      subtitle: Text('Rp. 120.000,- /month'),
-                      trailing: Icon(Icons.arrow_right),
-                    ),
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text('Car Seat Joie'),
-                      subtitle: Text('Rp. 200.000,- /month'),
-                      trailing: Icon(Icons.arrow_right),
-                    ),
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text('Baby Seat to Eat'),
-                      subtitle: Text('Rp. 60.000,- /month'),
-                      trailing: Icon(Icons.arrow_right),
-                    ),
-                  ],
+                title: const Text('Ready to Rent'),
+                description: const Text('Available item to rent'),
+                content: items.map(
+                  data: (val) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: val
+                          .map((p) => ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  onPressed: () {
+                                    rentController.rentItemSelected.value = p;
+                                    context.go('/rent/form');
+                                  },
+                                ),
+                                title: Text(p.name),
+                                subtitle: Text(
+                                  '${currency.format(p.rentOneMonth)}/Month\n${currency.format(p.rentOneWeek)}/Week\n${currency.format(p.rentThreeDay)}/3 Days',
+                                  style: ShadTheme.of(context).textTheme.muted,
+                                ),
+                                trailing: const Icon(Icons.arrow_right),
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RentForm(item: p)),
+                                ),
+                              ))
+                          .toList(),
+                    );
+                  },
+                  error: (e, ee) => Text('error $e $ee'),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                 ),
               ),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Expanded(
               child: ShadCard(
-                title: Text('Rental Periode'),
-                description: Text('List customer who rent our item'),
-                content: Column(
-                  children: [
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text('Williem'),
-                      subtitle: Text('Baby Seat to Eat - Expired on 20 days'),
-                      trailing: Icon(Icons.check_circle, color: Colors.green),
-                    ),
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text('Jose'),
-                      subtitle: Text('Car Seat Joie - Expired on 5 days'),
-                      trailing: Icon(Icons.check_circle, color: Colors.green),
-                    ),
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text('Brad'),
-                      subtitle: Text('Car Seat Joie - Expired on -2 days'),
-                      trailing: Icon(Icons.close, color: Colors.red),
-                    ),
-                  ],
+                title: const Text('Rental Periode'),
+                description: const Text('List customer who rent our item'),
+                content: rents.map(
+                  data: (rest) {
+                    return Column(
+                        children: rest.map(
+                      (p) {
+                        return FutureBuilder<RentItemModel?>(
+                          future: Database().getRentItemById(p.item),
+                          builder: (context, snapshot) {
+                            return ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(p.name,
+                                  style: p.paid
+                                      ? const TextStyle(
+                                          decoration:
+                                              TextDecoration.lineThrough)
+                                      : null),
+                              subtitle: Text(
+                                '${snapshot.data?.name} - Expired on ${(DateTime.now().difference(p.rentDate).inDays - 1).abs()} days',
+                                style: p.paid
+                                    ? const TextStyle(
+                                        decoration: TextDecoration.lineThrough)
+                                    : null,
+                              ),
+                              trailing: p.paid
+                                  ? null
+                                  : DateTime.now()
+                                          .difference(p.rentDate)
+                                          .inDays
+                                          .isNegative
+                                      ? const Icon(Icons.check_circle,
+                                          color: Colors.green)
+                                      : const Icon(Icons.close,
+                                          color: Colors.red),
+                              onTap: () {
+                                if (p.paid) return;
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RentForm(
+                                            item: snapshot.data!,
+                                            rent: p,
+                                          )),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ).toList());
+                  },
+                  error: (e, ee) => Text('error $e $ee'),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                 ),
               ),
-            )
+            ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push('/rent/form'),
+        tooltip: 'Add',
+        child: const Icon(Icons.add),
       ),
     );
   }

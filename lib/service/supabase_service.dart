@@ -5,7 +5,10 @@ import 'package:due_kasir/model/customer_model.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/presence_model.dart';
+import 'package:due_kasir/model/rent_item_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../model/rent_model.dart';
 
 class SupabaseHelper {
   static final SupabaseClient supabase = Supabase.instance.client;
@@ -211,7 +214,94 @@ class SupabaseHelper {
         allPresense.add(PresenceModel.fromJson(val));
       });
     }
-
     return allPresense;
+  }
+
+  // rent item
+  addRentItem(Map data) async {
+    data.putIfAbsent('user', () => supabase.auth.currentUser!.id);
+    await supabase.from('rent_items').insert(data).then((value) {
+      log('success add presense $value');
+    }).catchError((error) {
+      log('error add presense $error');
+    });
+  }
+
+  Future getRentItems() async {
+    List<RentItemModel> rentItems = [];
+
+    final result = await supabase
+        .from('rent_items')
+        .select()
+        .eq('user', supabase.auth.currentUser!.id);
+
+    if (result.isNotEmpty) {
+      await Future.forEach(result, (val) async {
+        rentItems.add(RentItemModel.fromJson(val));
+      });
+    }
+    return rentItems;
+  }
+
+  removeRentItem(int id) async {
+    await supabase.from('rent_items').select().eq("id", id).then((value) async {
+      await supabase.from('rent_items').delete().eq('id', id);
+    });
+  }
+
+  updateRentItem(RentItemModel item) async {
+    await supabase
+        .from('rent_items')
+        .select()
+        .eq("id", item.id!)
+        .then((value) async {
+      if (value.isEmpty) {
+        addRentItem(item.toJson());
+      } else {
+        await supabase
+            .from('rent_items')
+            .update(item.toJson())
+            .match({'id': item.id!});
+      }
+    });
+  }
+
+  // rent item
+  addRent(Map data) async {
+    data.putIfAbsent('user', () => supabase.auth.currentUser!.id);
+    await supabase.from('rent').insert(data).then((value) {
+      log('success add presense $value');
+    }).catchError((error) {
+      log('error add presense $error');
+    });
+  }
+
+  Future getRent() async {
+    List<RentModel> rentItems = [];
+
+    final result = await supabase
+        .from('rent')
+        .select()
+        .eq('user', supabase.auth.currentUser!.id);
+
+    if (result.isNotEmpty) {
+      await Future.forEach(result, (val) async {
+        rentItems.add(RentModel.fromJson(val));
+      });
+    }
+    return rentItems;
+  }
+
+  updateRent(RentModel item) async {
+    await supabase.from('rent').select().eq("id", item.id!).then((value) async {
+      if (value.isEmpty) {
+        addRent(item.toJson());
+      } else {
+        await supabase
+            .from('rent')
+            .update(item.toJson())
+            .match({'id': item.id!});
+      }
+    });
   }
 }

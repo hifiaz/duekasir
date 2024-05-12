@@ -342,6 +342,12 @@ extension $RegisterRouteExtension on RegisterRoute {
 RouteBase get $rentRoute => GoRouteData.$route(
       path: '/rent',
       factory: $RentRouteExtension._fromState,
+      routes: [
+        GoRouteData.$route(
+          path: 'form',
+          factory: $RentItemFormRouteExtension._fromState,
+        ),
+      ],
     );
 
 extension $RentRouteExtension on RentRoute {
@@ -349,6 +355,24 @@ extension $RentRouteExtension on RentRoute {
 
   String get location => GoRouteData.$location(
         '/rent',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $RentItemFormRouteExtension on RentItemFormRoute {
+  static RentItemFormRoute _fromState(GoRouterState state) =>
+      const RentItemFormRoute();
+
+  String get location => GoRouteData.$location(
+        '/rent/form',
       );
 
   void go(BuildContext context) => context.go(location);

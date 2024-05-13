@@ -65,8 +65,6 @@ dependencies:
   internet_connection_checker: ^1.0.0+1
   fl_chart: ^0.67.0
   supabase_flutter: ^2.5.2
-  camera_platform_interface: ^2.6.0
-  camera_windows: ^0.2.2
 
 dependency_overrides:
   intl: ^0.19.0

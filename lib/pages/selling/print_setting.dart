@@ -92,7 +92,7 @@ class PrintSettingState extends State<PrintSetting> {
                 setState(() {
                   _info = "connection status: $result";
                 });
-              } else if (sel == 'test') {
+              } else if (sel == 'Test Print') {
                 final profile = await CapabilityProfile.load();
                 late CapabilityProfile winProfile;
                 if (Platform.isWindows) {

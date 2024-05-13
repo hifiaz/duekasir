@@ -5,7 +5,6 @@ import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/pages/drawer.dart';
 import 'package:due_kasir/pages/report/report_bestseller.dart';
-import 'package:due_kasir/pages/report/report_pie.dart';
 import 'package:due_kasir/pages/report/report_revenue.dart';
 import 'package:due_kasir/pages/report/report_visitors.dart';
 import 'package:due_kasir/service/database.dart';
@@ -36,7 +35,7 @@ class _ReportState extends State<Report> {
     final rentRevenue = reportController.rentRevenue.watch(context);
     final expenses = expensesController.expenses.watch(context);
     final theme = ShadTheme.of(context);
-    final screenRevenue = isMobile ? context.width : (context.width - 70) / 4;
+    // final screenRevenue = isMobile ? context.width : (context.width - 70) / 4;
     final screen = isMobile ? context.width : (context.width - 60) / 3;
     return Scaffold(
       drawer: const NavDrawer(),
@@ -90,11 +89,11 @@ class _ReportState extends State<Report> {
               runSpacing: 10,
               spacing: 10,
               children: [
-                ReportPie(width: screenRevenue),
+                // ReportPie(width: screenRevenue),
                 Column(
                   children: [
                     ShadCard(
-                      width: screenRevenue,
+                      width: screen,
                       title: Text(
                           currency.format(sumReport(reportToday.value ?? [])),
                           style: theme.textTheme.h4),
@@ -102,7 +101,7 @@ class _ReportState extends State<Report> {
                     ),
                     const SizedBox(height: 10),
                     ShadCard(
-                      width: screenRevenue,
+                      width: screen,
                       title: Text(
                           currency
                               .format(sumReport(reportYesteday.value ?? [])),
@@ -115,7 +114,7 @@ class _ReportState extends State<Report> {
                   Column(
                     children: [
                       ShadCard(
-                        width: screenRevenue,
+                        width: screen,
                         title: Text(
                             currency.format(sumReport(report.value ?? [])),
                             style: theme.textTheme.h4),
@@ -125,7 +124,7 @@ class _ReportState extends State<Report> {
                         height: 10,
                       ),
                       ShadCard(
-                        width: screenRevenue,
+                        width: screen,
                         title: Text(
                             currency.format(sumReport(report.value ?? []) -
                                 report.value!.fold(
@@ -145,7 +144,7 @@ class _ReportState extends State<Report> {
                 Column(
                   children: [
                     ShadCard(
-                      width: screenRevenue,
+                      width: screen,
                       title: Text(
                           currency.format((rentRevenue.value ?? [])
                               .fold(0, (p, c) => p + c.amount)),
@@ -157,7 +156,7 @@ class _ReportState extends State<Report> {
                     ),
                     if (expenses.hasValue)
                       ShadCard(
-                        width: screenRevenue,
+                        width: screen,
                         title: Text(
                             currency.format(expenses.value!
                                 .fold(0, (p, c) => p + c.amount)),

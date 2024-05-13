@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:due_kasir/routes/router.dart';
@@ -39,15 +38,13 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    if (!Platform.isWindows) {
-      subscription = Connectivity()
-          .onConnectivityChanged
-          .listen((List<ConnectivityResult> result) async {
-        isDeviceConnected.value =
-            await InternetConnectionChecker().hasConnection;
-        log("Internet status ====== $isDeviceConnected");
-      });
-    }
+
+    subscription = Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> result) async {
+      isDeviceConnected.value = await InternetConnectionChecker().hasConnection;
+      log("Internet status ====== $isDeviceConnected");
+    });
   }
 
   @override

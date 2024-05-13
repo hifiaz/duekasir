@@ -4,7 +4,6 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
-  camera_windows
   connectivity_plus
   file_saver
   isar_flutter_libs

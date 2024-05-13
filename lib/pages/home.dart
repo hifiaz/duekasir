@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -13,6 +14,7 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
     final auth = authController.customer.watch(context);
+    User? user = Supabase.instance.client.auth.currentUser;
     return Scaffold(
       drawer: const NavDrawer(),
       appBar: AppBar(
@@ -37,7 +39,11 @@ class Home extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Account Login', style: theme.textTheme.h4),
-                IconButton(onPressed: () => context.push('/login'), icon: const Icon(Icons.login))
+                if (user == null)
+                  ShadButton.outline(
+                    text: const Text('Login'),
+                    onPressed: () => context.push('/login'),
+                  ),
               ],
             ),
             description:

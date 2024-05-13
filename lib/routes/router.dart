@@ -1,5 +1,6 @@
 import 'package:due_kasir/pages/customer.dart';
 import 'package:due_kasir/pages/customer/customer_form.dart';
+import 'package:due_kasir/pages/expenses.dart';
 import 'package:due_kasir/pages/home.dart';
 import 'package:due_kasir/pages/inventory.dart';
 import 'package:due_kasir/pages/inventory/csv_preview.dart';
@@ -187,6 +188,15 @@ class PresenceRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) => const Presence();
 }
+
+@TypedGoRoute<ExpensesRoute>(path: '/expenses')
+class ExpensesRoute extends GoRouteData {
+  const ExpensesRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const Expanses();
+}
+
 
 @TypedGoRoute<TestingRoute>(path: '/testing')
 class TestingRoute extends GoRouteData {

@@ -35,11 +35,11 @@ class CustomerModel {
       'nama': nama,
       'phone': phone,
       'ktp': ktp,
-      'dob': dob,
+      'dob': dob?.toIso8601String(),
       'keterangan': keterangan,
       'status': status,
-      'masuk': masuk?.millisecondsSinceEpoch,
-      'createdAt': createdAt?.millisecondsSinceEpoch,
+      'masuk': masuk?.toIso8601String(),
+      'createdAt': createdAt?.toIso8601String(),
     };
   }
 
@@ -53,12 +53,9 @@ class CustomerModel {
       keterangan:
           json['keterangan'] != null ? json['keterangan'] as String : null,
       status: json['status'],
-      masuk: json['masuk'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['masuk'] as int)
-          : null,
-      createdAt: json['createdAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int)
-          : null,
+      masuk: json['masuk'] != null ? DateTime.parse(json['masuk']) : null,
+      createdAt:
+          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
     );
   }
 }

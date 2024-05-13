@@ -7,6 +7,7 @@ import 'package:due_kasir/controller/selling_controller.dart';
 import 'package:due_kasir/main.dart';
 import 'package:due_kasir/model/auth_model.dart';
 import 'package:due_kasir/model/customer_model.dart';
+import 'package:due_kasir/model/expenses_model.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/presence_model.dart';
@@ -112,7 +113,20 @@ class Database {
     IsarCollection<CustomerModel> customerCollection =
         isar.collection<CustomerModel>();
     final customer = customerCollection.where().findAll();
+
     return customer;
+  }
+
+  Future<void> syncCustomers() async {
+    final customers = await getCustomers();
+    if (customers.isNotEmpty) {
+      for (CustomerModel element in customers) {
+        final res = await _supabaseHelper.getCustomerById(element.id!);
+        if (res == false) {
+          _supabaseHelper.addCustomer(element.toJson());
+        }
+      }
+    }
   }
 
   Future<List<CustomerModel>> searchCustomers({String? value}) async {
@@ -523,6 +537,36 @@ class Database {
     }
   }
 
+  Future<List<RentModel>> getRentRevenue() async {
+    final isar = await db;
+    IsarCollection<RentModel> rentCollection = isar.collection<RentModel>();
+
+    return await rentCollection.filter().paidEqualTo(true).findAll();
+  }
+
+  // expenses
+  Future<void> addExpenses(ExpensesModel val) async {
+    val.isSynced = isDeviceConnected.value;
+    final isar = await db;
+    isar.writeTxnSync<int>(() => isar.expensesModels.putSync(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.addExpenses(val.toJson());
+    }
+  }
+
+  Future<List<ExpensesModel>> getExpenses() async {
+    final isar = await db;
+    IsarCollection<ExpensesModel> expensesCollection =
+        isar.collection<ExpensesModel>();
+    if (isDeviceConnected.value) {
+      final res = await _supabaseHelper.getExpenses();
+
+      return res;
+    } else {
+      return await expensesCollection.where().findAll();
+    }
+  }
+
   Future<void> createBackUp() async {
     final isar = await db;
     final backUpDir = await getDownloadsDirectory();
@@ -580,6 +624,7 @@ class Database {
           PresenceModelSchema,
           RentItemModelSchema,
           RentModelSchema,
+          ExpensesModelSchema,
         ],
         directory: dir.path,
         inspector: true,

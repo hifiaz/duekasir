@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:due_kasir/model/customer_model.dart';
+import 'package:due_kasir/model/expenses_model.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/presence_model.dart';
@@ -12,11 +13,6 @@ import '../model/rent_model.dart';
 
 class SupabaseHelper {
   static final SupabaseClient supabase = Supabase.instance.client;
-
-  // static final customer = supabase
-  //     .from('customer')
-  //     .select()
-  //     .eq('user', supabase.auth.currentUser!.id);
 
   Future getInventoryAll() async {
     List data = [];
@@ -100,6 +96,11 @@ class SupabaseHelper {
     await supabase.from('customer').select().eq("id", id).then((value) async {
       await supabase.from('customer').delete().eq('id', id);
     });
+  }
+
+  Future<bool> getCustomerById(int id) async {
+    final res = await supabase.from('customer').select().eq("id", id);
+    return res.isNotEmpty;
   }
 
   updateCustomer(CustomerModel item) async {
@@ -266,7 +267,7 @@ class SupabaseHelper {
     });
   }
 
-  // rent item
+  // rent
   addRent(Map data) async {
     data.putIfAbsent('user', () => supabase.auth.currentUser!.id);
     await supabase.from('rent').insert(data).then((value) {
@@ -303,5 +304,31 @@ class SupabaseHelper {
             .match({'id': item.id!});
       }
     });
+  }
+
+  // expenses
+  addExpenses(Map data) async {
+    data.putIfAbsent('user', () => supabase.auth.currentUser!.id);
+    await supabase.from('expenses').insert(data).then((value) {
+      log('success add presense $value');
+    }).catchError((error) {
+      log('error add presense $error');
+    });
+  }
+
+  Future getExpenses() async {
+    List<ExpensesModel> expensesItems = [];
+
+    final result = await supabase
+        .from('expenses')
+        .select()
+        .eq('user', supabase.auth.currentUser!.id);
+
+    if (result.isNotEmpty) {
+      await Future.forEach(result, (val) async {
+        expensesItems.add(ExpensesModel.fromJson(val));
+      });
+    }
+    return expensesItems;
   }
 }

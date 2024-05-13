@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:due_kasir/controller/report_controller.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
-import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
@@ -9,8 +8,9 @@ import 'package:signals/signals_flutter.dart';
 final totalItem = Signal(0);
 
 class ReportBestSeller extends StatefulWidget {
+  final double width;
   final List<PenjualanModel> list;
-  const ReportBestSeller({super.key, required this.list});
+  const ReportBestSeller({super.key, required this.width, required this.list});
 
   @override
   State<ReportBestSeller> createState() => _ReportBestSellerState();
@@ -42,11 +42,7 @@ class _ReportBestSellerState extends State<ReportBestSeller> {
     final items = reportController.bestSeller.watch(context);
     final theme = ShadTheme.of(context);
     return ShadCard(
-      width: context.isTablet
-          ? context.width / 2
-          : context.isMobile
-              ? context.width
-              : context.width / 3,
+      width: widget.width,
       title: const Text('Best Seller'),
       description: const Text('Items base on how many item sold'),
       content: Column(

@@ -10,6 +10,7 @@ class ReportController {
   final reportIncome = futureSignal(() async => Database().getSalesByMonth());
   final reportOutOfStcok = futureSignal(() async => Database().getOutStock());
   final bestSeller = listSignal<ProductItemModel>([], autoDispose: true);
+  final rentRevenue = futureSignal(() async => Database().getRentRevenue());
 }
 
 final reportController = ReportController();

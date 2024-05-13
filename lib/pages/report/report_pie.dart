@@ -2,7 +2,6 @@ import 'package:due_kasir/controller/report_controller.dart';
 import 'package:due_kasir/controller/user_controller.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/utils/constant.dart';
-import 'package:due_kasir/utils/extension.dart';
 import 'package:due_kasir/widget/indicator.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +9,8 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
 class ReportPie extends StatelessWidget {
-  const ReportPie({super.key});
+  final double width;
+  const ReportPie({super.key, required this.width});
 
   @override
   Widget build(BuildContext context) {
@@ -18,18 +18,14 @@ class ReportPie extends StatelessWidget {
     final reportUsers = reportController.reportUser.watch(context);
     final report = reportController.report.watch(context);
     return ShadCard(
-      width: context.isTablet
-          ? context.width / 2.5
-          : context.isMobile
-              ? context.width
-              : context.width / 3.5,
+      width: width,
       title: const Text('Admin'),
       content: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (reportUsers.hasValue && report.hasValue)
             SizedBox(
-              width: 200,
+              width: 150,
               height: 125,
               child: PieChart(
                 PieChartData(
@@ -71,7 +67,7 @@ class ReportPie extends StatelessWidget {
         PieChartSectionData(
           color: converColor(key.key),
           value: total / key.value.length,
-          title:'${(100 * (key.value.length / total)).toStringAsFixed(2)}%',
+          title: '${(100 * (key.value.length / total)).toStringAsFixed(2)}%',
           radius: 30,
           titleStyle: const TextStyle(
             fontSize: 16.0,

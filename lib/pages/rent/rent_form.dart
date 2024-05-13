@@ -225,7 +225,7 @@ class RentForm extends HookWidget {
                                 name: editingName.text,
                                 id: rent!.id,
                                 item: item.id!,
-                                amount: amount.value,
+                                amount: amount.value + pinalty.value,
                                 identity: identity.value,
                                 picture: people.value,
                                 paid: true,
@@ -258,7 +258,6 @@ class RentForm extends HookWidget {
                                 howManyDay: days.value,
                                 createdAt: DateTime.now(),
                               );
-                              print('hello $newItem');
                               Database().addRent(newItem).whenComplete(() {
                                 rentController.rents.refresh();
                                 context.pop();

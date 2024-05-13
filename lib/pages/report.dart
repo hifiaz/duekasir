@@ -1,3 +1,4 @@
+import 'package:due_kasir/controller/expenses_controller.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/controller/report_controller.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
@@ -32,7 +33,11 @@ class _ReportState extends State<Report> {
     final reportToday = reportController.reportToday.watch(context);
     final reportYesteday = reportController.reportYesterday.watch(context);
     final reportOutOfStcok = reportController.reportOutOfStcok.watch(context);
+    final rentRevenue = reportController.rentRevenue.watch(context);
+    final expenses = expensesController.expenses.watch(context);
     final theme = ShadTheme.of(context);
+    final screenRevenue = isMobile ? context.width : (context.width - 70) / 4;
+    final screen = isMobile ? context.width : (context.width - 60) / 3;
     return Scaffold(
       drawer: const NavDrawer(),
       appBar: AppBar(
@@ -85,15 +90,11 @@ class _ReportState extends State<Report> {
               runSpacing: 10,
               spacing: 10,
               children: [
-                const ReportPie(),
+                ReportPie(width: screenRevenue),
                 Column(
                   children: [
                     ShadCard(
-                      width: context.isTablet
-                          ? context.width / 2
-                          : isMobile
-                              ? context.width
-                              : context.width / 3,
+                      width: screenRevenue,
                       title: Text(
                           currency.format(sumReport(reportToday.value ?? [])),
                           style: theme.textTheme.h4),
@@ -101,11 +102,7 @@ class _ReportState extends State<Report> {
                     ),
                     const SizedBox(height: 10),
                     ShadCard(
-                      width: context.isTablet
-                          ? context.width / 2
-                          : isMobile
-                              ? context.width
-                              : context.width / 3,
+                      width: screenRevenue,
                       title: Text(
                           currency
                               .format(sumReport(reportYesteday.value ?? [])),
@@ -118,11 +115,7 @@ class _ReportState extends State<Report> {
                   Column(
                     children: [
                       ShadCard(
-                        width: context.isTablet
-                            ? context.width / 2
-                            : isMobile
-                                ? context.width
-                                : context.width / 3,
+                        width: screenRevenue,
                         title: Text(
                             currency.format(sumReport(report.value ?? [])),
                             style: theme.textTheme.h4),
@@ -132,11 +125,7 @@ class _ReportState extends State<Report> {
                         height: 10,
                       ),
                       ShadCard(
-                        width: context.isTablet
-                            ? context.width / 2
-                            : isMobile
-                                ? context.width
-                                : context.width / 3,
+                        width: screenRevenue,
                         title: Text(
                             currency.format(sumReport(report.value ?? []) -
                                 report.value!.fold(
@@ -153,13 +142,41 @@ class _ReportState extends State<Report> {
                       ),
                     ],
                   ),
-                const ReportVisitors(),
+                Column(
+                  children: [
+                    ShadCard(
+                      width: screenRevenue,
+                      title: Text(
+                          currency.format((rentRevenue.value ?? [])
+                              .fold(0, (p, c) => p + c.amount)),
+                          style: theme.textTheme.h4),
+                      description: const Text('Rent Revenue'),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    if (expenses.hasValue)
+                      ShadCard(
+                        width: screenRevenue,
+                        title: Text(
+                            currency.format(expenses.value!
+                                .fold(0, (p, c) => p + c.amount)),
+                            style:
+                                theme.textTheme.h4.copyWith(color: Colors.red)),
+                        description: const Text('Expenses'),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              runSpacing: 10,
+              spacing: 10,
+              children: [
+                ReportVisitors(width: screen),
                 ShadCard(
-                  width: context.isTablet
-                      ? context.width / 2
-                      : isMobile
-                          ? context.width
-                          : context.width / 3,
+                  width: screen,
                   title: const Text('Out of Stock'),
                   description: Text(
                       'You have ${reportOutOfStcok.value?.length} item out of stock.'),
@@ -218,7 +235,8 @@ class _ReportState extends State<Report> {
                     ],
                   ),
                 ),
-                if (report.hasValue) ReportBestSeller(list: report.value!),
+                if (report.hasValue)
+                  ReportBestSeller(width: screen, list: report.value!),
               ],
             ),
             const SizedBox(height: 20),

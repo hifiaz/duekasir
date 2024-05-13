@@ -1,3 +1,4 @@
+import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/pages/drawer.dart';
 import 'package:due_kasir/pages/inventory/inventory_list.dart';
 import 'package:due_kasir/service/database.dart';
@@ -17,7 +18,14 @@ class Inventory extends StatelessWidget {
         centerTitle: false,
         actions: [
           ShadButton.ghost(
-            onPressed: () => Database().getInventorys(),
+            onPressed: () async {
+              await Database().getInventorys();
+              Database().searchInventorys().then((val) {
+                inventoryController.inventorys.clear();
+                inventoryController.inventorys.addAll(val);
+              });
+              // });
+            },
             text: const Text('Refresh'),
             icon: const Padding(
               padding: EdgeInsets.only(right: 8),

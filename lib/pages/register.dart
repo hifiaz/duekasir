@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -14,6 +15,7 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   final formKey = GlobalKey<ShadFormState>();
+  bool obscure = true;
 
   @override
   Widget build(BuildContext context) {
@@ -44,16 +46,31 @@ class _RegisterState extends State<Register> {
                 ),
                 ShadInputFormField(
                   id: 'password',
-                  // controller: password,
-                  label: const Text('Password'),
-                  placeholder: const Text('Enter your password'),
-                  obscureText: true,
+                  placeholder: const Text('Password'),
+                  obscureText: obscure,
+                  prefix: const Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: ShadImage.square(size: 16, LucideIcons.lock),
+                  ),
                   validator: (v) {
-                    if (v.length < 2) {
-                      return 'Email must be valid';
+                    if (v.length < 5) {
+                      return 'Password must more then 5';
                     }
                     return null;
                   },
+                  suffix: ShadButton(
+                    width: 24,
+                    height: 24,
+                    padding: EdgeInsets.zero,
+                    decoration: ShadDecoration.none,
+                    icon: ShadImage.square(
+                      size: 16,
+                      obscure ? LucideIcons.eyeOff : LucideIcons.eye,
+                    ),
+                    onPressed: () {
+                      setState(() => obscure = !obscure);
+                    },
+                  ),
                 ),
                 const SizedBox(height: 16),
                 ShadButton(
@@ -71,7 +88,8 @@ class _RegisterState extends State<Register> {
                             ShadToaster.of(context).show(
                               ShadToast(
                                 title: const Text('Register Success'),
-                                description: const Text('Login and Enjoy Due Kasir!'),
+                                description:
+                                    const Text('Login and Enjoy Due Kasir!'),
                                 action: ShadButton.outline(
                                   text: const Text('Back!'),
                                   onPressed: () =>
@@ -93,6 +111,22 @@ class _RegisterState extends State<Register> {
                     }
                   },
                 ),
+                Center(
+                  child: RichText(
+                    text: TextSpan(children: [
+                      TextSpan(
+                        text: 'Already Have Account?',
+                        style: ShadTheme.of(context).textTheme.muted,
+                      ),
+                      TextSpan(
+                        text: ' Login',
+                        style: ShadTheme.of(context).textTheme.p,
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () => context.go('/login'),
+                      ),
+                    ]),
+                  ),
+                )
               ],
             ),
           ),

@@ -181,13 +181,13 @@ class Database {
       for (CustomerModel element in customers) {
         final res = await _supabaseHelper.getCustomerById(element.id!);
         if (res == false) {
-          _supabaseHelper.addCustomer(element.toJson());
+          await _supabaseHelper.addCustomer(element.toJson());
         }
       }
     } else {
       final res = await _supabaseHelper.getCustomerAll();
       if (res.isNotEmpty) {
-        insertCustomerFresh(res);
+        await insertCustomerFresh(res);
       }
     }
   }
@@ -288,7 +288,7 @@ class Database {
     if (isDeviceConnected.value) {
       inventoryController.inventorys.value =
           await _supabaseHelper.getInventoryAll();
-      insertInventoryFresh(inventoryController.inventorys.value);
+      await insertInventoryFresh(inventoryController.inventorys.value);
     } else {
       inventoryController.inventorys.value =
           await inventoryCollection.where().findAll();

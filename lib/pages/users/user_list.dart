@@ -45,7 +45,17 @@ class UserList extends StatelessWidget {
                               DataCell(Text(''))
                             ])
                           ],
-                      error: (e) => Text('Error $e'),
+                      error: (e) => [
+                            const DataRow(cells: [
+                              DataCell(Text('No Data')),
+                              DataCell(Text('')),
+                              DataCell(Text('')),
+                              DataCell(Text('')),
+                              DataCell(Text('')),
+                              DataCell(Text('')),
+                              DataCell(Text(''))
+                            ])
+                          ],
                       data: (data) {
                         return [
                           for (UserModel user in data)

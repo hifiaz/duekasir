@@ -104,6 +104,7 @@ class NavDrawer extends StatelessWidget {
               title: const Text('Account'),
               leading: const Icon(Icons.account_circle),
               trailing: PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert),
                 onSelected: (item) async {
                   if (item == 'restore') {
                     ShadToaster.of(context).show(

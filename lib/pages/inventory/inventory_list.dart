@@ -53,96 +53,112 @@ class InventoryList extends HookWidget {
                     ),
                   ),
                 ),
-                ShadButton(
-                  onPressed: () async {
-                    FilePickerResult? result =
-                        await FilePicker.platform.pickFiles();
-                    if (result != null) {
-                      File file = File(result.files.single.path!);
-                      inventoryController.csvFile.value = file;
-                      if (context.mounted) context.push('/csv-preview');
-                    }
-                  },
-                  text: const Text('Upload'),
-                  icon: const Padding(
-                    padding: EdgeInsets.only(right: 8),
-                    child: Icon(
-                      Icons.upload,
-                      size: 16,
-                    ),
-                  ),
-                ),
-                ShadButton.ghost(
-                  icon: const Icon(Icons.download, size: 16),
-                  size: ShadButtonSize.icon,
-                  onPressed: () async {
-                    List<List<dynamic>> rows = [];
-                    rows.add([
-                      "id",
-                      "name",
-                      "code",
-                      "description",
-                      "total_item",
-                      "quantity",
-                      "size",
-                      "low_price",
-                      "sell_price",
-                      "sell_price_percent",
-                      "discount_percent",
-                      "is_percent",
-                      "item_in",
-                      "item_out",
-                      "created"
-                    ]);
-                    for (ItemModel map in inventorySearch) {
+                PopupMenuButton<String>(
+                  onSelected: (item) async {
+                    if (item == 'upload') {
+                      FilePickerResult? result =
+                          await FilePicker.platform.pickFiles();
+                      if (result != null) {
+                        File file = File(result.files.single.path!);
+                        inventoryController.csvFile.value = file;
+                        if (context.mounted) context.push('/csv-preview');
+                      }
+                    } else if (item == 'download') {
+                      List<List<dynamic>> rows = [];
                       rows.add([
-                        map.id,
-                        map.nama,
-                        map.code,
-                        map.deskripsi,
-                        map.jumlahBarang,
-                        map.quantity,
-                        map.ukuran,
-                        map.hargaDasar,
-                        map.hargaJual,
-                        map.hargaJualPersen,
-                        map.diskonPersen,
-                        map.isHargaJualPersen,
-                        map.barangMasuk,
-                        map.barangKeluar,
-                        map.createdAt
+                        "id",
+                        "name",
+                        "code",
+                        "description",
+                        "total_item",
+                        "quantity",
+                        "size",
+                        "low_price",
+                        "sell_price",
+                        "sell_price_percent",
+                        "discount_percent",
+                        "is_percent",
+                        "item_in",
+                        "item_out",
+                        "created"
                       ]);
-                    }
-                    final directory = await getApplicationDocumentsDirectory();
-                    String csv = const ListToCsvConverter().convert(rows);
-                    String filePath = "${directory.path}/due-kasir.csv";
+                      for (ItemModel map in inventorySearch) {
+                        rows.add([
+                          map.id,
+                          map.nama,
+                          map.code,
+                          map.deskripsi,
+                          map.jumlahBarang,
+                          map.quantity,
+                          map.ukuran,
+                          map.hargaDasar,
+                          map.hargaJual,
+                          map.hargaJualPersen,
+                          map.diskonPersen,
+                          map.isHargaJualPersen,
+                          map.barangMasuk,
+                          map.barangKeluar,
+                          map.createdAt
+                        ]);
+                      }
+                      final directory =
+                          await getApplicationDocumentsDirectory();
+                      String csv = const ListToCsvConverter().convert(rows);
+                      String filePath = "${directory.path}/due-kasir.csv";
 
-                    File file = File(filePath);
-                    File fileCsv = await file.writeAsString(csv);
-                    if (!fileCsv.existsSync()) {
-                      fileCsv.create(recursive: true);
-                    }
-                    if (Platform.isWindows) {
-                      FileSaver.instance
-                          .saveFile(
-                              name:
-                                  'due-kasir-${DateTime.now().millisecondsSinceEpoch}.csv',
-                              file: fileCsv)
-                          .whenComplete(
-                            () => const ShadToast(
-                              title: Text('Export CSV Success!'),
-                              description: Text(
-                                  'CSV File already on your download folder'),
-                            ),
-                          );
-                    } else {
-                      await FileSaver.instance.saveAs(
-                          name: 'due-kasir',
-                          file: fileCsv,
-                          ext: 'csv',
-                          mimeType: MimeType.csv);
+                      File file = File(filePath);
+                      File fileCsv = await file.writeAsString(csv);
+                      if (!fileCsv.existsSync()) {
+                        fileCsv.create(recursive: true);
+                      }
+                      if (Platform.isWindows) {
+                        FileSaver.instance
+                            .saveFile(
+                                name:
+                                    'due-kasir-${DateTime.now().millisecondsSinceEpoch}.csv',
+                                file: fileCsv)
+                            .then(
+                              (_) => const ShadToast(
+                                title: Text('Export CSV Success!'),
+                                description: Text(
+                                    'CSV File already on your download folder'),
+                              ),
+                            );
+                      } else {
+                        await FileSaver.instance.saveAs(
+                            name: 'due-kasir',
+                            file: fileCsv,
+                            ext: 'csv',
+                            mimeType: MimeType.csv);
+                      }
                     }
                   },
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<String>>[
+                    const PopupMenuItem<String>(
+                      value: 'download',
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.download),
+                          SizedBox(width: 8),
+                          Text('Download'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'upload',
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.upload),
+                          SizedBox(width: 8),
+                          Text('Upload'),
+                        ],
+                      ),
+                    ),
+                  ],
+                  icon: const Icon(Icons.more_vert_outlined),
                 ),
               ],
             ),

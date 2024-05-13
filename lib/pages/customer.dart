@@ -19,8 +19,8 @@ class Customer extends HookWidget {
         centerTitle: false,
         actions: [
           ShadButton.ghost(
-            onPressed: () {
-              Database().searchCustomers().then((val) {
+            onPressed: () async {
+              await Database().searchCustomers().then((val) {
                 customerController.customer.clear();
                 customerController.customer.addAll(val);
               });
@@ -37,11 +37,10 @@ class Customer extends HookWidget {
           PopupMenuButton<String>(
             onSelected: (item) async {
               if (item == 'sync') {
-                Database().syncCustomers().whenComplete(() {
-                  Database().searchCustomers().then((val) {
-                    customerController.customer.clear();
-                    customerController.customer.addAll(val);
-                  });
+                await Database().syncCustomers();
+                Database().searchCustomers().then((val) {
+                  customerController.customer.clear();
+                  customerController.customer.addAll(val);
                 });
               }
             },

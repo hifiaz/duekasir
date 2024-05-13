@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Rent extends StatefulWidget {
   const Rent({super.key});
@@ -20,6 +21,7 @@ class Rent extends StatefulWidget {
 class _RentState extends State<Rent> {
   @override
   Widget build(BuildContext context) {
+    User? user = Supabase.instance.client.auth.currentUser;
     final items = rentController.rentItems.watch(context);
     final rents = rentController.rents.watch(context);
     final screen = context.isMobile ? context.width : (context.width - 60) / 2;
@@ -83,7 +85,8 @@ class _RentState extends State<Rent> {
                         .toList(),
                   );
                 },
-                error: (e, ee) => Text('error $e $ee'),
+                error: (e, ee) =>
+                    Text(user == null ? 'No data' : 'Something wrong please force close app and reopen $e'),
                 loading: () => const Center(child: CircularProgressIndicator()),
               ),
             ),
@@ -141,7 +144,8 @@ class _RentState extends State<Rent> {
                     },
                   ).toList());
                 },
-                error: (e, ee) => Text('error $e $ee'),
+                error: (e, ee) =>
+                    Text(user == null ? 'No data' : 'Something wrong please force close app and reopen'),
                 loading: () => const Center(child: CircularProgressIndicator()),
               ),
             ),
@@ -149,7 +153,9 @@ class _RentState extends State<Rent> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/rent/form'),
+        onPressed: () => user == null
+            ? context.go('/register')
+            : context.push('/rent/form'),
         tooltip: 'Add',
         child: const Icon(Icons.add),
       ),

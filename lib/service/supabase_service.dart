@@ -7,6 +7,8 @@ import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/presence_model.dart';
 import 'package:due_kasir/model/rent_item_model.dart';
+import 'package:due_kasir/model/store_model.dart';
+import 'package:due_kasir/model/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../model/rent_model.dart';
@@ -65,7 +67,7 @@ class SupabaseHelper {
   }
 
   // customer
-  Future getCustomerAll() async {
+  Future<List<CustomerModel>> getCustomerAll() async {
     List<CustomerModel> allCustomer = [];
 
     await supabase
@@ -330,5 +332,94 @@ class SupabaseHelper {
       });
     }
     return expensesItems;
+  }
+
+  // store
+  addStore(Map data) async {
+    data.putIfAbsent('user', () => supabase.auth.currentUser!.id);
+    await supabase.from('store').insert(data).then((value) {
+      log('success add store $value');
+    }).catchError((error) {
+      log('error add store $error');
+    });
+  }
+
+  Future<StoreModel?> getStore() async {
+    final result = await supabase
+        .from('store')
+        .select()
+        .eq('user', supabase.auth.currentUser!.id);
+    return result.isEmpty ? null : StoreModel.fromJson(result.first);
+  }
+
+  updateStore(StoreModel item) async {
+    await supabase
+        .from('store')
+        .select()
+        .eq("id", item.id!)
+        .then((value) async {
+      if (value.isEmpty) {
+        addStore(item.toJson());
+      } else {
+        await supabase
+            .from('store')
+            .update(item.toJson())
+            .match({'id': item.id!});
+      }
+    });
+  }
+
+  // user
+  addUsers(Map data) async {
+    data.putIfAbsent('user', () => supabase.auth.currentUser!.id);
+    await supabase.from('users').insert(data).then((value) {
+      log('success add users $value');
+    }).catchError((error) {
+      log('error add users $error');
+    });
+  }
+
+  Future<bool> getUserById(int id) async {
+    final res = await supabase.from('users').select().eq("id", id);
+    return res.isNotEmpty;
+  }
+
+  Future<List<UserModel>> getUsers() async {
+    List<UserModel> users = [];
+
+    final result = await supabase
+        .from('users')
+        .select()
+        .eq('user', supabase.auth.currentUser!.id);
+
+    if (result.isNotEmpty) {
+      await Future.forEach(result, (val) async {
+        users.add(UserModel.fromJson(val));
+      });
+    }
+    return users;
+  }
+
+  removeUsers(int id) async {
+    await supabase.from('users').select().eq("id", id).then((value) async {
+      await supabase.from('users').delete().eq('id', id);
+    });
+  }
+
+  updateUsers(UserModel item) async {
+    await supabase
+        .from('users')
+        .select()
+        .eq("id", item.id!)
+        .then((value) async {
+      if (value.isEmpty) {
+        addUsers(item.toJson());
+      } else {
+        await supabase
+            .from('users')
+            .update(item.toJson())
+            .match({'id': item.id!});
+      }
+    });
   }
 }

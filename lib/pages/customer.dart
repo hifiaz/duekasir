@@ -1,9 +1,11 @@
+import 'package:due_kasir/controller/customer_controller.dart';
 import 'package:due_kasir/pages/customer/customer_list.dart';
 import 'package:due_kasir/pages/drawer.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class Customer extends HookWidget {
   const Customer({super.key});
@@ -16,10 +18,31 @@ class Customer extends HookWidget {
         title: const Text('Customer'),
         centerTitle: false,
         actions: [
+          ShadButton.ghost(
+            onPressed: () {
+              Database().searchCustomers().then((val) {
+                customerController.customer.clear();
+                customerController.customer.addAll(val);
+              });
+            },
+            text: const Text('Refresh'),
+            icon: const Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Icon(
+                Icons.refresh,
+                size: 16,
+              ),
+            ),
+          ),
           PopupMenuButton<String>(
             onSelected: (item) async {
               if (item == 'sync') {
-                Database().syncCustomers();
+                Database().syncCustomers().whenComplete(() {
+                  Database().searchCustomers().then((val) {
+                    customerController.customer.clear();
+                    customerController.customer.addAll(val);
+                  });
+                });
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[

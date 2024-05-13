@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:due_kasir/controller/expenses_controller.dart';
 import 'package:due_kasir/pages/drawer.dart';
 import 'package:due_kasir/pages/expenses/expenses_form.dart';
@@ -35,49 +37,70 @@ class Expanses extends StatelessWidget {
         ],
       ),
       body: expenses.hasValue && expenses.value?.isNotEmpty == true
-          ? ShadTable.list(
-              header: const [
-                ShadTableCell.header(child: Text('ID')),
-                ShadTableCell.header(child: Text('Title')),
-                ShadTableCell.header(child: Text('Amount')),
-                ShadTableCell.header(child: Text('Note')),
-                ShadTableCell.header(
-                  alignment: Alignment.centerRight,
-                  child: Text('Date'),
-                ),
-              ],
-              columnSpanExtent: (index) {
-                if (index == 1) return const FixedTableSpanExtent(200);
-                if (index == 2) return const FixedTableSpanExtent(200);
-                if (index == 4) {
-                  return const MaxTableSpanExtent(
-                    FixedTableSpanExtent(120),
-                    RemainingTableSpanExtent(),
-                  );
-                }
-                // uses the default value
-                return null;
-              },
-              children: expenses.value!.map(
-                (p) => [
-                  ShadTableCell(
-                    child: Text(
-                      p.id.toString(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                      ),
+          ? Platform.isAndroid || Platform.isIOS
+              ? SingleChildScrollView(
+                  child: expenses.map(
+                    data: (expanse) {
+                      return Column(
+                        children: expanse
+                            .map((v) => ListTile(
+                                  title: Text(v.title),
+                                  subtitle: Text(currency.format(v.amount)),
+                                  trailing: Text(
+                                      dateWithoutTime.format(v.createdAt!)),
+                                ))
+                            .toList(),
+                      );
+                    },
+                    error: (e, __) => Text('$e'),
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(),
                     ),
                   ),
-                  ShadTableCell(child: Text(p.title)),
-                  ShadTableCell(child: Text(currency.format(p.amount))),
-                  ShadTableCell(child: Text(p.note ?? '-')),
-                  ShadTableCell(
-                    alignment: Alignment.centerRight,
-                    child: Text(dateWithTime.format(p.createdAt!)),
+                )
+              : ShadTable.list(
+                  header: const [
+                    ShadTableCell.header(child: Text('ID')),
+                    ShadTableCell.header(child: Text('Title')),
+                    ShadTableCell.header(child: Text('Amount')),
+                    ShadTableCell.header(child: Text('Note')),
+                    ShadTableCell.header(
+                      alignment: Alignment.centerRight,
+                      child: Text('Date'),
+                    ),
+                  ],
+                  columnSpanExtent: (index) {
+                    if (index == 1) return const FixedTableSpanExtent(200);
+                    if (index == 2) return const FixedTableSpanExtent(200);
+                    if (index == 4) {
+                      return const MaxTableSpanExtent(
+                        FixedTableSpanExtent(120),
+                        RemainingTableSpanExtent(),
+                      );
+                    }
+                    // uses the default value
+                    return null;
+                  },
+                  children: expenses.value!.map(
+                    (p) => [
+                      ShadTableCell(
+                        child: Text(
+                          p.id.toString(),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      ShadTableCell(child: Text(p.title)),
+                      ShadTableCell(child: Text(currency.format(p.amount))),
+                      ShadTableCell(child: Text(p.note ?? '-')),
+                      ShadTableCell(
+                        alignment: Alignment.centerRight,
+                        child: Text(dateWithTime.format(p.createdAt!)),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            )
+                )
           : const Center(
               child: Text('There is no data'),
             ),

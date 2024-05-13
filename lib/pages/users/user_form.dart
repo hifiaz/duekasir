@@ -132,7 +132,7 @@ class UserForm extends HookWidget {
                       ShadButton.destructive(
                         text: const Text('Delete'),
                         onPressed: () {
-                          Database().deleteUser(user.id).whenComplete(() {
+                          Database().deleteUser(user.id!).whenComplete(() {
                             userController.users.refresh();
                             Navigator.pop(context);
                           });
@@ -145,13 +145,15 @@ class UserForm extends HookWidget {
                           return;
                         } else {
                           if (user != null) {
-                            final updateUser = UserModel()
-                              ..id = user.id
-                              ..nama = editingName.text
-                              ..dob = lahir.value
-                              ..status = status.value
-                              ..keterangan = role.value
-                              ..masuk = DateTime.now();
+                            final updateUser = UserModel(
+                              id: user.id,
+                              nama: editingName.text,
+                              dob: lahir.value,
+                              status: status.value,
+                              keterangan: role.value,
+                              masuk: DateTime.now(),
+                              createdAt: user.createdAt,
+                            );
                             Database().updateUser(updateUser).whenComplete(() {
                               Future.delayed(Durations.short1).then((_) {
                                 userController.users.refresh();
@@ -159,12 +161,14 @@ class UserForm extends HookWidget {
                               });
                             });
                           } else {
-                            final newUser = UserModel()
-                              ..nama = editingName.text
-                              ..dob = lahir.value
-                              ..status = status.value
-                              ..keterangan = role.value
-                              ..masuk = DateTime.now();
+                            final newUser = UserModel(
+                              nama: editingName.text,
+                              dob: lahir.value,
+                              status: status.value,
+                              keterangan: role.value,
+                              masuk: DateTime.now(),
+                              createdAt: DateTime.now(),
+                            );
 
                             Database().addNewUser(newUser).whenComplete(() {
                               userController.users.refresh();

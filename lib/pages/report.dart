@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:due_kasir/controller/expenses_controller.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/controller/report_controller.dart';
@@ -255,6 +257,9 @@ class _ReportState extends State<Report> {
                   children: [
                     for (PenjualanModel item in (report.value ?? []).reversed)
                       ExpansionTile(
+                          tilePadding: Platform.isAndroid || Platform.isIOS
+                              ? EdgeInsets.zero
+                              : null,
                           leading: Text(item.id.toString()),
                           title: FutureBuilder<UserModel?>(
                               future: Database().getUserById(item.kasir),
@@ -264,14 +269,23 @@ class _ReportState extends State<Report> {
                                 }
                                 return const Text('Admin');
                               }),
-                          subtitle: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(dateWithTime.format(item.createdAt)),
-                              Text(
-                                  '(${item.totalItem.toString()}) ${currency.format(item.totalHarga)}')
-                            ],
-                          ),
+                          subtitle: Platform.isAndroid || Platform.isIOS
+                              ? Column(
+                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                      Text(dateWithTime.format(item.createdAt)),
+                                      Text(
+                                          '(${item.totalItem.toString()}) ${currency.format(item.totalHarga)}')
+                                    ])
+                              : Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(dateWithTime.format(item.createdAt)),
+                                    Text(
+                                        '(${item.totalItem.toString()}) ${currency.format(item.totalHarga)}')
+                                  ],
+                                ),
                           children: [
                             ...item.items.map(
                               (val) => ListTile(

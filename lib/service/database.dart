@@ -56,23 +56,41 @@ class Database {
   Future<void> addNewUser(UserModel val) async {
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.userModels.putSync(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.addUsers(val.toJson());
+    }
   }
 
   Future<void> deleteUser(int val) async {
     final isar = await db;
     isar.writeTxn<bool>(() async => await isar.userModels.delete(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.removeUsers(val);
+    }
   }
 
   Future<void> updateUser(UserModel val) async {
     final isar = await db;
     isar.writeTxn<int>(() => isar.userModels.put(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.updateUsers(val);
+    }
   }
 
   Future<List<UserModel>> getUsers() async {
     final isar = await db;
     IsarCollection<UserModel> userCollection = isar.collection<UserModel>();
-    final users = userCollection.where().findAll();
-    return users;
+    if (isDeviceConnected.value) {
+      final users = await _supabaseHelper.getUsers();
+      if (users.isEmpty) {
+        final users = userCollection.where().findAll();
+        return users;
+      }
+      return users;
+    } else {
+      final users = userCollection.where().findAll();
+      return users;
+    }
   }
 
   Future<UserModel?> getUserById(int id) async {
@@ -80,6 +98,46 @@ class Database {
     IsarCollection<UserModel> userCollection = isar.collection<UserModel>();
     final users = userCollection.get(id);
     return users;
+  }
+
+  Future<void> clearUser() async {
+    final isar = await db;
+    IsarCollection<CustomerModel> customerCollection =
+        isar.collection<CustomerModel>();
+    isar.writeTxn<void>(() => customerCollection.clear());
+  }
+
+  insertUserFresh(List<UserModel> userList) async {
+    final isar = await db;
+    await clearUser();
+    if (userList.isNotEmpty) {
+      await Future.forEach(
+          userList,
+          (val) async =>
+              await isar.writeTxn<int>(() => isar.userModels.put(val)));
+      await getUsers();
+    }
+  }
+
+  Future<void> syncUsers() async {
+    final users = await getUsers();
+    if (users.isNotEmpty) {
+      await Future.forEach(users, (element) async {
+        final res = await _supabaseHelper.getUserById(element.id!);
+        if (res == false) {
+          _supabaseHelper.addUsers(element.toJson());
+        }
+      });
+      final res = await _supabaseHelper.getUsers();
+      if (res.isNotEmpty) {
+        insertUserFresh(res);
+      }
+    } else {
+      final res = await _supabaseHelper.getUsers();
+      if (res.isNotEmpty) {
+        insertUserFresh(res);
+      }
+    }
   }
 
   // Customer
@@ -126,6 +184,44 @@ class Database {
           _supabaseHelper.addCustomer(element.toJson());
         }
       }
+    } else {
+      final res = await _supabaseHelper.getCustomerAll();
+      if (res.isNotEmpty) {
+        insertCustomerFresh(res);
+      }
+    }
+  }
+
+  Future<void> clearCustomer() async {
+    final isar = await db;
+    IsarCollection<CustomerModel> customerCollection =
+        isar.collection<CustomerModel>();
+    isar.writeTxn<void>(() => customerCollection.clear());
+  }
+
+  insertCustomerFresh(List<CustomerModel> customerList) async {
+    final isar = await db;
+    await clearCustomer();
+    if (customerList.isNotEmpty) {
+      await Future.forEach(
+          customerList,
+          (val) async =>
+              await isar.writeTxn<int>(() => isar.customerModels.put(val)));
+      await getCustomers();
+    }
+  }
+
+  Future<void> checkCustomerSynced() async {
+    final users = await getUsers();
+    if (users.isNotEmpty) {
+      for (UserModel element in users) {
+        final res = await _supabaseHelper.getReportById(element.id!);
+        if (res == false) {
+          // _supabaseHelper.addReport(element.toJson());
+        }
+      }
+    } else {
+      getReport();
     }
   }
 
@@ -406,11 +502,6 @@ class Database {
     return listOfOrders;
   }
 
-  Future<void> addStore(StoreModel val) async {
-    final isar = await db;
-    isar.writeTxnSync<int>(() => isar.storeModels.putSync(val));
-  }
-
   Future<void> checkIsReportSynced() async {
     final reports = await getReport();
     if (reports.isNotEmpty) {
@@ -425,16 +516,35 @@ class Database {
     }
   }
 
-  Future<void> updateStore(StoreModel val) async {
+  Future<void> addStore(StoreModel val) async {
     final isar = await db;
-    isar.writeTxn<int>(() async => await isar.storeModels.put(val));
+    isar.writeTxnSync<int>(() => isar.storeModels.putSync(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.updateStore(val);
+    }
   }
 
   Future<StoreModel?> getStore() async {
     final isar = await db;
     IsarCollection<StoreModel> storeCollection = isar.collection<StoreModel>();
-    final store = storeCollection.get(1);
-    return store;
+    if (isDeviceConnected.value) {
+      final res = await _supabaseHelper.getStore();
+      if (res == null) {
+        final store = storeCollection.where().findFirst();
+        return store;
+      }
+      return res;
+    } else {
+      final store = storeCollection.where().findFirst();
+      return store;
+    }
+  }
+
+  Future<void> syncStore() async {
+    final store = await getStore();
+    if (store != null) {
+      _supabaseHelper.updateStore(store);
+    }
   }
 
   // presense

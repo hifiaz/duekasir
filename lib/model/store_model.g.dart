@@ -100,13 +100,14 @@ StoreModel _storeModelDeserialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = StoreModel();
-  object.description = reader.readString(offsets[0]);
-  object.footer = reader.readStringOrNull(offsets[1]);
-  object.id = id;
-  object.phone = reader.readString(offsets[2]);
-  object.subFooter = reader.readStringOrNull(offsets[3]);
-  object.title = reader.readString(offsets[4]);
+  final object = StoreModel(
+    description: reader.readString(offsets[0]),
+    footer: reader.readStringOrNull(offsets[1]),
+    id: id,
+    phone: reader.readString(offsets[2]),
+    subFooter: reader.readStringOrNull(offsets[3]),
+    title: reader.readString(offsets[4]),
+  );
   return object;
 }
 
@@ -133,7 +134,7 @@ P _storeModelDeserializeProp<P>(
 }
 
 Id _storeModelGetId(StoreModel object) {
-  return object.id;
+  return object.id ?? Isar.autoIncrement;
 }
 
 List<IsarLinkBase<dynamic>> _storeModelGetLinks(StoreModel object) {
@@ -507,8 +508,24 @@ extension StoreModelQueryFilter
     });
   }
 
+  QueryBuilder<StoreModel, StoreModel, QAfterFilterCondition> idIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'id',
+      ));
+    });
+  }
+
+  QueryBuilder<StoreModel, StoreModel, QAfterFilterCondition> idIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'id',
+      ));
+    });
+  }
+
   QueryBuilder<StoreModel, StoreModel, QAfterFilterCondition> idEqualTo(
-      Id value) {
+      Id? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
@@ -518,7 +535,7 @@ extension StoreModelQueryFilter
   }
 
   QueryBuilder<StoreModel, StoreModel, QAfterFilterCondition> idGreaterThan(
-    Id value, {
+    Id? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -531,7 +548,7 @@ extension StoreModelQueryFilter
   }
 
   QueryBuilder<StoreModel, StoreModel, QAfterFilterCondition> idLessThan(
-    Id value, {
+    Id? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -544,8 +561,8 @@ extension StoreModelQueryFilter
   }
 
   QueryBuilder<StoreModel, StoreModel, QAfterFilterCondition> idBetween(
-    Id lower,
-    Id upper, {
+    Id? lower,
+    Id? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {

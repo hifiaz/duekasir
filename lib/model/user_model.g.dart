@@ -98,14 +98,15 @@ UserModel _userModelDeserialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = UserModel();
-  object.createdAt = reader.readDateTime(offsets[0]);
-  object.dob = reader.readDateTimeOrNull(offsets[1]);
-  object.id = id;
-  object.keterangan = reader.readStringOrNull(offsets[2]);
-  object.masuk = reader.readDateTimeOrNull(offsets[3]);
-  object.nama = reader.readString(offsets[4]);
-  object.status = reader.readBool(offsets[5]);
+  final object = UserModel(
+    createdAt: reader.readDateTime(offsets[0]),
+    dob: reader.readDateTimeOrNull(offsets[1]),
+    id: id,
+    keterangan: reader.readStringOrNull(offsets[2]),
+    masuk: reader.readDateTimeOrNull(offsets[3]),
+    nama: reader.readString(offsets[4]),
+    status: reader.readBool(offsets[5]),
+  );
   return object;
 }
 
@@ -134,7 +135,7 @@ P _userModelDeserializeProp<P>(
 }
 
 Id _userModelGetId(UserModel object) {
-  return object.id;
+  return object.id ?? Isar.autoIncrement;
 }
 
 List<IsarLinkBase<dynamic>> _userModelGetLinks(UserModel object) {
@@ -347,8 +348,24 @@ extension UserModelQueryFilter
     });
   }
 
+  QueryBuilder<UserModel, UserModel, QAfterFilterCondition> idIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'id',
+      ));
+    });
+  }
+
+  QueryBuilder<UserModel, UserModel, QAfterFilterCondition> idIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'id',
+      ));
+    });
+  }
+
   QueryBuilder<UserModel, UserModel, QAfterFilterCondition> idEqualTo(
-      Id value) {
+      Id? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
@@ -358,7 +375,7 @@ extension UserModelQueryFilter
   }
 
   QueryBuilder<UserModel, UserModel, QAfterFilterCondition> idGreaterThan(
-    Id value, {
+    Id? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -371,7 +388,7 @@ extension UserModelQueryFilter
   }
 
   QueryBuilder<UserModel, UserModel, QAfterFilterCondition> idLessThan(
-    Id value, {
+    Id? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -384,8 +401,8 @@ extension UserModelQueryFilter
   }
 
   QueryBuilder<UserModel, UserModel, QAfterFilterCondition> idBetween(
-    Id lower,
-    Id upper, {
+    Id? lower,
+    Id? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {

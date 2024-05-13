@@ -49,7 +49,7 @@ class CustomerModel {
       nama: json['nama'],
       phone: json['phone'] != null ? json['phone'] as String : null,
       ktp: json['ktp'] != null ? json['ktp'] as String : null,
-      dob: json['dob'] != null ? DateTime(json['dob']) : null,
+      dob: json['dob'] != null ? DateTime.parse(json['dob']) : null,
       keterangan:
           json['keterangan'] != null ? json['keterangan'] as String : null,
       status: json['status'],

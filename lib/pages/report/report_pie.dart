@@ -44,7 +44,7 @@ class ReportPie extends StatelessWidget {
               children: users.value
                       ?.map(
                         (u) => Indicator(
-                          color: converColor(u.id),
+                          color: converColor(u.id!),
                           text: u.nama,
                           isSquare: false,
                         ),

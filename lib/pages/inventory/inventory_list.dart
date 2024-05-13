@@ -148,14 +148,13 @@ class InventoryList extends HookWidget {
             ),
           ),
           const SizedBox(height: 20),
-          if (Platform.isAndroid)
+          if (Platform.isAndroid || Platform.isIOS)
             for (ItemModel i in inventorySearch)
               ListTile(
-                contentPadding: EdgeInsets.zero,
                 leading: Text(i.id.toString()),
                 title: Text(i.nama),
                 subtitle: Text(
-                    '${i.diskonPersen == null || i.diskonPersen == 0 ? '-' : currency.format(i.hargaJual - i.hargaJual * (i.diskonPersen! / 100))} - ${i.code}'),
+                    '${i.diskonPersen == null || i.diskonPersen == 0 ? currency.format(i.hargaJual) : currency.format(i.hargaJual - i.hargaJual * (i.diskonPersen! / 100))} - ${i.code} (${i.jumlahBarang} Stock)'),
                 trailing: const Icon(Icons.arrow_right_outlined),
                 onTap: () {
                   inventoryController.inventorySelected.value = i;

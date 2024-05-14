@@ -14,6 +14,7 @@ import 'package:due_kasir/pages/report.dart';
 import 'package:due_kasir/pages/selling.dart';
 import 'package:due_kasir/pages/selling/print_setting.dart';
 import 'package:due_kasir/pages/store.dart';
+import 'package:due_kasir/pages/sync.dart';
 import 'package:due_kasir/pages/testing.dart';
 import 'package:due_kasir/pages/users.dart';
 import 'package:due_kasir/pages/users/user_form.dart';
@@ -197,6 +198,13 @@ class ExpensesRoute extends GoRouteData {
   Widget build(BuildContext context, GoRouterState state) => const Expanses();
 }
 
+@TypedGoRoute<SyncRoute>(path: '/sync')
+class SyncRoute extends GoRouteData {
+  const SyncRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const Sync();
+}
 
 @TypedGoRoute<TestingRoute>(path: '/testing')
 class TestingRoute extends GoRouteData {

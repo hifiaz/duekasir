@@ -155,8 +155,10 @@ class NavDrawer extends StatelessWidget {
                           ShadButton(
                             text: const Text('Continue'),
                             onPressed: () async {
-                              await Database().clearAllData().whenComplete(
-                                  () => Navigator.of(context).pop(true));
+                              await Database().clearAllData().whenComplete(() {
+                                Navigator.of(context).pop(true);
+                                context.go('/');
+                              });
                             },
                           ),
                         ],
@@ -165,6 +167,9 @@ class NavDrawer extends StatelessWidget {
                   } else if (item == 'logout') {
                     context.pop();
                     await Supabase.instance.client.auth.signOut();
+                  } else if (item == 'sync') {
+                    context.pop();
+                    context.go('/sync');
                   }
                 },
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -189,11 +194,16 @@ class NavDrawer extends StatelessWidget {
                       value: 'login',
                       child: Text('Login'),
                     )
-                  else
+                  else ...[
+                    const PopupMenuItem<String>(
+                      value: 'sync',
+                      child: Text('Sync'),
+                    ),
                     const PopupMenuItem<String>(
                       value: 'logout',
                       child: Text('Logout'),
                     ),
+                  ]
                 ],
               ),
               onTap: () => context.go('/home'),

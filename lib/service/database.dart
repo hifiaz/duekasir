@@ -171,18 +171,21 @@ class Database {
     IsarCollection<CustomerModel> customerCollection =
         isar.collection<CustomerModel>();
     final customer = customerCollection.where().findAll();
-
     return customer;
   }
 
   Future<void> syncCustomers() async {
     final customers = await getCustomers();
     if (customers.isNotEmpty) {
-      for (CustomerModel element in customers) {
-        final res = await _supabaseHelper.getCustomerById(element.id!);
+      await Future.forEach(customers, (val) async {
+        final res = await _supabaseHelper.getCustomerById(val.id!);
         if (res == false) {
-          await _supabaseHelper.addCustomer(element.toJson());
+          await _supabaseHelper.addCustomer(val.toJson());
         }
+      });
+      final res = await _supabaseHelper.getCustomerAll();
+      if (res.isNotEmpty) {
+        await insertCustomerFresh(res);
       }
     } else {
       final res = await _supabaseHelper.getCustomerAll();
@@ -207,8 +210,8 @@ class Database {
           customerList,
           (val) async =>
               await isar.writeTxn<int>(() => isar.customerModels.put(val)));
-      await getCustomers();
     }
+    await getCustomers();
   }
 
   Future<void> checkCustomerSynced() async {
@@ -544,6 +547,11 @@ class Database {
     final store = await getStore();
     if (store != null) {
       _supabaseHelper.updateStore(store);
+    } else {
+      final res = await _supabaseHelper.getStore();
+      if (res != null) {
+        await addStore(res);
+      }
     }
   }
 
@@ -669,8 +677,10 @@ class Database {
     IsarCollection<ExpensesModel> expensesCollection =
         isar.collection<ExpensesModel>();
     if (isDeviceConnected.value) {
-      final res = await _supabaseHelper.getExpenses();
-
+      final List<ExpensesModel> res = await _supabaseHelper.getExpenses();
+      if (res.isNotEmpty) {
+        // TODO sync with local database
+      }
       return res;
     } else {
       return await expensesCollection.where().findAll();

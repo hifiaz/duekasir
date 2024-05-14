@@ -21,7 +21,7 @@ class Home extends StatelessWidget {
         title: const Text('Account'),
         centerTitle: false,
         actions: [
-          ShadButton(
+          ShadButton.ghost(
             icon: const Padding(
                 padding: EdgeInsets.only(right: 8), child: Icon(Icons.store)),
             text: const Text('Store'),

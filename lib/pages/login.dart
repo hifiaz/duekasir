@@ -26,7 +26,7 @@ class _LoginState extends State<Login> {
           ShadButton.outline(
             text: const Text('Back'),
             onPressed: () {
-              context.go('/');
+              context.go('/sync');
             },
           ),
         ],
@@ -104,7 +104,7 @@ class _LoginState extends State<Login> {
                               ),
                             );
                             Future.delayed(const Duration(seconds: 2))
-                                .then((_) => context.go('/'));
+                                .then((_) => context.go('/sync'));
                           }
                         }
                       } on AuthException catch (e) {

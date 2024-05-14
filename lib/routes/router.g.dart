@@ -20,6 +20,7 @@ List<RouteBase> get $appRoutes => [
       $rentRoute,
       $presenceRoute,
       $expensesRoute,
+      $syncRoute,
       $testingRoute,
     ];
 
@@ -418,6 +419,28 @@ extension $ExpensesRouteExtension on ExpensesRoute {
 
   String get location => GoRouteData.$location(
         '/expenses',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $syncRoute => GoRouteData.$route(
+      path: '/sync',
+      factory: $SyncRouteExtension._fromState,
+    );
+
+extension $SyncRouteExtension on SyncRoute {
+  static SyncRoute _fromState(GoRouterState state) => const SyncRoute();
+
+  String get location => GoRouteData.$location(
+        '/sync',
       );
 
   void go(BuildContext context) => context.go(location);

@@ -13,7 +13,7 @@ class ReportRevenue extends StatelessWidget {
     final reportIncome = reportController.reportIncome.watch(context);
     if (reportIncome.hasValue && reportIncome.value != null) {
       return SizedBox(
-        height: 200,
+        height: 250,
         child: LineChart(mainData(reportIncome.value!)),
       );
     }
@@ -48,7 +48,7 @@ class ReportRevenue extends StatelessWidget {
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 1,
-      maxX: (data.entries.length + 2).toDouble(),
+      maxX: 31,
       minY: 0,
       maxY: 1000000.0,
       lineTouchData: LineTouchData(touchTooltipData:

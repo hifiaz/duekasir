@@ -19,7 +19,7 @@ class ReportVisitors extends StatelessWidget {
         children: [
           const SizedBox(height: 16),
           if (reportIncome.hasValue)
-            for (var i in reportIncome.value!.entries.take(10))
+            for (var i in reportIncome.value!.entries.toList().reversed.take(10))
               Column(
                 children: [
                   ListTile(

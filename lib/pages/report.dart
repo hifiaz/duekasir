@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:due_kasir/controller/expenses_controller.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/controller/report_controller.dart';
@@ -14,6 +12,7 @@ import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_date_range_picker/flutter_date_range_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
@@ -29,6 +28,7 @@ class _ReportState extends State<Report> {
   int touchedIndex = -1;
   @override
   Widget build(BuildContext context) {
+    final dateRange = reportController.dateRange.watch(context);
     final isMobile = context.isMobile;
     final report = reportController.report.watch(context);
     final reportToday = reportController.reportToday.watch(context);
@@ -37,7 +37,6 @@ class _ReportState extends State<Report> {
     final rentRevenue = reportController.rentRevenue.watch(context);
     final expenses = expensesController.expenses.watch(context);
     final theme = ShadTheme.of(context);
-    // final screenRevenue = isMobile ? context.width : (context.width - 70) / 4;
     final screen = isMobile ? context.width : (context.width - 60) / 3;
     return Scaffold(
       drawer: const NavDrawer(),
@@ -87,6 +86,51 @@ class _ReportState extends State<Report> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 200,
+                    child: DateRangeFormField(
+                      // initialValue: DateRange(dateRange.first, dateRange.last),
+                      decoration: const InputDecoration(
+                        label: Text("Date Range"),
+                        hintText: 'Please select a date range',
+                      ),
+                      pickerBuilder: (context, y) => DateRangePickerWidget(
+                        maximumDateRangeLength: 30,
+                        minimumDateRangeLength: 3,
+                        height: 330,
+                        initialDateRange:
+                            DateRange(dateRange.first, dateRange.last),
+                        maxDate: DateTime.now().add(const Duration(days: 1)),
+                        initialDisplayedDate: dateRange.first,
+                        onDateRangeChanged: (DateRange? val) {
+                          if (val?.start == null) {
+                            y.call(DateRange(dateRange.first, dateRange.last));
+                          } else {
+                            y.call(val);
+                            reportController.dateRange.value = [
+                              val!.start,
+                              val.end
+                            ];
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  ShadButton.outline(
+                    text: const Text('Reset'),
+                    onPressed: () => reportController.dateRange.value = [
+                      DateTime.now().subtract(const Duration(days: 30)),
+                      DateTime.now()
+                    ],
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
             Wrap(
               runSpacing: 10,
               spacing: 10,
@@ -128,7 +172,8 @@ class _ReportState extends State<Report> {
                       ShadCard(
                         width: screen,
                         title: Text(
-                            currency.format(sumReport(report.value ?? []) -
+                            currency.format(report.value!.fold(
+                                    0, (p, c) => p + c.totalHarga.toInt()) -
                                 report.value!.fold(
                                     0,
                                     (p, c) =>
@@ -255,63 +300,75 @@ class _ReportState extends State<Report> {
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Column(
                   children: [
-                    for (PenjualanModel item in (report.value ?? []).reversed)
-                      ExpansionTile(
-                          tilePadding: Platform.isAndroid || Platform.isIOS
-                              ? EdgeInsets.zero
-                              : null,
-                          leading: Text(item.id.toString()),
-                          title: FutureBuilder<UserModel?>(
-                              future: Database().getUserById(item.kasir),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  return Text(snapshot.data?.nama ?? 'Admin');
-                                }
-                                return const Text('Admin');
-                              }),
-                          subtitle: Platform.isAndroid || Platform.isIOS
-                              ? Column(
-                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                      Text(dateWithTime.format(item.createdAt)),
-                                      Text(
-                                          '(${item.totalItem.toString()}) ${currency.format(item.totalHarga)}')
-                                    ])
-                              : Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(dateWithTime.format(item.createdAt)),
-                                    Text(
-                                        '(${item.totalItem.toString()}) ${currency.format(item.totalHarga)}')
-                                  ],
-                                ),
-                          children: [
-                            ...item.items.map(
-                              (val) => ListTile(
-                                title: Text('${val.nama} - ${val.code}'),
-                                subtitle: Row(
-                                  children: [
-                                    Text('${val.quantity} x '),
-                                    Text(val.diskonPersen == null ||
-                                            val.diskonPersen == 0
-                                        ? currency.format(val.hargaJual)
-                                        : currency.format(val.hargaJual! -
-                                            val.hargaJual! *
-                                                (val.diskonPersen! / 100))),
-                                  ],
-                                ),
-                                trailing: Text(val.diskonPersen == null ||
-                                        val.diskonPersen == 0
-                                    ? currency
-                                        .format(val.hargaJual! * val.quantity!)
-                                    : currency.format((val.hargaJual! -
-                                            val.hargaJual! *
-                                                (val.diskonPersen! / 100)) *
-                                        val.quantity!)),
+                    ShadAccordion<PenjualanModel>.multiple(
+                      children: (report.value ?? []).reversed.map(
+                            (detail) => ShadAccordionItem(
+                              value: detail,
+                              title: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 5,
+                                runSpacing: 5,
+                                children: [
+                                  Text(
+                                    '${detail.id}.',
+                                    style:
+                                        ShadTheme.of(context).textTheme.small,
+                                  ),
+                                  FutureBuilder<UserModel?>(
+                                    future:
+                                        Database().getUserById(detail.kasir),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        return Text(
+                                            snapshot.data?.nama ?? 'Admin');
+                                      }
+                                      return const Text('Admin');
+                                    },
+                                  ),
+                                  Text(
+                                    '${currency.format(detail.totalHarga)} (${detail.totalItem.toString()})',
+                                    style:
+                                        ShadTheme.of(context).textTheme.small,
+                                  ),
+                                  Text(dateWithTime.format(detail.createdAt),
+                                      style: ShadTheme.of(context)
+                                          .textTheme
+                                          .muted),
+                                ],
+                              ),
+                              content: Column(
+                                children: [
+                                  ...detail.items.map(
+                                    (val) => ListTile(
+                                      title: Text('${val.nama} - ${val.code}'),
+                                      subtitle: Row(
+                                        children: [
+                                          Text('${val.quantity} x '),
+                                          Text(val.diskonPersen == null ||
+                                                  val.diskonPersen == 0
+                                              ? currency.format(val.hargaJual)
+                                              : currency.format(val.hargaJual! -
+                                                  val.hargaJual! *
+                                                      (val.diskonPersen! /
+                                                          100))),
+                                        ],
+                                      ),
+                                      trailing: Text(val.diskonPersen == null ||
+                                              val.diskonPersen == 0
+                                          ? currency.format(
+                                              val.hargaJual! * val.quantity!)
+                                          : currency.format((val.hargaJual! -
+                                                  val.hargaJual! *
+                                                      (val.diskonPersen! /
+                                                          100)) *
+                                              val.quantity!)),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ]),
+                          ),
+                    ),
                   ],
                 ),
               ),

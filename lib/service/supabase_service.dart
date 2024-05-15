@@ -122,13 +122,23 @@ class SupabaseHelper {
     });
   }
 
-  Future getRepots() async {
+  Future getRepots({DateTime? start, DateTime? end}) async {
     List<PenjualanModel> allReport = [];
 
-    final result = await supabase
-        .from('report')
-        .select()
-        .eq('user', supabase.auth.currentUser!.id);
+    List<Map<String, dynamic>> result;
+    if (start != null && end != null) {
+      result = await supabase
+          .from('report')
+          .select()
+          .eq('user', supabase.auth.currentUser!.id)
+          .gt('createdAt', start.toIso8601String())
+          .lt('createdAt', end.toIso8601String());
+    } else {
+      result = await supabase
+          .from('report')
+          .select()
+          .eq('user', supabase.auth.currentUser!.id);
+    }
 
     if (result.isNotEmpty) {
       await Future.forEach(result, (val) async {

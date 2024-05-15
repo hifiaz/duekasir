@@ -215,16 +215,16 @@ class Database {
   }
 
   Future<void> checkCustomerSynced() async {
-    final users = await getUsers();
-    if (users.isNotEmpty) {
-      for (UserModel element in users) {
-        final res = await _supabaseHelper.getReportById(element.id!);
+    final customers = await getCustomers();
+    if (customers.isNotEmpty) {
+      for (CustomerModel element in customers) {
+        final res = await _supabaseHelper.getCustomerById(element.id!);
         if (res == false) {
-          // _supabaseHelper.addReport(element.toJson());
+          _supabaseHelper.addCustomer(element.toJson());
         }
       }
     } else {
-      getReport();
+      getCustomers();
     }
   }
 
@@ -424,18 +424,32 @@ class Database {
     }
   }
 
-  Future<List<PenjualanModel>> getReport() async {
+  Future<List<PenjualanModel>> getReport(
+      {required DateTime start, required DateTime end}) async {
     final isar = await db;
     IsarCollection<PenjualanModel> reportCollection =
         isar.collection<PenjualanModel>();
     if (isDeviceConnected.value) {
-      final List<PenjualanModel> res = await _supabaseHelper.getRepots();
-      final items = await reportCollection.where().findAll();
+      final List<PenjualanModel> res = await _supabaseHelper.getRepots(
+        start: start.copyWith(hour: 0, minute: 0, second: 0),
+        end: end.copyWith(hour: 23, minute: 59, second: 59),
+      );
+      final items = await reportCollection
+          .where()
+          .filter()
+          .createdAtBetween(start.copyWith(hour: 0, minute: 0, second: 0),
+              end.copyWith(hour: 23, minute: 59, second: 59))
+          .findAll();
       if (res.length == items.length || items.length >= res.length) {
         return items;
       } else {
         await insertReportFresh(res);
-        final freshItems = await reportCollection.where().findAll();
+        final freshItems = await reportCollection
+            .where()
+            .filter()
+            .createdAtBetween(start.copyWith(hour: 0, minute: 0, second: 0),
+                end.copyWith(hour: 23, minute: 59, second: 59))
+            .findAll();
         return freshItems;
       }
     }
@@ -484,18 +498,16 @@ class Database {
     return listOfOrders;
   }
 
-  Future<Map<DateTime, List<PenjualanModel>>> getSalesByMonth() async {
+  Future<Map<DateTime, List<PenjualanModel>>> getSalesByDate(
+      {required DateTime start, required DateTime end}) async {
     final isar = await db;
     IsarCollection<PenjualanModel> inventoryCollection =
         isar.collection<PenjualanModel>();
     List<PenjualanModel> items = inventoryCollection
         .where()
         .filter()
-        .createdAtBetween(
-            DateTime.now()
-                .subtract(const Duration(days: 30))
-                .copyWith(hour: 0, minute: 0, second: 0),
-            DateTime.now().copyWith(hour: 23, minute: 59, second: 59))
+        .createdAtBetween(start.copyWith(hour: 0, minute: 0, second: 0),
+            end.copyWith(hour: 23, minute: 59, second: 59))
         .findAllSync();
 
     final Map<DateTime, List<PenjualanModel>> listOfOrders = items.groupListsBy(
@@ -505,8 +517,26 @@ class Database {
     return listOfOrders;
   }
 
+  Future<List<PenjualanModel>> getReportAll() async {
+    final isar = await db;
+    IsarCollection<PenjualanModel> reportCollection =
+        isar.collection<PenjualanModel>();
+    if (isDeviceConnected.value) {
+      final List<PenjualanModel> res = await _supabaseHelper.getRepots();
+      final items = await reportCollection.where().findAll();
+      if (res.length == items.length || items.length >= res.length) {
+        return items;
+      } else {
+        await insertReportFresh(res);
+        final freshItems = await reportCollection.where().findAll();
+        return freshItems;
+      }
+    }
+    return [];
+  }
+
   Future<void> checkIsReportSynced() async {
-    final reports = await getReport();
+    final reports = await getReportAll();
     if (reports.isNotEmpty) {
       for (PenjualanModel element in reports) {
         final res = await _supabaseHelper.getReportById(element.id!);
@@ -515,7 +545,7 @@ class Database {
         }
       }
     } else {
-      getReport();
+      getReportAll();
     }
   }
 
@@ -672,19 +702,41 @@ class Database {
     }
   }
 
+  Future<void> clearExpenses() async {
+    final isar = await db;
+    IsarCollection<ExpensesModel> expensesCollection =
+        isar.collection<ExpensesModel>();
+    isar.writeTxn<void>(() => expensesCollection.clear());
+  }
+
+  insertExpensesFresh(List<ExpensesModel> expensesList) async {
+    final isar = await db;
+    await clearExpenses();
+
+    if (expensesList.isNotEmpty) {
+      await Future.forEach(
+          expensesList,
+          (val) async =>
+              await isar.writeTxn<int>(() => isar.expensesModels.put(val)));
+    }
+  }
+
   Future<List<ExpensesModel>> getExpenses() async {
     final isar = await db;
     IsarCollection<ExpensesModel> expensesCollection =
         isar.collection<ExpensesModel>();
     if (isDeviceConnected.value) {
       final List<ExpensesModel> res = await _supabaseHelper.getExpenses();
-      if (res.isNotEmpty) {
-        // TODO sync with local database
+      final items = await expensesCollection.where().findAll();
+      if (res.length == items.length || items.length >= res.length) {
+        return items;
+      } else {
+        await insertExpensesFresh(res);
+        final freshItems = await expensesCollection.where().findAll();
+        return freshItems;
       }
-      return res;
-    } else {
-      return await expensesCollection.where().findAll();
     }
+    return [];
   }
 
   Future<void> createBackUp() async {

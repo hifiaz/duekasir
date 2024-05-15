@@ -226,6 +226,7 @@ class SellingRightState extends State<SellingRight> {
                       pembeli: pelanggan?.id,
                       createdAt: DateTime.now(),
                     );
+                    if (products.isEmpty) return;
                     Database().addPenjualan(newItem).whenComplete(() {
                       letsPrint(
                               store: store.value!,
@@ -245,6 +246,7 @@ class SellingRightState extends State<SellingRight> {
                         note.clear();
                         getIt.get<SellingController>().tipeBayar.value =
                             TypePayment.qris;
+                        sellingFormKey.currentState?.reset();
                         getIt
                             .get<SellingController>()
                             .updateBatch(list.value!.items)

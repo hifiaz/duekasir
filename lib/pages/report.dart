@@ -281,8 +281,7 @@ class _ReportState extends State<Report> {
                     ],
                   ),
                 ),
-                if (report.hasValue)
-                  ReportBestSeller(width: screen, list: report.value!),
+                ReportBestSeller(width: screen),
               ],
             ),
             const SizedBox(height: 20),

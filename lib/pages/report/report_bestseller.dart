@@ -7,42 +7,38 @@ import 'package:signals/signals_flutter.dart';
 
 final totalItem = Signal(0);
 
-class ReportBestSeller extends StatefulWidget {
+class ReportBestSeller extends StatelessWidget {
   final double width;
-  final List<PenjualanModel> list;
-  const ReportBestSeller({super.key, required this.width, required this.list});
-
-  @override
-  State<ReportBestSeller> createState() => _ReportBestSellerState();
-}
-
-class _ReportBestSellerState extends State<ReportBestSeller> {
-  @override
-  void initState() {
-    final itemsRes = reportController.bestSeller.watch(context);
-    if (totalItem.value != widget.list.length) {
-      totalItem.value = widget.list.length;
-      for (var i in widget.list) {
-        for (var r in i.items) {
-          var res = itemsRes.firstWhereOrNull((v) => v.id == r.id);
-          if (res != null) {
-            itemsRes[itemsRes.indexWhere((element) => element.id == r.id)] = res
-              ..quantity = (res.quantity! + r.quantity!);
-          } else {
-            itemsRes.add(r);
-          }
-        }
-      }
-    }
-    super.initState();
-  }
+  const ReportBestSeller({super.key, required this.width});
 
   @override
   Widget build(BuildContext context) {
     final items = reportController.bestSeller.watch(context);
+    reportController.report.listen(context, () {
+      print('hello ${reportController.report.value.value?.length}');
+      final List<PenjualanModel>? listValue =
+          reportController.report.value.value;
+      if (listValue != null) {
+        if (totalItem.value != listValue.length) {
+          totalItem.value = listValue.length;
+          for (var i in listValue) {
+            for (var r in i.items) {
+              var res = items.firstWhereOrNull((v) => v.id == r.id);
+              if (res != null) {
+                items[items.indexWhere((element) => element.id == r.id)] = res
+                  ..quantity = (res.quantity! + r.quantity!);
+              } else {
+                items.add(r);
+              }
+            }
+          }
+        }
+      }
+    });
+
     final theme = ShadTheme.of(context);
     return ShadCard(
-      width: widget.width,
+      width: width,
       title: const Text('Best Seller'),
       description: const Text('Items base on how many item sold'),
       content: Column(

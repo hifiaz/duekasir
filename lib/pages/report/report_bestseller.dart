@@ -15,7 +15,6 @@ class ReportBestSeller extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = reportController.bestSeller.watch(context);
     reportController.report.listen(context, () {
-      print('hello ${reportController.report.value.value?.length}');
       final List<PenjualanModel>? listValue =
           reportController.report.value.value;
       if (listValue != null) {

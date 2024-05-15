@@ -37,8 +37,18 @@ Prerequisite: https://flutter.dev/docs/get-started/install
     - [x] Scan Barcode with external device
     - [x] Scan barcode with mobile phone
 3. Report
-    - [x] list transaction
-    - [x] search
+    - [x] Filter by Date
+    - [x] Total Sales Today
+    - [x] Total Sales Yesterday
+    - [x] Revenue
+    - [x] Profit
+    - [x] Rent Revenue
+    - [x] Expenses
+    - [x] Total Visitor
+    - [x] Out of Stock
+    - [x] Best Seller
+    - [x] Revenue by Day
+    - [x] List Sales
 4. Customer
     - [x] list customer
     - [x] CRUD customer
@@ -48,8 +58,14 @@ Prerequisite: https://flutter.dev/docs/get-started/install
     - [x] CRUD user
     - [ ] Search user
 6. Backup & Restore Isar
-7. Sync with firebase
+7. Sync with supabase
+8. Presence / Absense
+9. Rent feature
+
 * MacOS Support
+* Windows Support
+* IOS Support
+* Android Support
 
 ## Author
 

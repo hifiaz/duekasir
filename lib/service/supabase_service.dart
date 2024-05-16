@@ -16,7 +16,7 @@ import '../model/rent_model.dart';
 class SupabaseHelper {
   static final SupabaseClient supabase = Supabase.instance.client;
 
-  Future getInventoryAll() async {
+  Future<List<ItemModel>> getInventoryAll() async {
     List data = [];
     List<ItemModel> allInventory = [];
 

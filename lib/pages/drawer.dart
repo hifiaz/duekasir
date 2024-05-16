@@ -1,6 +1,4 @@
 import 'package:due_kasir/controller/auth_controller.dart';
-import 'package:due_kasir/controller/customer_controller.dart';
-import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
@@ -57,13 +55,7 @@ class NavDrawer extends StatelessWidget {
             ListTile(
               title: const Text('Inventory'),
               leading: const Icon(Icons.inventory),
-              onTap: () {
-                Database().searchInventorys().then((val) {
-                  inventoryController.inventorys.clear();
-                  inventoryController.inventorys.addAll(val);
-                });
-                context.go('/inventory');
-              },
+              onTap: () => context.go('/inventory'),
             ),
             ListTile(
               title: const Text('Presence'),
@@ -93,11 +85,14 @@ class NavDrawer extends StatelessWidget {
               title: const Text('Customer'),
               leading: const Icon(Icons.people),
               onTap: () {
-                Database().searchCustomers().then((val) {
-                  customerController.customer.clear();
-                  customerController.customer.addAll(val);
-                });
                 context.go('/customer');
+              },
+            ),
+            ListTile(
+              title: const Text('Salaries'),
+              leading: const Icon(Icons.account_balance),
+              onTap: () {
+                context.go('/salaries');
               },
             ),
             ListTile(

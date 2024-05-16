@@ -17,28 +17,11 @@ class Inventory extends StatelessWidget {
         title: const Text('Inventory'),
         centerTitle: false,
         actions: [
-          ShadButton.ghost(
-            onPressed: () async {
-              await Database().getInventorys();
-              Database().searchInventorys().then((val) {
-                inventoryController.inventorys.clear();
-                inventoryController.inventorys.addAll(val);
-              });
-              // });
-            },
-            text: const Text('Refresh'),
-            icon: const Padding(
-              padding: EdgeInsets.only(right: 8),
-              child: Icon(
-                Icons.refresh,
-                size: 16,
-              ),
-            ),
-          ),
           PopupMenuButton<String>(
             onSelected: (item) async {
               if (item == 'sync') {
-                Database().checkIsInventorySynced();
+                await Database().checkIsInventorySynced();
+                inventoryController.inventorys.refresh();
               } else if (item == 'clear') {
                 showShadDialog(
                   context: context,

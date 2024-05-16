@@ -21,6 +21,7 @@ List<RouteBase> get $appRoutes => [
       $presenceRoute,
       $expensesRoute,
       $syncRoute,
+      $salariesRoute,
       $testingRoute,
     ];
 
@@ -441,6 +442,52 @@ extension $SyncRouteExtension on SyncRoute {
 
   String get location => GoRouteData.$location(
         '/sync',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $salariesRoute => GoRouteData.$route(
+      path: '/salaries',
+      factory: $SalariesRouteExtension._fromState,
+      routes: [
+        GoRouteData.$route(
+          path: 'form',
+          factory: $SalariesFormRouteExtension._fromState,
+        ),
+      ],
+    );
+
+extension $SalariesRouteExtension on SalariesRoute {
+  static SalariesRoute _fromState(GoRouterState state) => const SalariesRoute();
+
+  String get location => GoRouteData.$location(
+        '/salaries',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $SalariesFormRouteExtension on SalariesFormRoute {
+  static SalariesFormRoute _fromState(GoRouterState state) =>
+      const SalariesFormRoute();
+
+  String get location => GoRouteData.$location(
+        '/salaries/form',
       );
 
   void go(BuildContext context) => context.go(location);

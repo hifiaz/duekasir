@@ -239,10 +239,7 @@ class InventoryForm extends HookWidget {
                             Database()
                                 .deleteInventory(item.id!)
                                 .whenComplete(() {
-                              Database().searchInventorys().then((val) {
-                                inventoryController.inventorys.clear();
-                                inventoryController.inventorys.addAll(val);
-                              });
+                              inventoryController.inventorys.refresh();
                               Navigator.pop(context);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -288,36 +285,29 @@ class InventoryForm extends HookWidget {
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
                                   context.pop();
-                                  Database().searchInventorys().then((val) {
-                                    inventoryController.inventorys.clear();
-                                    inventoryController.inventorys.addAll(val);
-                                  });
+                                  inventoryController.inventorys.refresh();
                                   inventoryController.inventorySelected.value =
                                       null;
                                 });
                               });
                             } else {
                               final newItem = ItemModel(
-                                nama: editingName.text.replaceAll(',', ' '),
-                                code: editingCode.text,
-                                quantity: 1,
-                                hargaJual: hargaJual.value.toInt(),
-                                ukuran: editingUkuran.text,
-                                isHargaJualPersen: true,
-                                hargaJualPersen:
-                                    double.parse(editingHargaJualPersen.text),
-                                hargaDasar: int.parse(editingHargaDasar.text),
-                                diskonPersen:
-                                    double.tryParse(editingDiscount.text),
-                                jumlahBarang: stock.value,
-                                createdAt: DateTime.now()
-                              );
+                                  nama: editingName.text.replaceAll(',', ' '),
+                                  code: editingCode.text,
+                                  quantity: 1,
+                                  hargaJual: hargaJual.value.toInt(),
+                                  ukuran: editingUkuran.text,
+                                  isHargaJualPersen: true,
+                                  hargaJualPersen:
+                                      double.parse(editingHargaJualPersen.text),
+                                  hargaDasar: int.parse(editingHargaDasar.text),
+                                  diskonPersen:
+                                      double.tryParse(editingDiscount.text),
+                                  jumlahBarang: stock.value,
+                                  createdAt: DateTime.now());
 
                               Database().addInventory(newItem).whenComplete(() {
-                                Database().searchInventorys().then((val) {
-                                  inventoryController.inventorys.clear();
-                                  inventoryController.inventorys.addAll(val);
-                                });
+                                inventoryController.inventorys.refresh();
                                 context.pop();
                               });
                             }

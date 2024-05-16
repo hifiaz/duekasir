@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:due_kasir/controller/customer_controller.dart';
 import 'package:due_kasir/controller/selling/events.dart';
 import 'package:due_kasir/controller/selling_controller.dart';
 import 'package:due_kasir/controller/store_controller.dart';
@@ -91,10 +90,6 @@ class SellingRightState extends State<SellingRight> {
                   subtitle: const Text('Pelanggan'),
                   trailing: const Icon(Icons.arrow_right),
                   onTap: () {
-                    Database().searchCustomers().then((val) {
-                      customerController.customer.clear();
-                      customerController.customer.addAll(val);
-                    });
                     showShadSheet(
                       side: ShadSheetSide.right,
                       context: context,

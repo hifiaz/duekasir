@@ -77,20 +77,14 @@ class Database {
     }
   }
 
-  Future<List<UserModel>> getUsers() async {
+  Future<List<UserModel>> getUsers({String? name}) async {
     final isar = await db;
     IsarCollection<UserModel> userCollection = isar.collection<UserModel>();
-    if (isDeviceConnected.value) {
-      final users = await _supabaseHelper.getUsers();
-      if (users.isEmpty) {
-        final users = userCollection.where().findAll();
-        return users;
-      }
-      return users;
-    } else {
-      final users = userCollection.where().findAll();
-      return users;
-    }
+    final users = userCollection
+        .filter()
+        .namaContains(name ?? '', caseSensitive: false)
+        .findAll();
+    return users;
   }
 
   Future<UserModel?> getUserById(int id) async {
@@ -166,11 +160,14 @@ class Database {
     }
   }
 
-  Future<List<CustomerModel>> getCustomers() async {
+  Future<List<CustomerModel>> getCustomers({String? name}) async {
     final isar = await db;
     IsarCollection<CustomerModel> customerCollection =
         isar.collection<CustomerModel>();
-    final customer = customerCollection.where().findAll();
+    final customer = customerCollection
+        .filter()
+        .namaContains(name ?? '', caseSensitive: false)
+        .findAll();
     return customer;
   }
 
@@ -228,17 +225,6 @@ class Database {
     }
   }
 
-  Future<List<CustomerModel>> searchCustomers({String? value}) async {
-    final isar = await db;
-    IsarCollection<CustomerModel> customerCollection =
-        isar.collection<CustomerModel>();
-    final items = customerCollection
-        .filter()
-        .group((q) => q.namaContains(value ?? '', caseSensitive: false))
-        .findAll();
-    return items;
-  }
-
   Future<CustomerModel?> getCustomerById(int id) async {
     final isar = await db;
     IsarCollection<CustomerModel> customerCollection =
@@ -284,18 +270,25 @@ class Database {
     }
   }
 
-  Future<void> getInventorys() async {
+  Future<List<ItemModel>> getInventorys({String? value}) async {
     final isar = await db;
     IsarCollection<ItemModel> inventoryCollection =
         isar.collection<ItemModel>();
-    if (isDeviceConnected.value) {
-      inventoryController.inventorys.value =
-          await _supabaseHelper.getInventoryAll();
-      await insertInventoryFresh(inventoryController.inventorys.value);
-    } else {
-      inventoryController.inventorys.value =
-          await inventoryCollection.where().findAll();
-    }
+    return await inventoryCollection
+        .filter()
+        .group((q) => q
+            .namaContains(value ?? '', caseSensitive: false)
+            .or()
+            .codeContains(value ?? '', caseSensitive: false))
+        .findAll();
+    // if (isDeviceConnected.value) {
+    //   inventoryController.inventorys.value =
+    //       await _supabaseHelper.getInventoryAll();
+    //   await insertInventoryFresh(inventoryController.inventorys.value);
+    // } else {
+    //   inventoryController.inventorys.value =
+    //       await inventoryCollection.where().findAll();
+    // }
   }
 
   insertInventoryFresh(List<ItemModel> inventoryList) async {
@@ -356,18 +349,23 @@ class Database {
     if (inventorys.isNotEmpty) {
       List<ItemModel> unsyncedInventory = await getUnsyncedInventoryData();
       if (inventoryController.deleteItemList.value.isNotEmpty) {
-        for (ItemModel element in inventoryController.deleteItemList.value) {
-          _supabaseHelper.removeInventory(element.id!);
-        }
+        await Future.forEach(inventoryController.deleteItemList.value,
+            (element) async => _supabaseHelper.removeInventory(element.id!));
+        // for (ItemModel element in inventoryController.deleteItemList.value) {
+        //   _supabaseHelper.removeInventory(element.id!);
+        // }
         inventoryController.deleteItemList.value.clear();
       }
       if (unsyncedInventory.isNotEmpty) {
-        for (ItemModel element in unsyncedInventory) {
+        await Future.forEach(unsyncedInventory, (element) async {
           element.isSynced = true;
           await _supabaseHelper.updateInventory(element);
           updateInventorySync(element);
-        }
+        });
       }
+      // refresh
+      final res = await _supabaseHelper.getInventoryAll();
+      await insertInventoryFresh(res);
     } else {
       getInventorys();
     }

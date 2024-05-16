@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/model/item_model.dart';
-import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart';
@@ -19,23 +18,8 @@ class InventoryList extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final search = useTextEditingController();
-    // final inventory = inventoryController.inventory.watch(context);
-    final inventorySearch = inventoryController.inventorys.watch(context);
-    useListenable(search);
-    useListenableSelector(search, () {
-      if (search.text.length > 2) {
-        Database().searchInventorys(value: search.text).then((val) {
-          inventoryController.inventorys.clear();
-          inventoryController.inventorys.addAll(val);
-        });
-      } else if (search.text.length == 1) {
-        Database().searchInventorys().then((val) {
-          inventoryController.inventorys.clear();
-          inventoryController.inventorys.addAll(val);
-        });
-      }
-    });
+    final inventory = inventoryController.inventorys.watch(context);
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -46,7 +30,10 @@ class InventoryList extends HookWidget {
               children: [
                 Expanded(
                   child: TextFormField(
-                    controller: search,
+                    onChanged: (val) {
+                      inventoryController.searchInventory.value = val;
+                      inventoryController.inventorys.refresh();
+                    },
                     decoration: const InputDecoration(
                       prefixIcon: Icon(Icons.search),
                       hintText: 'Search',
@@ -64,72 +51,75 @@ class InventoryList extends HookWidget {
                         if (context.mounted) context.push('/csv-preview');
                       }
                     } else if (item == 'download') {
-                      List<List<dynamic>> rows = [];
-                      rows.add([
-                        "id",
-                        "name",
-                        "code",
-                        "description",
-                        "total_item",
-                        "quantity",
-                        "size",
-                        "low_price",
-                        "sell_price",
-                        "sell_price_percent",
-                        "discount_percent",
-                        "is_percent",
-                        "item_in",
-                        "item_out",
-                        "created"
-                      ]);
-                      for (ItemModel map in inventorySearch) {
+                      if (inventory.hasValue &&
+                          inventory.value?.isNotEmpty == true) {
+                        List<List<dynamic>> rows = [];
                         rows.add([
-                          map.id,
-                          map.nama,
-                          map.code,
-                          map.deskripsi,
-                          map.jumlahBarang,
-                          map.quantity,
-                          map.ukuran,
-                          map.hargaDasar,
-                          map.hargaJual,
-                          map.hargaJualPersen,
-                          map.diskonPersen,
-                          map.isHargaJualPersen,
-                          map.barangMasuk,
-                          map.barangKeluar,
-                          map.createdAt
+                          "id",
+                          "name",
+                          "code",
+                          "description",
+                          "total_item",
+                          "quantity",
+                          "size",
+                          "low_price",
+                          "sell_price",
+                          "sell_price_percent",
+                          "discount_percent",
+                          "is_percent",
+                          "item_in",
+                          "item_out",
+                          "created"
                         ]);
-                      }
-                      final directory =
-                          await getApplicationDocumentsDirectory();
-                      String csv = const ListToCsvConverter().convert(rows);
-                      String filePath = "${directory.path}/due-kasir.csv";
+                        for (ItemModel map in inventory.value!) {
+                          rows.add([
+                            map.id,
+                            map.nama,
+                            map.code,
+                            map.deskripsi,
+                            map.jumlahBarang,
+                            map.quantity,
+                            map.ukuran,
+                            map.hargaDasar,
+                            map.hargaJual,
+                            map.hargaJualPersen,
+                            map.diskonPersen,
+                            map.isHargaJualPersen,
+                            map.barangMasuk,
+                            map.barangKeluar,
+                            map.createdAt
+                          ]);
+                        }
+                        final directory =
+                            await getApplicationDocumentsDirectory();
+                        String csv = const ListToCsvConverter().convert(rows);
+                        String filePath = "${directory.path}/due-kasir.csv";
 
-                      File file = File(filePath);
-                      File fileCsv = await file.writeAsString(csv);
-                      if (!fileCsv.existsSync()) {
-                        fileCsv.create(recursive: true);
-                      }
-                      if (Platform.isWindows) {
-                        FileSaver.instance
-                            .saveFile(
-                                name:
-                                    'due-kasir-${DateTime.now().millisecondsSinceEpoch}.csv',
-                                file: fileCsv)
-                            .then(
-                              (_) => const ShadToast(
-                                title: Text('Export CSV Success!'),
-                                description: Text(
-                                    'CSV File already on your download folder'),
-                              ),
-                            );
-                      } else {
-                        await FileSaver.instance.saveAs(
-                            name: 'due-kasir',
-                            file: fileCsv,
-                            ext: 'csv',
-                            mimeType: MimeType.csv);
+                        File file = File(filePath);
+                        File fileCsv = await file.writeAsString(csv);
+                        if (!fileCsv.existsSync()) {
+                          fileCsv.create(recursive: true);
+                        }
+                        if (Platform.isWindows) {
+                          FileSaver.instance
+                              .saveFile(
+                                  name:
+                                      'due-kasir-${DateTime.now().millisecondsSinceEpoch}.csv',
+                                  file: fileCsv)
+                              .then(
+                                (_) => const ShadToast(
+                                  title: Text('Export CSV Success!'),
+                                  description: Text(
+                                      'CSV File already on your download folder'),
+                                ),
+                              );
+                        } else {
+                          await FileSaver.instance.saveAs(
+                              name: 'due-kasir',
+                              file: fileCsv,
+                              ext: 'csv',
+                              mimeType: MimeType.csv);
+                        }
                       }
                     }
                   },
@@ -164,63 +154,127 @@ class InventoryList extends HookWidget {
             ),
           ),
           const SizedBox(height: 20),
-          if (Platform.isAndroid || Platform.isIOS)
-            for (ItemModel i in inventorySearch)
-              ListTile(
-                leading: Text(i.id.toString()),
-                title: Text(i.nama),
-                subtitle: Text(
-                    '${i.diskonPersen == null || i.diskonPersen == 0 ? currency.format(i.hargaJual) : currency.format(i.hargaJual - i.hargaJual * (i.diskonPersen! / 100))} - ${i.code} (${i.jumlahBarang} Stock)'),
-                trailing: const Icon(Icons.arrow_right_outlined),
-                onTap: () {
-                  inventoryController.inventorySelected.value = i;
-                  context.go('/inventory/form');
-                },
-              )
-          else
-            Watch(
-              (context) => DataTable(
-                columns: const [
-                  DataColumn(label: Text('ID')),
-                  DataColumn(label: Text('Nama')),
-                  DataColumn(label: Text('Code')),
-                  DataColumn(label: Text('Stock')),
-                  DataColumn(label: Text('Harga')),
-                  DataColumn(label: Text('Ukuran')),
-                  DataColumn(label: Text('Disc')),
-                  DataColumn(label: Text('H.Disc')),
-                  DataColumn(label: Text('More')),
-                ],
-                rows: inventorySearch
-                    .map((item) => DataRow(cells: [
-                          DataCell(Text(item.id.toString())),
-                          DataCell(Text(item.nama)),
-                          DataCell(Text(item.code)),
-                          DataCell(Text(item.jumlahBarang.toString())),
-                          DataCell(Text(currency.format(item.hargaJual))),
-                          DataCell(Text(item.ukuran)),
-                          DataCell(Text(item.diskonPersen == null ||
-                                  item.diskonPersen == 0
-                              ? '-'
-                              : item.diskonPersen.toString())),
-                          DataCell(Text(item.diskonPersen == null ||
-                                  item.diskonPersen == 0
-                              ? '-'
-                              : currency.format(item.hargaJual -
-                                  item.hargaJual *
-                                      (item.diskonPersen! / 100)))),
-                          DataCell(
-                            const Icon(Icons.more_horiz),
-                            onTap: () {
-                              inventoryController.inventorySelected.value =
-                                  item;
-                              context.go('/inventory/form');
-                            },
-                          ),
-                        ]))
-                    .toList(),
-              ),
-            ),
+          inventory.map(
+              data: (items) {
+                if (Platform.isAndroid || Platform.isIOS) {
+                  return Column(
+                    children: items
+                        .map((i) => ListTile(
+                              leading: Text(i.id.toString()),
+                              title: Text(i.nama),
+                              subtitle: Text(
+                                  '${i.diskonPersen == null || i.diskonPersen == 0 ? currency.format(i.hargaJual) : currency.format(i.hargaJual - i.hargaJual * (i.diskonPersen! / 100))} - ${i.code} (${i.jumlahBarang} Stock)'),
+                              trailing: const Icon(Icons.arrow_right_outlined),
+                              onTap: () {
+                                inventoryController.inventorySelected.value = i;
+                                context.go('/inventory/form');
+                              },
+                            ))
+                        .toList(),
+                  );
+                  // for (ItemModel i in inventorySearch)
+                  //   ListTile(
+                  //     leading: Text(i.id.toString()),
+                  //     title: Text(i.nama),
+                  //     subtitle: Text(
+                  //         '${i.diskonPersen == null || i.diskonPersen == 0 ? currency.format(i.hargaJual) : currency.format(i.hargaJual - i.hargaJual * (i.diskonPersen! / 100))} - ${i.code} (${i.jumlahBarang} Stock)'),
+                  //     trailing: const Icon(Icons.arrow_right_outlined),
+                  //     onTap: () {
+                  //       inventoryController.inventorySelected.value = i;
+                  //       context.go('/inventory/form');
+                  //     },
+                  //   );
+                }
+                return DataTable(
+                  columns: const [
+                    DataColumn(label: Text('ID')),
+                    DataColumn(label: Text('Nama')),
+                    DataColumn(label: Text('Code')),
+                    DataColumn(label: Text('Stock')),
+                    DataColumn(label: Text('Harga')),
+                    DataColumn(label: Text('Ukuran')),
+                    DataColumn(label: Text('Disc')),
+                    DataColumn(label: Text('H.Disc')),
+                    DataColumn(label: Text('More')),
+                  ],
+                  rows: items
+                      .map((item) => DataRow(cells: [
+                            DataCell(Text(item.id.toString())),
+                            DataCell(Text(item.nama)),
+                            DataCell(Text(item.code)),
+                            DataCell(Text(item.jumlahBarang.toString())),
+                            DataCell(Text(currency.format(item.hargaJual))),
+                            DataCell(Text(item.ukuran)),
+                            DataCell(Text(item.diskonPersen == null ||
+                                    item.diskonPersen == 0
+                                ? '-'
+                                : item.diskonPersen.toString())),
+                            DataCell(Text(item.diskonPersen == null ||
+                                    item.diskonPersen == 0
+                                ? '-'
+                                : currency.format(item.hargaJual -
+                                    item.hargaJual *
+                                        (item.diskonPersen! / 100)))),
+                            DataCell(
+                              const Icon(Icons.more_horiz),
+                              onTap: () {
+                                inventoryController.inventorySelected.value =
+                                    item;
+                                context.go('/inventory/form');
+                              },
+                            ),
+                          ]))
+                      .toList(),
+                );
+              },
+              error: (e, __) => Text('$e'),
+              loading: () => const CircularProgressIndicator()),
+
+          // else
+          //   Watch(
+          //     (context) => DataTable(
+          //       columns: const [
+          //         DataColumn(label: Text('ID')),
+          //         DataColumn(label: Text('Nama')),
+          //         DataColumn(label: Text('Code')),
+          //         DataColumn(label: Text('Stock')),
+          //         DataColumn(label: Text('Harga')),
+          //         DataColumn(label: Text('Ukuran')),
+          //         DataColumn(label: Text('Disc')),
+          //         DataColumn(label: Text('H.Disc')),
+          //         DataColumn(label: Text('More')),
+          //       ],
+          //       rows: inventorySearch
+          //           .map((item) => DataRow(cells: [
+          //                 DataCell(Text(item.id.toString())),
+          //                 DataCell(Text(item.nama)),
+          //                 DataCell(Text(item.code)),
+          //                 DataCell(Text(item.jumlahBarang.toString())),
+          //                 DataCell(Text(currency.format(item.hargaJual))),
+          //                 DataCell(Text(item.ukuran)),
+          //                 DataCell(Text(item.diskonPersen == null ||
+          //                         item.diskonPersen == 0
+          //                     ? '-'
+          //                     : item.diskonPersen.toString())),
+          //                 DataCell(Text(item.diskonPersen == null ||
+          //                         item.diskonPersen == 0
+          //                     ? '-'
+          //                     : currency.format(item.hargaJual -
+          //                         item.hargaJual *
+          //                             (item.diskonPersen! / 100)))),
+          //                 DataCell(
+          //                   const Icon(Icons.more_horiz),
+          //                   onTap: () {
+          //                     inventoryController.inventorySelected.value =
+          //                         item;
+          //                     context.go('/inventory/form');
+          //                   },
+          //                 ),
+          //               ]))
+          //           .toList(),
+          //     ),
+          //   ),
+          const SizedBox(height: 100),
         ],
       ),
     );

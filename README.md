@@ -24,6 +24,12 @@ Prerequisite: https://flutter.dev/docs/get-started/install
     ```sh
      flutter run
     ```
+
+<img width="1179" alt="Screenshot 2024-05-15 at 18 35 45" src="https://github.com/hifiaz/duekasir/assets/20653803/b21f2407-99f2-4508-a65a-5cae9d57dbb2">
+<img width="1181" alt="Screenshot 2024-05-15 at 18 36 00" src="https://github.com/hifiaz/duekasir/assets/20653803/dae12532-38bc-47d8-9d56-81f7186d58be">
+<img width="1179" alt="Screenshot 2024-05-15 at 18 36 31" src="https://github.com/hifiaz/duekasir/assets/20653803/d5a26dd1-ba0f-4d40-a657-358440c67bdc">
+
+
 ## Features
 
 1. Inventory
@@ -54,11 +60,11 @@ Prerequisite: https://flutter.dev/docs/get-started/install
 4. Customer
     - [x] list customer
     - [x] CRUD customer
-    - [ ] Search customer
+    - [x] Search customer
 5. User
     - [x] List user
     - [x] CRUD user
-    - [ ] Search user
+    - [x] Search user
 6. Backup & Restore Isar
 7. Sync with supabase
 8. Presence / Absense
@@ -68,11 +74,6 @@ Prerequisite: https://flutter.dev/docs/get-started/install
 * Windows Support
 * IOS Support
 * Android Support
-
-<img width="1179" alt="Screenshot 2024-05-15 at 18 35 45" src="https://github.com/hifiaz/duekasir/assets/20653803/b21f2407-99f2-4508-a65a-5cae9d57dbb2">
-<img width="1181" alt="Screenshot 2024-05-15 at 18 36 00" src="https://github.com/hifiaz/duekasir/assets/20653803/dae12532-38bc-47d8-9d56-81f7186d58be">
-<img width="1179" alt="Screenshot 2024-05-15 at 18 36 31" src="https://github.com/hifiaz/duekasir/assets/20653803/d5a26dd1-ba0f-4d40-a657-358440c67bdc">
-
 
 ## Author
 

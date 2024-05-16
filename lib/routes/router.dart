@@ -11,6 +11,8 @@ import 'package:due_kasir/pages/register.dart';
 import 'package:due_kasir/pages/rent.dart';
 import 'package:due_kasir/pages/rent/rent_item_form.dart';
 import 'package:due_kasir/pages/report.dart';
+import 'package:due_kasir/pages/salaries.dart';
+import 'package:due_kasir/pages/salaries/salaries_form.dart';
 import 'package:due_kasir/pages/selling.dart';
 import 'package:due_kasir/pages/selling/print_setting.dart';
 import 'package:due_kasir/pages/store.dart';
@@ -204,6 +206,28 @@ class SyncRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) => const Sync();
+}
+
+@TypedGoRoute<SalariesRoute>(
+  path: '/salaries',
+  routes: <TypedGoRoute<GoRouteData>>[
+    TypedGoRoute<SalariesFormRoute>(
+      path: 'form',
+    )
+  ],
+)
+class SalariesRoute extends GoRouteData {
+  const SalariesRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const Salaries();
+}
+
+class SalariesFormRoute extends GoRouteData {
+  const SalariesFormRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const SalariesForm();
 }
 
 @TypedGoRoute<TestingRoute>(path: '/testing')

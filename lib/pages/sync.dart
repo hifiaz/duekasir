@@ -101,18 +101,10 @@ class Sync extends StatelessWidget {
               // inventory
               await Database().checkIsInventorySynced();
               await Database().getInventorys();
-              await Database().searchInventorys().then((val) async {
-                inventoryController.inventorys.clear();
-                inventoryController.inventorys.addAll(val);
-              });
-
+              inventoryController.inventorys.refresh();
               // customer
               await Database().syncCustomers();
-              Database().searchCustomers().then((val) {
-                customerController.customer.clear();
-                customerController.customer.addAll(val);
-              });
-              
+              customerController.customer.refresh();
               isSync.value = false;
               if (context.mounted) {
                 ShadToaster.of(context).show(

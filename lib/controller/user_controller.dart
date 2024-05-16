@@ -3,7 +3,9 @@ import 'package:due_kasir/service/database.dart';
 import 'package:signals/signals_flutter.dart';
 
 class UserController {
-  final users = futureSignal(() async => Database().getUsers());
+  final searchUser = signal<String?>(null);
+  final users = futureSignal(
+      () async => Database().getUsers(name: userController.searchUser.value));
   final userSelected = signal<UserModel?>(null);
 }
 

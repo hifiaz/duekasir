@@ -2,21 +2,27 @@ import 'package:due_kasir/controller/user_controller.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:signals/signals_flutter.dart';
 
-class UserList extends StatelessWidget {
+class UserList extends HookWidget {
   const UserList({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final users = userController.users.watch(context);
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextFormField(
+              onChanged: (val) {
+                userController.searchUser.value = val;
+                userController.users.refresh();
+              },
               decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.search),
                 hintText: 'Search',
@@ -33,7 +39,7 @@ class UserList extends StatelessWidget {
                     DataColumn(label: Text('Role')),
                     DataColumn(label: Text('Detail')),
                   ],
-                  rows: userController.users.value.map(
+                  rows: users.map(
                       loading: () => [
                             const DataRow(cells: [
                               DataCell(Text('Loading')),

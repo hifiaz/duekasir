@@ -134,10 +134,7 @@ class CustomerForm extends HookWidget {
                             Database()
                                 .deleteCustomer(customer.id!)
                                 .whenComplete(() {
-                              Database().searchCustomers().then((val) {
-                                customerController.customer.clear();
-                                customerController.customer.addAll(val);
-                              });
+                              customerController.customer.refresh();
                               Navigator.pop(context);
                             });
                           },
@@ -161,10 +158,7 @@ class CustomerForm extends HookWidget {
                                   .updateCustomer(updateCustomer)
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
-                                  Database().searchCustomers().then((val) {
-                                    customerController.customer.clear();
-                                    customerController.customer.addAll(val);
-                                  });
+                                  customerController.customer.refresh();
                                   context.pop();
                                 });
                               });
@@ -183,10 +177,7 @@ class CustomerForm extends HookWidget {
                               Database()
                                   .addNewCustomer(newCustomer)
                                   .whenComplete(() {
-                                Database().searchCustomers().then((val) {
-                                  customerController.customer.clear();
-                                  customerController.customer.addAll(val);
-                                });
+                                customerController.customer.refresh();
                                 context.pop();
                               });
                             }

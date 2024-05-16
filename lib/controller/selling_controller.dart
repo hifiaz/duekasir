@@ -83,10 +83,7 @@ class SellingController {
       await Database().updateInventory(item);
     });
     Future.delayed(Durations.short1).then((_) {
-      Database().searchInventorys().then((val) {
-        inventoryController.inventorys.clear();
-        inventoryController.inventorys.addAll(val);
-      });
+      inventoryController.inventorys.refresh();
     });
   }
 }

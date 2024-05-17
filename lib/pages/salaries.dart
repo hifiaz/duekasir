@@ -1,7 +1,15 @@
+import 'package:due_kasir/controller/salary_controller.dart';
+import 'package:due_kasir/controller/store_controller.dart';
+import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/pages/drawer.dart';
+import 'package:due_kasir/pages/salaries/salaries_form.dart';
+import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/utils/constant.dart';
+import 'package:due_kasir/widget/pdf_generator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:signals/signals_flutter.dart';
 
 class Salaries extends StatefulWidget {
   const Salaries({super.key});
@@ -14,29 +22,10 @@ class _SalariesState extends State<Salaries> {
   final forSalariesmKey = GlobalKey<ShadFormState>();
   String? password;
   bool obscure = true;
-  var invoices = [
-    (
-      invoice: "INV001",
-      name: "Zila",
-      date: "Now",
-      paymentStatus: "Paid",
-      totalAmount: r"$250.00",
-      paymentMethod: "Credit Card",
-      option: "Credit Card",
-    ),
-    (
-      invoice: "INV002",
-      name: "Zula",
-      date: "Now",
-      paymentStatus: "Pending",
-      totalAmount: r"$150.00",
-      paymentMethod: "PayPal",
-      option: "PayPal",
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final store = storeController.store.watch(context);
+    final salaries = salaryController.salaries.watch(context);
     return Scaffold(
       drawer: const NavDrawer(),
       appBar: AppBar(
@@ -100,7 +89,7 @@ class _SalariesState extends State<Salaries> {
                     text: const Text('Access'),
                     onPressed: () {
                       if (forSalariesmKey.currentState!.value['password'] ==
-                          '242309') {
+                          '111111') {
                         setState(() {
                           password =
                               forSalariesmKey.currentState!.value['password'];
@@ -111,57 +100,102 @@ class _SalariesState extends State<Salaries> {
                 ),
               ),
             )
-          : ShadTable.list(
-              header: const [
-                ShadTableCell.header(child: Text('Invoice')),
-                ShadTableCell.header(child: Text('Status')),
-                ShadTableCell.header(child: Text('Name')),
-                ShadTableCell.header(child: Text('Date')),
-                ShadTableCell.header(child: Text('Method')),
-                ShadTableCell.header(child: Text('Amount')),
-                ShadTableCell.header(
-                  alignment: Alignment.centerRight,
-                  child: Text('Options'),
-                ),
-              ],
-              columnSpanExtent: (index) {
-                if (index == 6) return const RemainingTableSpanExtent();
-                return null;
+          : salaries.map(
+              data: (salary) {
+                if (salary.isEmpty) {
+                  return const Text('There is No Data');
+                }
+                return ShadTable.list(
+                  header: const [
+                    ShadTableCell.header(child: Text('Id')),
+                    ShadTableCell.header(child: Text('Status')),
+                    ShadTableCell.header(child: Text('Name')),
+                    ShadTableCell.header(child: Text('Date')),
+                    ShadTableCell.header(child: Text('Note')),
+                    ShadTableCell.header(child: Text('Amount')),
+                    ShadTableCell.header(
+                      alignment: Alignment.centerRight,
+                      child: Text('Options'),
+                    ),
+                  ],
+                  columnSpanExtent: (index) {
+                    if (index == 5) return const FixedTableSpanExtent(200);
+                    if (index == 6) return const RemainingTableSpanExtent();
+                    return null;
+                  },
+                  children: salary.map(
+                    (item) {
+                      return [
+                        ShadTableCell(
+                          child: Text(
+                            item.id.toString(),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        ShadTableCell(child: Text(item.status)),
+                        ShadTableCell(
+                          child: FutureBuilder<UserModel?>(
+                            future: Database().getUserById(item.userId),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Text(snapshot.data?.nama ?? 'Admin');
+                              }
+                              return const Text('Admin');
+                            },
+                          ),
+                        ),
+                        ShadTableCell(child: Text(item.periode)),
+                        ShadTableCell(child: Text(item.note ?? '')),
+                        ShadTableCell(child: Text(currency.format(item.total))),
+                        ShadTableCell(
+                          alignment: Alignment.centerRight,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ShadButton.outline(
+                                text: const Text('Export PDF'),
+                                onPressed: () async {
+                                  var user =
+                                      await Database().getUserById(item.userId);
+                                  if (user != null) {
+                                    pdfGenerator(
+                                      user: user,
+                                      store: store.value!,
+                                      salary: item,
+                                    );
+                                  }
+                                },
+                              ),
+                              ShadButton(
+                                text: const Text('Edit'),
+                                onPressed: () async {
+                                  var user =
+                                      await Database().getUserById(item.userId);
+                                  if (context.mounted) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SalariesForm(
+                                          salary: item,
+                                          selectedUser: user,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ];
+                    },
+                  ),
+                );
               },
-              children: invoices.map(
-                (invoice) => [
-                  ShadTableCell(
-                    child: Text(
-                      invoice.invoice,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  ShadTableCell(child: Text(invoice.name)),
-                  ShadTableCell(child: Text(invoice.date)),
-                  ShadTableCell(child: Text(invoice.paymentStatus)),
-                  ShadTableCell(child: Text(invoice.paymentMethod)),
-                  ShadTableCell(child: Text(invoice.totalAmount)),
-                  ShadTableCell(
-                    alignment: Alignment.centerRight,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ShadButton.outline(
-                          text: const Text('Print'),
-                          onPressed: () {},
-                        ),
-                        ShadButton(
-                          text: const Text('Edit'),
-                          onPressed: () {},
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+              error: (e, __) => Text('$e'),
+              loading: () => const CircularProgressIndicator()),
     );
   }
 }

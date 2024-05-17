@@ -8,8 +8,6 @@ class InventoryController {
   final searchInventory = signal<String?>(null);
   final inventorys = futureSignal(() async => Database()
       .getInventorys(value: inventoryController.searchInventory.value));
-  // final inventorys =
-  //     ListSignal<ItemModel>([]..sort((a, b) => a.id!.compareTo(b.id!)));
   final deleteItemList = Signal<List<ItemModel>>([]);
   final inventorySelected = signal<ItemModel?>(null);
   final csvFile = signal<File?>(null);

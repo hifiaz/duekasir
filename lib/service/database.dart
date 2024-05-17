@@ -13,6 +13,7 @@ import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/presence_model.dart';
 import 'package:due_kasir/model/rent_item_model.dart';
 import 'package:due_kasir/model/rent_model.dart';
+import 'package:due_kasir/model/salary_model.dart';
 import 'package:due_kasir/model/store_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/service/get_it.dart';
@@ -281,14 +282,6 @@ class Database {
             .or()
             .codeContains(value ?? '', caseSensitive: false))
         .findAll();
-    // if (isDeviceConnected.value) {
-    //   inventoryController.inventorys.value =
-    //       await _supabaseHelper.getInventoryAll();
-    //   await insertInventoryFresh(inventoryController.inventorys.value);
-    // } else {
-    //   inventoryController.inventorys.value =
-    //       await inventoryCollection.where().findAll();
-    // }
   }
 
   insertInventoryFresh(List<ItemModel> inventoryList) async {
@@ -737,6 +730,37 @@ class Database {
     return [];
   }
 
+
+  // Salary
+  Future<void> addSalary(SalaryModel val) async {
+    val.isSynced = isDeviceConnected.value;
+    final isar = await db;
+    isar.writeTxnSync<int>(() => isar.salaryModels.putSync(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.addSalary(val.toJson());
+    }
+  }
+
+  Future<List<SalaryModel>> getSalary() async {
+    final isar = await db;
+    IsarCollection<SalaryModel> salaryCollection = isar.collection<SalaryModel>();
+    // if (isDeviceConnected.value) {
+    //   final res = await _supabaseHelper.getSalarys();
+
+    //   return res;
+    // } else {
+      return await salaryCollection.where().findAll();
+    // }
+  }
+
+  Future<void> updateSalary(SalaryModel val) async {
+    final isar = await db;
+    isar.writeTxn<int>(() async => await isar.salaryModels.put(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.updateSalary(val);
+    }
+  }
+
   Future<void> createBackUp() async {
     final isar = await db;
     final backUpDir = await getDownloadsDirectory();
@@ -795,6 +819,7 @@ class Database {
           RentItemModelSchema,
           RentModelSchema,
           ExpensesModelSchema,
+          SalaryModelSchema,
         ],
         directory: dir.path,
         inspector: true,

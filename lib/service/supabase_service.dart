@@ -7,6 +7,7 @@ import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/presence_model.dart';
 import 'package:due_kasir/model/rent_item_model.dart';
+import 'package:due_kasir/model/salary_model.dart';
 import 'package:due_kasir/model/store_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -427,6 +428,49 @@ class SupabaseHelper {
       } else {
         await supabase
             .from('users')
+            .update(item.toJson())
+            .match({'id': item.id!});
+      }
+    });
+  }
+
+  // salary
+  addSalary(Map data) async {
+    data.putIfAbsent('user', () => supabase.auth.currentUser!.id);
+    await supabase.from('salary').insert(data).then((value) {
+      log('success add presesalarynse $value');
+    }).catchError((error) {
+      log('error add salary $error');
+    });
+  }
+
+  Future getSalarys() async {
+    List<SalaryModel> salaryItems = [];
+
+    final result = await supabase
+        .from('salary')
+        .select()
+        .eq('user', supabase.auth.currentUser!.id);
+
+    if (result.isNotEmpty) {
+      await Future.forEach(result, (val) async {
+        salaryItems.add(SalaryModel.fromJson(val));
+      });
+    }
+    return salaryItems;
+  }
+
+  updateSalary(SalaryModel item) async {
+    await supabase
+        .from('salary')
+        .select()
+        .eq("id", item.id!)
+        .then((value) async {
+      if (value.isEmpty) {
+        addRent(item.toJson());
+      } else {
+        await supabase
+            .from('salary')
             .update(item.toJson())
             .match({'id': item.id!});
       }

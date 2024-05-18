@@ -25,6 +25,8 @@ class Report extends StatefulWidget {
 }
 
 class _ReportState extends State<Report> {
+  final reportFormKey = GlobalKey<ShadFormState>();
+  bool obscure = true;
   int touchedIndex = -1;
   @override
   Widget build(BuildContext context) {
@@ -62,7 +64,10 @@ class _ReportState extends State<Report> {
           PopupMenuButton<String>(
             onSelected: (item) async {
               if (item == 'sync') {
-                Database().checkIsReportSynced();
+                await Database().checkIsReportSynced();
+                reportController.report.refresh();
+                reportController.reportToday.refresh();
+                reportController.reportYesterday.refresh();
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -303,39 +308,57 @@ class _ReportState extends State<Report> {
                       children: (report.value ?? []).reversed.map(
                             (detail) => ShadAccordionItem(
                               value: detail,
-                              title: Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                spacing: 5,
-                                runSpacing: 5,
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    '${detail.id}.',
-                                    style:
-                                        ShadTheme.of(context).textTheme.small,
+                                  Wrap(
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    spacing: 5,
+                                    runSpacing: 5,
+                                    children: [
+                                      Text(
+                                        '${detail.id}.',
+                                        style: ShadTheme.of(context)
+                                            .textTheme
+                                            .small,
+                                      ),
+                                      FutureBuilder<UserModel?>(
+                                        future: Database()
+                                            .getUserById(detail.kasir),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasData) {
+                                            return Text(
+                                                snapshot.data?.nama ?? 'Admin');
+                                          }
+                                          return const Text('Admin');
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  FutureBuilder<UserModel?>(
-                                    future:
-                                        Database().getUserById(detail.kasir),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        return Text(
-                                            snapshot.data?.nama ?? 'Admin');
-                                      }
-                                      return const Text('Admin');
-                                    },
+                                  Wrap(
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    spacing: 5,
+                                    runSpacing: 5,
+                                    children: [
+                                      Text(
+                                        '${currency.format(detail.totalHarga)} (${detail.totalItem.toString()})',
+                                        style: ShadTheme.of(context)
+                                            .textTheme
+                                            .small,
+                                      ),
+                                      Text(
+                                          dateWithTime.format(detail.createdAt),
+                                          style: ShadTheme.of(context)
+                                              .textTheme
+                                              .muted),
+                                    ],
                                   ),
-                                  Text(
-                                    '${currency.format(detail.totalHarga)} (${detail.totalItem.toString()})',
-                                    style:
-                                        ShadTheme.of(context).textTheme.small,
-                                  ),
-                                  Text(dateWithTime.format(detail.createdAt),
-                                      style: ShadTheme.of(context)
-                                          .textTheme
-                                          .muted),
                                 ],
                               ),
                               content: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   ...detail.items.map(
                                     (val) => ListTile(
@@ -361,6 +384,89 @@ class _ReportState extends State<Report> {
                                                       (val.diskonPersen! /
                                                           100)) *
                                               val.quantity!)),
+                                    ),
+                                  ),
+                                  ShadButton.outline(
+                                    onPressed: () {
+                                      showShadDialog(
+                                        context: context,
+                                        builder: (context) => ShadDialog(
+                                          title: const Text('Delete Report'),
+                                          description: const Text(
+                                              "Are you sure to delete this report, this action can't be undo"),
+                                          content: Container(
+                                            width: 375,
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 20),
+                                            child: ShadInputFormField(
+                                              id: 'password',
+                                              label: const Text('Password'),
+                                              placeholder: const Text(
+                                                  'Enter your password'),
+                                              validator: (v) {
+                                                if (v.length < 2) {
+                                                  return 'Password must be at least 2 characters.';
+                                                }
+                                                return null;
+                                              },
+                                              obscureText: obscure,
+                                              prefix: const Padding(
+                                                padding: EdgeInsets.all(4.0),
+                                                child: ShadImage.square(
+                                                    size: 16, LucideIcons.lock),
+                                              ),
+                                              suffix: ShadButton(
+                                                width: 24,
+                                                height: 24,
+                                                padding: EdgeInsets.zero,
+                                                decoration: ShadDecoration.none,
+                                                icon: ShadImage.square(
+                                                  size: 16,
+                                                  obscure
+                                                      ? LucideIcons.eyeOff
+                                                      : LucideIcons.eye,
+                                                ),
+                                                onPressed: () {
+                                                  setState(
+                                                      () => obscure = !obscure);
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          actions: [
+                                            ShadButton(
+                                                onPressed: () => context.pop(),
+                                                text: const Text('Cancel')),
+                                            ShadButton(
+                                                onPressed: () async {
+                                                  if (reportFormKey
+                                                          .currentState!
+                                                          .value['password'] ==
+                                                      '111111') {
+                                                    await Database()
+                                                        .removePenjualan(
+                                                            detail.id!);
+                                                    reportController.report
+                                                        .refresh();
+                                                    reportController.reportToday
+                                                        .refresh();
+                                                    reportController
+                                                        .reportYesterday
+                                                        .refresh();
+                                                  }
+                                                },
+                                                text: const Text('Delete'))
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    text: const Text('Delete'),
+                                    icon: const Padding(
+                                      padding: EdgeInsets.only(right: 8),
+                                      child: Icon(
+                                        Icons.delete,
+                                        size: 16,
+                                      ),
                                     ),
                                   ),
                                 ],

@@ -1,8 +1,13 @@
+<img width="600" src="assets/logo.png" alt="Due Kasir Logo">
 # Due Kasir
 
 Is Open source for POS app focus on offline first
 
 [<img src="https://github.com/hifiaz/duekasir/assets/20653803/b0af666a-99c3-414a-b9e0-0558e8bee10b" width="250">](https://play.google.com/store/apps/details?id=com.devindo.due_kasir)
+
+<img width="1179" alt="Screenshot 2024-05-15 at 18 35 45" src="https://github.com/hifiaz/duekasir/assets/20653803/b21f2407-99f2-4508-a65a-5cae9d57dbb2">
+<img width="1181" alt="Screenshot 2024-05-15 at 18 36 00" src="https://github.com/hifiaz/duekasir/assets/20653803/dae12532-38bc-47d8-9d56-81f7186d58be">
+<img width="1179" alt="Screenshot 2024-05-15 at 18 36 31" src="https://github.com/hifiaz/duekasir/assets/20653803/d5a26dd1-ba0f-4d40-a657-358440c67bdc">
 
 ## Getting Started
 
@@ -24,11 +29,6 @@ Prerequisite: https://flutter.dev/docs/get-started/install
     ```sh
      flutter run
     ```
-
-<img width="1179" alt="Screenshot 2024-05-15 at 18 35 45" src="https://github.com/hifiaz/duekasir/assets/20653803/b21f2407-99f2-4508-a65a-5cae9d57dbb2">
-<img width="1181" alt="Screenshot 2024-05-15 at 18 36 00" src="https://github.com/hifiaz/duekasir/assets/20653803/dae12532-38bc-47d8-9d56-81f7186d58be">
-<img width="1179" alt="Screenshot 2024-05-15 at 18 36 31" src="https://github.com/hifiaz/duekasir/assets/20653803/d5a26dd1-ba0f-4d40-a657-358440c67bdc">
-
 
 ## Features
 
@@ -69,7 +69,7 @@ Prerequisite: https://flutter.dev/docs/get-started/install
 7. Sync with supabase
 8. Presence / Absense
 9. Rent feature
-
+10. Salaries (Password: 111111)
 * MacOS Support
 * Windows Support
 * IOS Support

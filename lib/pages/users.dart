@@ -1,8 +1,10 @@
+import 'package:due_kasir/controller/user_controller.dart';
 import 'package:due_kasir/pages/drawer.dart';
 import 'package:due_kasir/pages/users/user_list.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class Users extends StatelessWidget {
   const Users({super.key});
@@ -15,10 +17,25 @@ class Users extends StatelessWidget {
         title: const Text('Users'),
         centerTitle: false,
         actions: [
+          ShadButton.ghost(
+            onPressed: () {
+              userController.users.refresh();
+            },
+            text: const Text('Refresh'),
+            icon: const Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Icon(
+                Icons.refresh,
+                size: 16,
+              ),
+            ),
+          ),
           PopupMenuButton<String>(
             onSelected: (item) async {
               if (item == 'sync') {
-                Database().syncUsers();
+                Database()
+                    .syncUsers()
+                    .whenComplete(() => userController.users.refresh());
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[

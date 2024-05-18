@@ -360,6 +360,8 @@ class Database {
       final res = await _supabaseHelper.getInventoryAll();
       await insertInventoryFresh(res);
     } else {
+      final res = await _supabaseHelper.getInventoryAll();
+      await insertInventoryFresh(res);
       getInventorys();
     }
   }
@@ -394,6 +396,9 @@ class Database {
   Future<void> removePenjualan(int val) async {
     final isar = await db;
     isar.writeTxn<bool>(() => isar.penjualanModels.delete(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.removeReport(val);
+    }
   }
 
   Future<void> clearReport() async {
@@ -515,7 +520,7 @@ class Database {
     if (isDeviceConnected.value) {
       final List<PenjualanModel> res = await _supabaseHelper.getRepots();
       final items = await reportCollection.where().findAll();
-      if (res.length == items.length || items.length >= res.length) {
+      if (res.length == items.length) {
         return items;
       } else {
         await insertReportFresh(res);
@@ -551,17 +556,8 @@ class Database {
   Future<StoreModel?> getStore() async {
     final isar = await db;
     IsarCollection<StoreModel> storeCollection = isar.collection<StoreModel>();
-    if (isDeviceConnected.value) {
-      final res = await _supabaseHelper.getStore();
-      if (res == null) {
-        final store = storeCollection.where().findFirst();
-        return store;
-      }
-      return res;
-    } else {
-      final store = storeCollection.where().findFirst();
-      return store;
-    }
+    final store = storeCollection.where().findFirst();
+    return store;
   }
 
   Future<void> syncStore() async {
@@ -730,7 +726,6 @@ class Database {
     return [];
   }
 
-
   // Salary
   Future<void> addSalary(SalaryModel val) async {
     val.isSynced = isDeviceConnected.value;
@@ -743,13 +738,14 @@ class Database {
 
   Future<List<SalaryModel>> getSalary() async {
     final isar = await db;
-    IsarCollection<SalaryModel> salaryCollection = isar.collection<SalaryModel>();
+    IsarCollection<SalaryModel> salaryCollection =
+        isar.collection<SalaryModel>();
     // if (isDeviceConnected.value) {
     //   final res = await _supabaseHelper.getSalarys();
 
     //   return res;
     // } else {
-      return await salaryCollection.where().findAll();
+    return await salaryCollection.where().findAll();
     // }
   }
 

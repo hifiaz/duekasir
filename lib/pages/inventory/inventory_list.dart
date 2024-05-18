@@ -156,6 +156,9 @@ class InventoryList extends HookWidget {
           const SizedBox(height: 20),
           inventory.map(
               data: (items) {
+                if (items.isEmpty) {
+                  return const Center(child: Text('There is no Data'));
+                }
                 if (Platform.isAndroid || Platform.isIOS) {
                   return Column(
                     children: items
@@ -228,7 +231,7 @@ class InventoryList extends HookWidget {
                 );
               },
               error: (e, __) => Text('$e'),
-              loading: () => const CircularProgressIndicator()),
+              loading: () => const Center(child: CircularProgressIndicator())),
 
           // else
           //   Watch(

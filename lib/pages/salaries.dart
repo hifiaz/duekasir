@@ -103,7 +103,7 @@ class _SalariesState extends State<Salaries> {
           : salaries.map(
               data: (salary) {
                 if (salary.isEmpty) {
-                  return const Text('There is No Data');
+                  return const Center(child: Text('There is No Data'));
                 }
                 return ShadTable.list(
                   header: const [

@@ -1,3 +1,4 @@
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:due_kasir/controller/expenses_controller.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/controller/report_controller.dart';
@@ -12,7 +13,6 @@ import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_date_range_picker/flutter_date_range_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
@@ -91,49 +91,37 @@ class _ReportState extends State<Report> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 200,
-                    child: DateRangeFormField(
-                      // initialValue: DateRange(dateRange.first, dateRange.last),
-                      decoration: const InputDecoration(
-                        label: Text("Date Range"),
-                        hintText: 'Please select a date range',
-                      ),
-                      pickerBuilder: (context, y) => DateRangePickerWidget(
-                        maximumDateRangeLength: 30,
-                        minimumDateRangeLength: 3,
-                        height: 330,
-                        initialDateRange:
-                            DateRange(dateRange.first, dateRange.last),
-                        maxDate: DateTime.now().add(const Duration(days: 1)),
-                        initialDisplayedDate: dateRange.first,
-                        onDateRangeChanged: (DateRange? val) {
-                          if (val?.start == null) {
-                            y.call(DateRange(dateRange.first, dateRange.last));
-                          } else {
-                            y.call(val);
-                            reportController.dateRange.value = [
-                              val!.start,
-                              val.end
-                            ];
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                  ShadButton.outline(
-                    text: const Text('Reset'),
-                    onPressed: () => reportController.dateRange.value = [
-                      DateTime.now().subtract(const Duration(days: 30)),
-                      DateTime.now()
-                    ],
-                  )
-                ],
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ShadButton.outline(
+                    text: Text(
+                        'Filter: ${dateWithoutTime.format(dateRange.first)} - ${dateWithoutTime.format(dateRange.last)}'),
+                    onPressed: () async {
+                      var results = await showCalendarDatePicker2Dialog(
+                        context: context,
+                        config: CalendarDatePicker2WithActionButtonsConfig(
+                          calendarType: CalendarDatePicker2Type.range,
+                        ),
+                        dialogSize: const Size(325, 400),
+                        value: dateRange,
+                        borderRadius: BorderRadius.circular(15),
+                      );
+                      if (results != null) {
+                        reportController.dateRange.value = [
+                          results.first!,
+                          results.last!
+                        ];
+                      }
+                    }),
+                ShadButton(
+                  text: const Text('Reset'),
+                  onPressed: () => reportController.dateRange.value = [
+                    DateTime.now().subtract(const Duration(days: 30)),
+                    DateTime.now()
+                  ],
+                )
+              ],
             ),
             const SizedBox(height: 20),
             Wrap(

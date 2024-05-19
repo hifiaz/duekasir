@@ -196,28 +196,55 @@ class InventoryList extends HookWidget {
                     DataColumn(label: Text('Stock')),
                     DataColumn(label: Text('Harga')),
                     DataColumn(label: Text('Ukuran')),
-                    DataColumn(label: Text('Disc')),
-                    DataColumn(label: Text('H.Disc')),
                     DataColumn(label: Text('More')),
                   ],
+                  dataRowMaxHeight: 80.0,
                   rows: items
                       .map((item) => DataRow(cells: [
                             DataCell(Text(item.id.toString())),
                             DataCell(Text(item.nama)),
                             DataCell(Text(item.code)),
                             DataCell(Text(item.jumlahBarang.toString())),
-                            DataCell(Text(currency.format(item.hargaJual))),
+                            DataCell(ConstrainedBox(
+                              constraints: const BoxConstraints(minWidth: 110),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    currency.format(item.hargaJual),
+                                    style: TextStyle(
+                                        color: item.diskonPersen != null &&
+                                                item.diskonPersen != 0
+                                            ? Colors.red
+                                            : null,
+                                        decoration: item.diskonPersen != null &&
+                                                item.diskonPersen != 0
+                                            ? TextDecoration.lineThrough
+                                            : null),
+                                  ),
+                                  if (item.diskonPersen != null &&
+                                      item.diskonPersen != 0) ...[
+                                    Text(
+                                      'Dasar: ${currency.format(item.hargaDasar)}',
+                                      style: const TextStyle(fontSize: 10),
+                                    ),
+                                    Text(
+                                      'Disc: ${item.diskonPersen}',
+                                      style: const TextStyle(fontSize: 10),
+                                    ),
+                                    Text(
+                                      currency.format(item.hargaJual -
+                                          item.hargaJual *
+                                              (item.diskonPersen! / 100)),
+                                      style: const TextStyle(
+                                          fontSize: 12, color: Colors.green),
+                                    )
+                                  ]
+                                ],
+                              ),
+                            )),
                             DataCell(Text(item.ukuran)),
-                            DataCell(Text(item.diskonPersen == null ||
-                                    item.diskonPersen == 0
-                                ? '-'
-                                : item.diskonPersen.toString())),
-                            DataCell(Text(item.diskonPersen == null ||
-                                    item.diskonPersen == 0
-                                ? '-'
-                                : currency.format(item.hargaJual -
-                                    item.hargaJual *
-                                        (item.diskonPersen! / 100)))),
                             DataCell(
                               const Icon(Icons.more_horiz),
                               onTap: () {
@@ -232,51 +259,6 @@ class InventoryList extends HookWidget {
               },
               error: (e, __) => Text('$e'),
               loading: () => const Center(child: CircularProgressIndicator())),
-
-          // else
-          //   Watch(
-          //     (context) => DataTable(
-          //       columns: const [
-          //         DataColumn(label: Text('ID')),
-          //         DataColumn(label: Text('Nama')),
-          //         DataColumn(label: Text('Code')),
-          //         DataColumn(label: Text('Stock')),
-          //         DataColumn(label: Text('Harga')),
-          //         DataColumn(label: Text('Ukuran')),
-          //         DataColumn(label: Text('Disc')),
-          //         DataColumn(label: Text('H.Disc')),
-          //         DataColumn(label: Text('More')),
-          //       ],
-          //       rows: inventorySearch
-          //           .map((item) => DataRow(cells: [
-          //                 DataCell(Text(item.id.toString())),
-          //                 DataCell(Text(item.nama)),
-          //                 DataCell(Text(item.code)),
-          //                 DataCell(Text(item.jumlahBarang.toString())),
-          //                 DataCell(Text(currency.format(item.hargaJual))),
-          //                 DataCell(Text(item.ukuran)),
-          //                 DataCell(Text(item.diskonPersen == null ||
-          //                         item.diskonPersen == 0
-          //                     ? '-'
-          //                     : item.diskonPersen.toString())),
-          //                 DataCell(Text(item.diskonPersen == null ||
-          //                         item.diskonPersen == 0
-          //                     ? '-'
-          //                     : currency.format(item.hargaJual -
-          //                         item.hargaJual *
-          //                             (item.diskonPersen! / 100)))),
-          //                 DataCell(
-          //                   const Icon(Icons.more_horiz),
-          //                   onTap: () {
-          //                     inventoryController.inventorySelected.value =
-          //                         item;
-          //                     context.go('/inventory/form');
-          //                   },
-          //                 ),
-          //               ]))
-          //           .toList(),
-          //     ),
-          //   ),
           const SizedBox(height: 100),
         ],
       ),

@@ -1,5 +1,8 @@
 import 'package:due_kasir/controller/customer_controller.dart';
+import 'package:due_kasir/controller/expenses_controller.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
+import 'package:due_kasir/controller/presence_controller.dart';
+import 'package:due_kasir/controller/rent_controller.dart';
 import 'package:due_kasir/controller/report_controller.dart';
 import 'package:due_kasir/controller/store_controller.dart';
 import 'package:due_kasir/controller/user_controller.dart';
@@ -93,6 +96,17 @@ class Sync extends StatelessWidget {
               // users
               await Database().syncUsers();
               await userController.users.refresh();
+              // rent
+              await Database().rentSync();
+              await rentController.rents.refresh();
+              await Database().rentItemSync();
+              await rentController.rentItems.refresh();
+              // expenses
+              await Database().expensesSync();
+              await expensesController.expenses.refresh();
+              // presense
+              await Database().presenseSync();
+              await presenceController.presence.refresh();
               // report
               await Database().checkIsReportSynced();
               await reportController.report.refresh();

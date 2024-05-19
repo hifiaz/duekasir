@@ -101,12 +101,11 @@ class _SalariesFormState extends State<SalariesForm> {
                   Text('Information',
                       style: ShadTheme.of(context).textTheme.h4),
                   const SizedBox(height: 10),
-                  Row(
+                  Wrap(
                     children: [
                       if (users.hasValue && users.value?.isNotEmpty == true)
                         ShadSelectFormField<UserModel>(
                           id: 'user',
-                          minWidth: 350,
                           initialValue: widget.selectedUser,
                           label: const Text('User'),
                           onChanged: (v) => setState(() => user = v),

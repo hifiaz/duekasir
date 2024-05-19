@@ -29,64 +29,63 @@ class UserList extends HookWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Watch((context) => DataTable(
-                  columns: const [
-                    DataColumn(label: Text('ID')),
-                    DataColumn(label: Text('Name')),
-                    DataColumn(label: Text('Birth')),
-                    DataColumn(label: Text('Status')),
-                    DataColumn(label: Text('Join')),
-                    DataColumn(label: Text('Role')),
-                    DataColumn(label: Text('Detail')),
-                  ],
-                  rows: users.map(
-                      loading: () => [
-                            const DataRow(cells: [
-                              DataCell(Text('Loading')),
-                              DataCell(Text('')),
-                              DataCell(Text('')),
-                              DataCell(Text('')),
-                              DataCell(Text('')),
-                              DataCell(Text('')),
-                              DataCell(Text(''))
-                            ])
-                          ],
-                      error: (e) => [
-                            const DataRow(cells: [
-                              DataCell(Text('No Data')),
-                              DataCell(Text('')),
-                              DataCell(Text('')),
-                              DataCell(Text('')),
-                              DataCell(Text('')),
-                              DataCell(Text('')),
-                              DataCell(Text(''))
-                            ])
-                          ],
-                      data: (data) {
-                        return [
-                          for (UserModel user in data)
-                            DataRow(cells: [
-                              DataCell(Text(user.id.toString())),
-                              DataCell(Text(user.nama)),
-                              DataCell(Text(dateWithoutTime
-                                  .format(user.dob ?? DateTime.now()))),
-                              DataCell(Text(user.status == true
-                                  ? 'Active'
-                                  : 'Non Active')),
-                              DataCell(Text(dateWithTime
-                                  .format(user.masuk ?? DateTime.now()))),
-                              DataCell(Text(user.keterangan ?? '')),
-                              DataCell(
-                                const Icon(Icons.keyboard_arrow_right_outlined),
-                                onTap: () {
-                                  userController.userSelected.value = user;
-                                  context.push('/users/form');
-                                },
-                              ),
-                            ])
-                        ];
-                      }),
-                )),
+            DataTable(
+              columns: const [
+                DataColumn(label: Text('ID')),
+                DataColumn(label: Text('Name')),
+                DataColumn(label: Text('Birth')),
+                DataColumn(label: Text('Status')),
+                DataColumn(label: Text('Join')),
+                DataColumn(label: Text('Role')),
+                DataColumn(label: Text('Detail')),
+              ],
+              rows: users.map(
+                  loading: () => [
+                        const DataRow(cells: [
+                          DataCell(Text('Loading')),
+                          DataCell(Text('')),
+                          DataCell(Text('')),
+                          DataCell(Text('')),
+                          DataCell(Text('')),
+                          DataCell(Text('')),
+                          DataCell(Text(''))
+                        ])
+                      ],
+                  error: (e) => [
+                        const DataRow(cells: [
+                          DataCell(Text('No Data')),
+                          DataCell(Text('')),
+                          DataCell(Text('')),
+                          DataCell(Text('')),
+                          DataCell(Text('')),
+                          DataCell(Text('')),
+                          DataCell(Text(''))
+                        ])
+                      ],
+                  data: (data) {
+                    return [
+                      for (UserModel user in data)
+                        DataRow(cells: [
+                          DataCell(Text(user.id.toString())),
+                          DataCell(Text(user.nama)),
+                          DataCell(Text(dateWithoutTime
+                              .format(user.dob ?? DateTime.now()))),
+                          DataCell(Text(
+                              user.status == true ? 'Active' : 'Non Active')),
+                          DataCell(Text(dateWithTime
+                              .format(user.masuk ?? DateTime.now()))),
+                          DataCell(Text(user.keterangan ?? '')),
+                          DataCell(
+                            const Icon(Icons.keyboard_arrow_right_outlined),
+                            onTap: () {
+                              userController.userSelected.value = user;
+                              context.push('/users/form');
+                            },
+                          ),
+                        ])
+                    ];
+                  }),
+            ),
           ],
         ),
       ),

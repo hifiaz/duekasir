@@ -43,6 +43,29 @@ class _RentState extends State<Rent> {
               ),
             ),
           ),
+          PopupMenuButton<String>(
+            onSelected: (item) async {
+              if (item == 'sync') {
+                await Database().rentSync();
+                await rentController.rents.refresh();
+                await Database().rentItemSync();
+                await rentController.rentItems.refresh();
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'sync',
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.restore),
+                    SizedBox(width: 8),
+                    Text('Sync'),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -109,7 +132,9 @@ class _RentState extends State<Rent> {
                                         decoration: TextDecoration.lineThrough)
                                     : null),
                             subtitle: Text(
-                              '${snapshot.data?.name} - Expired on ${(DateTime.now().difference(p.rentDate).inDays - 1).abs()} days',
+                              p.paid
+                                  ? snapshot.data?.name ?? ''
+                                  : '${snapshot.data?.name} - Expired on ${(DateTime.now().difference(p.rentDate).inDays)} days - ${p.rentDate.day}/${p.rentDate.month}/${p.rentDate.year}',
                               style: p.paid
                                   ? const TextStyle(
                                       decoration: TextDecoration.lineThrough)

@@ -123,7 +123,8 @@ class SupabaseHelper {
     });
   }
 
-  Future getRepots({DateTime? start, DateTime? end}) async {
+  Future<List<PenjualanModel>> getRepots(
+      {DateTime? start, DateTime? end}) async {
     List<PenjualanModel> allReport = [];
 
     List<Map<String, dynamic>> result;
@@ -215,7 +216,12 @@ class SupabaseHelper {
     });
   }
 
-  Future getPresense() async {
+  Future<bool> getPresenseById(int id) async {
+    final res = await supabase.from('presense').select().eq("id", id);
+    return res.isNotEmpty;
+  }
+
+  Future<List<PresenceModel>> getPresense() async {
     List<PresenceModel> allPresense = [];
 
     final result = await supabase
@@ -241,7 +247,12 @@ class SupabaseHelper {
     });
   }
 
-  Future getRentItems() async {
+  Future<bool> getRentItemById(int id) async {
+    final res = await supabase.from('rent_items').select().eq("id", id);
+    return res.isNotEmpty;
+  }
+
+  Future<List<RentItemModel>> getRentItems() async {
     List<RentItemModel> rentItems = [];
 
     final result = await supabase
@@ -290,7 +301,7 @@ class SupabaseHelper {
     });
   }
 
-  Future getRent() async {
+  Future<List<RentModel>> getRent() async {
     List<RentModel> rentItems = [];
 
     final result = await supabase
@@ -304,6 +315,11 @@ class SupabaseHelper {
       });
     }
     return rentItems;
+  }
+
+  Future<bool> getRentById(int id) async {
+    final res = await supabase.from('rent').select().eq("id", id);
+    return res.isNotEmpty;
   }
 
   updateRent(RentModel item) async {
@@ -323,13 +339,19 @@ class SupabaseHelper {
   addExpenses(Map data) async {
     data.putIfAbsent('user', () => supabase.auth.currentUser!.id);
     await supabase.from('expenses').insert(data).then((value) {
-      log('success add presense $value');
+      log('success add expanses $value');
     }).catchError((error) {
-      log('error add presense $error');
+      log('error add expanses $error');
     });
   }
 
-  Future getExpenses() async {
+  removeExpenses(int id) async {
+    await supabase.from('expenses').select().eq("id", id).then((value) async {
+      await supabase.from('expenses').delete().eq('id', id);
+    });
+  }
+
+  Future<List<ExpensesModel>> getExpenses() async {
     List<ExpensesModel> expensesItems = [];
 
     final result = await supabase
@@ -343,6 +365,11 @@ class SupabaseHelper {
       });
     }
     return expensesItems;
+  }
+
+  Future<bool> getExpensesById(int id) async {
+    final res = await supabase.from('rent').select().eq("id", id);
+    return res.isNotEmpty;
   }
 
   // store
@@ -444,7 +471,7 @@ class SupabaseHelper {
     });
   }
 
-  Future getSalarys() async {
+  Future<List<SalaryModel>> getSalarys() async {
     List<SalaryModel> salaryItems = [];
 
     final result = await supabase

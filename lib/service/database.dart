@@ -582,16 +582,64 @@ class Database {
     }
   }
 
-  Future<List<PresenceModel>> getPresense() async {
+  Future<List<PresenceModel>> getPresense(
+      {required DateTime start, required DateTime end}) async {
     final isar = await db;
     IsarCollection<PresenceModel> presenseCollection =
         isar.collection<PresenceModel>();
-    if (isDeviceConnected.value) {
-      final res = await _supabaseHelper.getPresense();
+    return await presenseCollection
+        .where()
+        .filter()
+        .createdAtBetween(start.copyWith(hour: 0, minute: 0, second: 0),
+            end.copyWith(hour: 23, minute: 59, second: 59))
+        .findAll();
+  }
 
-      return res;
+  // sync presense
+  Future<void> presenseSync() async {
+    final isar = await db;
+    IsarCollection<PresenceModel> presenseCollection =
+        isar.collection<PresenceModel>();
+
+    final presense = await presenseCollection.where().findAll();
+    if (presense.isNotEmpty) {
+      final res = await _supabaseHelper.getPresense();
+      if (res.length != presense.length) {
+        if (presense.length >= res.length) {
+          await Future.forEach(presense, (val) async {
+            final res = await _supabaseHelper.getPresenseById(val.id!);
+            if (res == false) {
+              _supabaseHelper.addPresense(val.toJson());
+            }
+          });
+          final res = await _supabaseHelper.getPresense();
+          insertPresenseFresh(res);
+        } else {
+          insertPresenseFresh(res);
+        }
+      }
     } else {
-      return await presenseCollection.where().findAll();
+      final res = await _supabaseHelper.getPresense();
+      insertPresenseFresh(res);
+    }
+  }
+
+  Future<void> clearPresense() async {
+    final isar = await db;
+    IsarCollection<PresenceModel> presenseCollection =
+        isar.collection<PresenceModel>();
+    isar.writeTxn<void>(() => presenseCollection.clear());
+  }
+
+  insertPresenseFresh(List<PresenceModel> presenseList) async {
+    final isar = await db;
+    await clearPresense();
+
+    if (presenseList.isNotEmpty) {
+      await Future.forEach(
+          presenseList,
+          (val) async =>
+              await isar.writeTxn<int>(() => isar.presenceModels.put(val)));
     }
   }
 
@@ -609,13 +657,8 @@ class Database {
     final isar = await db;
     IsarCollection<RentItemModel> rentItemCollection =
         isar.collection<RentItemModel>();
-    if (isDeviceConnected.value) {
-      final res = await _supabaseHelper.getRentItems();
 
-      return res;
-    } else {
-      return await rentItemCollection.where().findAll();
-    }
+    return await rentItemCollection.where().findAll();
   }
 
   Future<RentItemModel?> getRentItemById(int id) async {
@@ -642,6 +685,49 @@ class Database {
     }
   }
 
+  // sync rent items
+  Future<void> rentItemSync() async {
+    final rentItems = await getRentItem();
+    if (rentItems.isNotEmpty) {
+      final res = await _supabaseHelper.getRentItems();
+      if (res.length != rentItems.length) {
+        if (rentItems.length >= res.length) {
+          await Future.forEach(rentItems, (val) async {
+            final res = await _supabaseHelper.getRentItemById(val.id!);
+            if (res == false) {
+              _supabaseHelper.addRentItem(val.toJson());
+            }
+          });
+          final res = await _supabaseHelper.getRentItems();
+          insertRentItemsFresh(res);
+        } else {
+          insertRentItemsFresh(res);
+        }
+      }
+    } else {
+      final res = await _supabaseHelper.getRentItems();
+      insertRentItemsFresh(res);
+    }
+  }
+
+  Future<void> clearRentItems() async {
+    final isar = await db;
+    IsarCollection<RentItemModel> rentItemsCollection =
+        isar.collection<RentItemModel>();
+    isar.writeTxn<void>(() => rentItemsCollection.clear());
+  }
+
+  insertRentItemsFresh(List<RentItemModel> rentItemList) async {
+    final isar = await db;
+    await clearRentItems();
+    if (rentItemList.isNotEmpty) {
+      await Future.forEach(
+          rentItemList,
+          (val) async =>
+              await isar.writeTxn<int>(() => isar.rentItemModels.put(val)));
+    }
+  }
+
   // rent
   Future<void> addRent(RentModel val) async {
     val.isSynced = isDeviceConnected.value;
@@ -655,13 +741,7 @@ class Database {
   Future<List<RentModel>> getRent() async {
     final isar = await db;
     IsarCollection<RentModel> rentCollection = isar.collection<RentModel>();
-    if (isDeviceConnected.value) {
-      final res = await _supabaseHelper.getRent();
-
-      return res;
-    } else {
-      return await rentCollection.where().findAll();
-    }
+    return await rentCollection.where().findAll();
   }
 
   Future<void> updateRent(RentModel val) async {
@@ -679,6 +759,48 @@ class Database {
     return await rentCollection.filter().paidEqualTo(true).findAll();
   }
 
+  // sync rent
+  Future<void> rentSync() async {
+    final rent = await getRent();
+    if (rent.isNotEmpty) {
+      final res = await _supabaseHelper.getRent();
+      if (res.length != rent.length) {
+        if (rent.length >= res.length) {
+          await Future.forEach(rent, (val) async {
+            final res = await _supabaseHelper.getRentById(val.id!);
+            if (res == false) {
+              _supabaseHelper.addRent(val.toJson());
+            }
+          });
+          final res = await _supabaseHelper.getRent();
+          insertRentFresh(res);
+        } else {
+          insertRentFresh(res);
+        }
+      }
+    } else {
+      final res = await _supabaseHelper.getRent();
+      insertRentFresh(res);
+    }
+  }
+
+  Future<void> clearRent() async {
+    final isar = await db;
+    IsarCollection<RentModel> rentCollection = isar.collection<RentModel>();
+    isar.writeTxn<void>(() => rentCollection.clear());
+  }
+
+  insertRentFresh(List<RentModel> rentList) async {
+    final isar = await db;
+    await clearRent();
+    if (rentList.isNotEmpty) {
+      await Future.forEach(
+          rentList,
+          (val) async =>
+              await isar.writeTxn<int>(() => isar.rentModels.put(val)));
+    }
+  }
+
   // expenses
   Future<void> addExpenses(ExpensesModel val) async {
     val.isSynced = isDeviceConnected.value;
@@ -686,6 +808,56 @@ class Database {
     isar.writeTxnSync<int>(() => isar.expensesModels.putSync(val));
     if (isDeviceConnected.value) {
       _supabaseHelper.addExpenses(val.toJson());
+    }
+  }
+
+  Future<void> deleteExpenses(int val) async {
+    final isar = await db;
+    isar.writeTxn<bool>(() async => await isar.expensesModels.delete(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.removeExpenses(val);
+    }
+  }
+
+  Future<List<ExpensesModel>> getExpenses(
+      {required DateTime start, required DateTime end}) async {
+    final isar = await db;
+    IsarCollection<ExpensesModel> expensesCollection =
+        isar.collection<ExpensesModel>();
+    return await expensesCollection
+        .where()
+        .filter()
+        .createdAtBetween(start.copyWith(hour: 0, minute: 0, second: 0),
+            end.copyWith(hour: 23, minute: 59, second: 59))
+        .findAll();
+  }
+
+  // sync expenses
+  Future<void> expensesSync() async {
+    final isar = await db;
+    IsarCollection<ExpensesModel> expensesCollection =
+        isar.collection<ExpensesModel>();
+
+    final expenses = await expensesCollection.where().findAll();
+    if (expenses.isNotEmpty) {
+      final res = await _supabaseHelper.getExpenses();
+      if (res.length != expenses.length) {
+        if (expenses.length >= res.length) {
+          await Future.forEach(expenses, (val) async {
+            final res = await _supabaseHelper.getRentById(val.id!);
+            if (res == false) {
+              _supabaseHelper.addExpenses(val.toJson());
+            }
+          });
+          final res = await _supabaseHelper.getExpenses();
+          insertExpensesFresh(res);
+        } else {
+          insertExpensesFresh(res);
+        }
+      }
+    } else {
+      final res = await _supabaseHelper.getExpenses();
+      insertExpensesFresh(res);
     }
   }
 
@@ -708,53 +880,32 @@ class Database {
     }
   }
 
-  Future<List<ExpensesModel>> getExpenses() async {
-    final isar = await db;
-    IsarCollection<ExpensesModel> expensesCollection =
-        isar.collection<ExpensesModel>();
-    if (isDeviceConnected.value) {
-      final List<ExpensesModel> res = await _supabaseHelper.getExpenses();
-      final items = await expensesCollection.where().findAll();
-      if (res.length == items.length || items.length >= res.length) {
-        return items;
-      } else {
-        await insertExpensesFresh(res);
-        final freshItems = await expensesCollection.where().findAll();
-        return freshItems;
-      }
-    }
-    return [];
-  }
-
   // Salary
   Future<void> addSalary(SalaryModel val) async {
     val.isSynced = isDeviceConnected.value;
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.salaryModels.putSync(val));
-    if (isDeviceConnected.value) {
-      _supabaseHelper.addSalary(val.toJson());
-    }
+    // TODO connect to supabase
+    // if (isDeviceConnected.value) {
+    //   _supabaseHelper.addSalary(val.toJson());
+    // }
   }
 
   Future<List<SalaryModel>> getSalary() async {
     final isar = await db;
     IsarCollection<SalaryModel> salaryCollection =
         isar.collection<SalaryModel>();
-    // if (isDeviceConnected.value) {
-    //   final res = await _supabaseHelper.getSalarys();
 
-    //   return res;
-    // } else {
     return await salaryCollection.where().findAll();
-    // }
   }
 
   Future<void> updateSalary(SalaryModel val) async {
     final isar = await db;
     isar.writeTxn<int>(() async => await isar.salaryModels.put(val));
-    if (isDeviceConnected.value) {
-      _supabaseHelper.updateSalary(val);
-    }
+    // TODO connect to supabase
+    // if (isDeviceConnected.value) {
+    //   _supabaseHelper.updateSalary(val);
+    // }
   }
 
   Future<void> createBackUp() async {

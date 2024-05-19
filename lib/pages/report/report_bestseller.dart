@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
-final totalItem = Signal(0);
+final totalItem = Signal(0, autoDispose: true);
 
 class ReportBestSeller extends StatelessWidget {
   final double width;

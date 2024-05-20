@@ -1,4 +1,4 @@
-<img width="600" src="assets/logo.png" alt="Due Kasir Logo">
+<img width="200" src="assets/logo.png" alt="Due Kasir Logo">
 # Due Kasir
 
 Is Open source for POS app focus on offline first

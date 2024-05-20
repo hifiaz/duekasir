@@ -1,13 +1,11 @@
 import 'package:collection/collection.dart';
-import 'package:due_kasir/controller/store_controller.dart';
+import 'package:due_kasir/controller/salary_controller.dart';
 import 'package:due_kasir/controller/user_controller.dart';
 import 'package:due_kasir/model/salary_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/service/database.dart';
-import 'package:due_kasir/widget/pdf_generator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -27,6 +25,7 @@ class _SalariesFormState extends State<SalariesForm> {
   TextEditingController total = TextEditingController();
   TextEditingController periode = TextEditingController();
   TextEditingController note = TextEditingController();
+  TextEditingController management = TextEditingController();
   List<Widget> formItems = [];
   List<Widget> formDeductions = [];
   int itemsCount = 0;
@@ -80,7 +79,6 @@ class _SalariesFormState extends State<SalariesForm> {
   Widget build(BuildContext context) {
     final items = itemSalary.watch(context);
     final deductions = itemDeductions.watch(context);
-    final store = storeController.store.watch(context);
     final users = userController.users.watch(context);
     return Scaffold(
       appBar: AppBar(
@@ -115,7 +113,7 @@ class _SalariesFormState extends State<SalariesForm> {
                               .toList(),
                           selectedOptionBuilder: (context, value) =>
                               Text(value.nama),
-                          placeholder: const Text('Select a user to display'),
+                          placeholder: const Text('User'),
                           validator: (v) {
                             if (v == null) {
                               return 'Please select an user to display';
@@ -140,7 +138,8 @@ class _SalariesFormState extends State<SalariesForm> {
                           return null;
                         },
                       ),
-                      Expanded(
+                      SizedBox(
+                        width: 320,
                         child: ShadInputFormField(
                           controller: periode,
                           id: 'periode',
@@ -245,6 +244,10 @@ class _SalariesFormState extends State<SalariesForm> {
                     },
                   ),
                   ShadInputFormField(
+                    controller: management,
+                    label: const Text('Management'),
+                  ),
+                  ShadInputFormField(
                     controller: note,
                     label: const Text('Note'),
                     maxLines: 3,
@@ -265,35 +268,13 @@ class _SalariesFormState extends State<SalariesForm> {
                             items: items,
                             deductions: deductions,
                             note: note.text,
+                            management: management.text,
                             total: int.parse(total.text),
                           );
 
                           Database().addSalary(salary).whenComplete(() {
-                            showShadDialog(
-                              context: context,
-                              builder: (context) => ShadDialog.alert(
-                                title:
-                                    const Text('Do you want to print salary?'),
-                                actions: [
-                                  ShadButton.outline(
-                                    text: const Text('Cancel'),
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(false),
-                                  ),
-                                  ShadButton(
-                                    text: const Text('Print'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop(true);
-                                      pdfGenerator(
-                                        user: user!,
-                                        store: store.value!,
-                                        salary: salary,
-                                      ).whenComplete(() => context.pop());
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
+                            salaryController.salaries.refresh();
+                            Navigator.of(context).pop(false);
                           });
                         }
                       },

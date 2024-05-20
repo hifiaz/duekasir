@@ -44,6 +44,40 @@ class _SalariesState extends State<Salaries> {
                 ),
               ),
             ),
+          ShadButton.ghost(
+            onPressed: () {
+              salaryController.salaries.refresh();
+            },
+            text: const Text('Refresh'),
+            icon: const Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Icon(
+                Icons.refresh,
+                size: 16,
+              ),
+            ),
+          ),
+          PopupMenuButton<String>(
+            onSelected: (item) async {
+              if (item == 'sync') {
+                await Database().salariesSync();
+                await salaryController.salaries.refresh();
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'sync',
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.restore),
+                    SizedBox(width: 8),
+                    Text('Sync'),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       body: password == null
@@ -184,6 +218,14 @@ class _SalariesState extends State<Salaries> {
                                       ),
                                     );
                                   }
+                                },
+                              ),
+                              ShadButton.destructive(
+                                text: const Text('Delete'),
+                                onPressed: () async {
+                                  await Database().deleteSalary(item.id!);
+                                  Future.delayed(Durations.medium1).then((_) =>
+                                      salaryController.salaries.refresh());
                                 },
                               ),
                             ],

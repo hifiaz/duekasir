@@ -230,10 +230,10 @@ Future<dynamic> pdfGenerator(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Container(child: Text("Management")),
-                          SizedBox(height: 10),
-                          Container(child: PdfLogo()),
-                          SizedBox(height: 10),
-                          Container(child: Text("Meliza Azhara")),
+                          SizedBox(height: 40),
+                          Container(
+                            child: Text(salary.management ?? store.title),
+                          ),
                         ])
                   ]),
               Row(children: [
@@ -258,7 +258,8 @@ Future<dynamic> pdfGenerator(
         file: file);
   } else {
     await FileSaver.instance.saveAs(
-        name: 'salary-kasir-${user.nama.trim()}',
+        name:
+            'salary-kasir-${user.nama.trim()}-${DateTime.now().millisecondsSinceEpoch}',
         file: file,
         ext: 'pdf',
         mimeType: MimeType.pdf);

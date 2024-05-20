@@ -1,6 +1,7 @@
 import 'package:due_kasir/controller/auth_controller.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/date_utils.dart';
+import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -15,16 +16,23 @@ class NavDrawer extends StatelessWidget {
     User? user = Supabase.instance.client.auth.currentUser;
     final auth = authController.customer.watch(context);
     return Drawer(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+            topRight: Radius.circular(5), bottomRight: Radius.circular(5)),
+      ),
       child: SingleChildScrollView(
         child: Column(
           children: <Widget>[
             UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(color: Color(0xff71C9CE)),
+              decoration: BoxDecoration(
+                  color: context.isDarkMode
+                      ? const Color(0xff164863)
+                      : const Color(0xffF6F6F6)),
               accountName: Text(
                   '${auth.value?.user.value?.nama ?? "Kasir"} - ${auth.value?.user.value?.keterangan ?? "Role"}',
-                  style: ShadTheme.of(context).textTheme.h4),
+                  style: ShadTheme.of(context).textTheme.h3),
               accountEmail: Text(user?.email ?? '',
-                  style: ShadTheme.of(context).textTheme.p),
+                  style: ShadTheme.of(context).textTheme.muted),
               currentAccountPictureSize: const Size(200, 80),
               currentAccountPicture: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,7 +43,7 @@ class NavDrawer extends StatelessWidget {
                   ),
                   Text(
                     dateWithTime.format(DateTime.now()),
-                    style: ShadTheme.of(context).textTheme.p,
+                    style: ShadTheme.of(context).textTheme.small,
                   ),
                 ],
               ),

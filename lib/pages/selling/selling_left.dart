@@ -22,12 +22,12 @@ class SellingLeft extends HookWidget {
     final list = getIt.get<SellingController>().cart.watch(context);
     final isSearch = getIt.get<SellingController>().isSearch.watch(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: SingleChildScrollView(
         child: Column(
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 if (Platform.isAndroid)
                   ShadButton.ghost(
@@ -67,7 +67,7 @@ class SellingLeft extends HookWidget {
                   color: !isSearch ? Colors.blue : null,
                   onPressed: () =>
                       getIt.get<SellingController>().isSearch.value = !isSearch,
-                  icon: const Icon(Icons.barcode_reader),
+                  icon: const Icon(Icons.qr_code_scanner),
                 ),
                 if (isSearch)
                   Expanded(
@@ -150,6 +150,7 @@ class SellingLeft extends HookWidget {
                         focusNode: focusNode,
                         onEditingComplete: onFieldSubmitted,
                         decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.all(10),
                           prefixIcon: const Icon(Icons.search),
                           hintText: 'Search',
                           suffixIcon: IconButton(
@@ -193,6 +194,7 @@ class SellingLeft extends HookWidget {
                         readOnly: true,
                         controller: editingBarcode,
                         decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.all(10),
                           prefixIcon: Icon(Icons.search),
                         ),
                       ),

@@ -471,6 +471,17 @@ class SupabaseHelper {
     });
   }
 
+  removeSalary(int id) async {
+    await supabase.from('salary').select().eq("id", id).then((value) async {
+      await supabase.from('salary').delete().eq('id', id);
+    });
+  }
+
+  Future<bool> getSalariesById(int id) async {
+    final res = await supabase.from('salary').select().eq("id", id);
+    return res.isNotEmpty;
+  }
+
   Future<List<SalaryModel>> getSalarys() async {
     List<SalaryModel> salaryItems = [];
 
@@ -479,9 +490,40 @@ class SupabaseHelper {
         .select()
         .eq('user', supabase.auth.currentUser!.id);
 
+    // if (result.isNotEmpty) {
+    //   await Future.forEach(result, (val) async {
+    //     salaryItems.add(SalaryModel.fromJson(val));
+    //   });
+    // }
     if (result.isNotEmpty) {
       await Future.forEach(result, (val) async {
-        salaryItems.add(SalaryModel.fromJson(val));
+        final List<dynamic> convertItem = jsonDecode(val['items']);
+        List<ItemSalary> items = [];
+        await Future.forEach(convertItem, (p) async {
+          items.add(ItemSalary.fromJson(p));
+        });
+
+        List<ItemSalary> deductions = [];
+        if (val['deductions'] != null) {
+          final List<dynamic> convertDeduction = jsonDecode(val['deductions']);
+          await Future.forEach(convertDeduction, (p) async {
+            deductions.add(ItemSalary.fromJson(p));
+          });
+        }
+
+        salaryItems.add(
+          SalaryModel(
+            id: val['id'],
+            periode: val['perionde'],
+            status: val['status'],
+            total: val['total'].toInt(),
+            userId: val['userId'].toInt(),
+            note: val['note'],
+            items: items,
+            deductions: deductions,
+            createdAt: DateTime.parse(val['createdAt']),
+          ),
+        );
       });
     }
     return salaryItems;

@@ -6,7 +6,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   file_saver
   gtk
   isar_flutter_libs
-  rive_common
   url_launcher_linux
 )
 

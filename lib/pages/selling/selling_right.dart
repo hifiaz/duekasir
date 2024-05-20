@@ -256,7 +256,7 @@ class SellingRightState extends State<SellingRight> {
                 icon: Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: Icon(
-                    isConnected && !Platform.isWindows
+                    isConnected && !Platform.isWindows || printName.isNotEmpty
                         ? Icons.print
                         : Icons.print_disabled,
                     size: 16,

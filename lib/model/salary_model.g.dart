@@ -39,28 +39,33 @@ const SalaryModelSchema = CollectionSchema(
       type: IsarType.objectList,
       target: r'ItemSalary',
     ),
-    r'note': PropertySchema(
+    r'management': PropertySchema(
       id: 4,
+      name: r'management',
+      type: IsarType.string,
+    ),
+    r'note': PropertySchema(
+      id: 5,
       name: r'note',
       type: IsarType.string,
     ),
     r'periode': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'periode',
       type: IsarType.string,
     ),
     r'status': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'status',
       type: IsarType.string,
     ),
     r'total': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'total',
       type: IsarType.long,
     ),
     r'userId': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'userId',
       type: IsarType.long,
     )
@@ -108,6 +113,12 @@ int _salaryModelEstimateSize(
     }
   }
   {
+    final value = object.management;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.note;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -138,11 +149,12 @@ void _salaryModelSerialize(
     ItemSalarySchema.serialize,
     object.items,
   );
-  writer.writeString(offsets[4], object.note);
-  writer.writeString(offsets[5], object.periode);
-  writer.writeString(offsets[6], object.status);
-  writer.writeLong(offsets[7], object.total);
-  writer.writeLong(offsets[8], object.userId);
+  writer.writeString(offsets[4], object.management);
+  writer.writeString(offsets[5], object.note);
+  writer.writeString(offsets[6], object.periode);
+  writer.writeString(offsets[7], object.status);
+  writer.writeLong(offsets[8], object.total);
+  writer.writeLong(offsets[9], object.userId);
 }
 
 SalaryModel _salaryModelDeserialize(
@@ -168,11 +180,12 @@ SalaryModel _salaryModelDeserialize(
           ItemSalary(),
         ) ??
         [],
-    note: reader.readStringOrNull(offsets[4]),
-    periode: reader.readString(offsets[5]),
-    status: reader.readString(offsets[6]),
-    total: reader.readLongOrNull(offsets[7]),
-    userId: reader.readLong(offsets[8]),
+    management: reader.readStringOrNull(offsets[4]),
+    note: reader.readStringOrNull(offsets[5]),
+    periode: reader.readString(offsets[6]),
+    status: reader.readString(offsets[7]),
+    total: reader.readLongOrNull(offsets[8]),
+    userId: reader.readLong(offsets[9]),
   );
   return object;
 }
@@ -206,12 +219,14 @@ P _salaryModelDeserializeProp<P>(
     case 4:
       return (reader.readStringOrNull(offset)) as P;
     case 5:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 6:
       return (reader.readString(offset)) as P;
     case 7:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 8:
+      return (reader.readLongOrNull(offset)) as P;
+    case 9:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -656,6 +671,160 @@ extension SalaryModelQueryFilter
         upper,
         includeUpper,
       );
+    });
+  }
+
+  QueryBuilder<SalaryModel, SalaryModel, QAfterFilterCondition>
+      managementIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'management',
+      ));
+    });
+  }
+
+  QueryBuilder<SalaryModel, SalaryModel, QAfterFilterCondition>
+      managementIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'management',
+      ));
+    });
+  }
+
+  QueryBuilder<SalaryModel, SalaryModel, QAfterFilterCondition>
+      managementEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'management',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SalaryModel, SalaryModel, QAfterFilterCondition>
+      managementGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'management',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SalaryModel, SalaryModel, QAfterFilterCondition>
+      managementLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'management',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SalaryModel, SalaryModel, QAfterFilterCondition>
+      managementBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'management',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SalaryModel, SalaryModel, QAfterFilterCondition>
+      managementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'management',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SalaryModel, SalaryModel, QAfterFilterCondition>
+      managementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'management',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SalaryModel, SalaryModel, QAfterFilterCondition>
+      managementContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'management',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SalaryModel, SalaryModel, QAfterFilterCondition>
+      managementMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'management',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SalaryModel, SalaryModel, QAfterFilterCondition>
+      managementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'management',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<SalaryModel, SalaryModel, QAfterFilterCondition>
+      managementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'management',
+        value: '',
+      ));
     });
   }
 
@@ -1247,6 +1416,18 @@ extension SalaryModelQuerySortBy
     });
   }
 
+  QueryBuilder<SalaryModel, SalaryModel, QAfterSortBy> sortByManagement() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'management', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SalaryModel, SalaryModel, QAfterSortBy> sortByManagementDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'management', Sort.desc);
+    });
+  }
+
   QueryBuilder<SalaryModel, SalaryModel, QAfterSortBy> sortByNote() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'note', Sort.asc);
@@ -1346,6 +1527,18 @@ extension SalaryModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<SalaryModel, SalaryModel, QAfterSortBy> thenByManagement() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'management', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SalaryModel, SalaryModel, QAfterSortBy> thenByManagementDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'management', Sort.desc);
+    });
+  }
+
   QueryBuilder<SalaryModel, SalaryModel, QAfterSortBy> thenByNote() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'note', Sort.asc);
@@ -1421,6 +1614,13 @@ extension SalaryModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<SalaryModel, SalaryModel, QDistinct> distinctByManagement(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'management', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<SalaryModel, SalaryModel, QDistinct> distinctByNote(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1486,6 +1686,12 @@ extension SalaryModelQueryProperty
       itemsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'items');
+    });
+  }
+
+  QueryBuilder<SalaryModel, String?, QQueryOperations> managementProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'management');
     });
   }
 

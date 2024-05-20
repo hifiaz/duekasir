@@ -885,10 +885,9 @@ class Database {
     val.isSynced = isDeviceConnected.value;
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.salaryModels.putSync(val));
-    // TODO connect to supabase
-    // if (isDeviceConnected.value) {
-    //   _supabaseHelper.addSalary(val.toJson());
-    // }
+    if (isDeviceConnected.value) {
+      _supabaseHelper.addSalary(val.toJson());
+    }
   }
 
   Future<List<SalaryModel>> getSalary() async {
@@ -902,10 +901,65 @@ class Database {
   Future<void> updateSalary(SalaryModel val) async {
     final isar = await db;
     isar.writeTxn<int>(() async => await isar.salaryModels.put(val));
-    // TODO connect to supabase
-    // if (isDeviceConnected.value) {
-    //   _supabaseHelper.updateSalary(val);
-    // }
+    if (isDeviceConnected.value) {
+      _supabaseHelper.updateSalary(val);
+    }
+  }
+
+  Future<void> deleteSalary(int val) async {
+    final isar = await db;
+    isar.writeTxn<bool>(() async => await isar.salaryModels.delete(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.removeSalary(val);
+    }
+  }
+
+  // sync salaries
+  Future<void> salariesSync() async {
+    final isar = await db;
+    IsarCollection<SalaryModel> salaryCollection =
+        isar.collection<SalaryModel>();
+
+    final salary = await salaryCollection.where().findAll();
+    if (salary.isNotEmpty) {
+      final res = await _supabaseHelper.getSalarys();
+      if (res.length != salary.length) {
+        if (salary.length >= res.length) {
+          await Future.forEach(salary, (val) async {
+            final res = await _supabaseHelper.getSalariesById(val.id!);
+            if (res == false) {
+              _supabaseHelper.addSalary(val.toJson());
+            }
+          });
+          final res = await _supabaseHelper.getSalarys();
+          insertSalaryFresh(res);
+        } else {
+          insertSalaryFresh(res);
+        }
+      }
+    } else {
+      final res = await _supabaseHelper.getSalarys();
+      insertSalaryFresh(res);
+    }
+  }
+
+  Future<void> clearSalary() async {
+    final isar = await db;
+    IsarCollection<SalaryModel> salaryCollection =
+        isar.collection<SalaryModel>();
+    isar.writeTxn<void>(() => salaryCollection.clear());
+  }
+
+  insertSalaryFresh(List<SalaryModel> salaryList) async {
+    final isar = await db;
+    await clearSalary();
+
+    if (salaryList.isNotEmpty) {
+      await Future.forEach(
+          salaryList,
+          (val) async =>
+              await isar.writeTxn<int>(() => isar.salaryModels.put(val)));
+    }
   }
 
   Future<void> createBackUp() async {

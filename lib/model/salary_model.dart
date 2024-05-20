@@ -12,6 +12,7 @@ class SalaryModel {
   List<ItemSalary>? deductions;
   int? total;
   String? note;
+  String? management;
   DateTime? createdAt;
   bool isSynced;
 
@@ -24,6 +25,7 @@ class SalaryModel {
     this.deductions,
     required this.total,
     this.note,
+    this.management,
     this.createdAt,
     this.isSynced = true,
   });
@@ -38,6 +40,7 @@ class SalaryModel {
       'deductions': deductions,
       'total': total,
       'note': note,
+      'management': management,
       'createdAt': createdAt?.toIso8601String()
     };
   }
@@ -52,6 +55,7 @@ class SalaryModel {
       deductions: json['deductions'],
       total: json['total'],
       note: json['note'],
+      management: json['management'],
       createdAt:
           json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
     );

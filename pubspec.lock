@@ -341,10 +341,10 @@ packages:
     dependency: "direct main"
     description:
       name: fl_chart
-      sha256: "2b7c1f5d867da9a054661641c8f499c55c47c39acccb97b3bc673f5fa9a39e74"
+      sha256: d0f0d49112f2f4b192481c16d05b6418bd7820e021e265a3c22db98acf7ed7fb
       url: "https://pub.dev"
     source: hosted
-    version: "0.67.0"
+    version: "0.68.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -429,14 +429,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  fpdart:
-    dependency: "direct main"
-    description:
-      name: fpdart
-      sha256: "7413acc5a6569a3fe8277928fc7487f3198530f0c4e635d0baef199ea36e8ee9"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -1065,26 +1057,26 @@ packages:
     dependency: "direct main"
     description:
       name: signals
-      sha256: "623a12333d53aeeaebeca83db2c7be04d09c46226d1bf9e3b5023fd1517399ed"
+      sha256: "38052d9107b4ae54b6b47a0e4625f31e6b4486decc8d92f113b3b557de6d4767"
       url: "https://pub.dev"
     source: hosted
-    version: "5.2.0"
+    version: "5.2.1"
   signals_core:
     dependency: transitive
     description:
       name: signals_core
-      sha256: e6d4940367e595c49fb93c1b918bfb03459d60ef7b7f9469befb5c236b6e20d0
+      sha256: e34d9e3a5125f2063a6a3817729961cf948ca8cfdd66b6036c1c8c48735d2dda
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.0"
+    version: "5.2.0"
   signals_flutter:
     dependency: transitive
     description:
       name: signals_flutter
-      sha256: "74e78aa2da49984c32576817fc878f16feb6f1e57278898835659cc85a023f9f"
+      sha256: d37006c8dc92e86aa80900d3d1eeb1ba62ae7bd67378d8cbea187c2730ad090d
       url: "https://pub.dev"
     source: hosted
-    version: "5.2.0"
+    version: "5.2.1"
   simple_barcode_scanner:
     dependency: "direct main"
     description:

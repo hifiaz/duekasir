@@ -7,6 +7,7 @@ import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/pages/drawer.dart';
 import 'package:due_kasir/pages/report/report_bestseller.dart';
 import 'package:due_kasir/pages/report/report_revenue.dart';
+import 'package:due_kasir/pages/report/report_visitor_weekly.dart';
 import 'package:due_kasir/pages/report/report_visitors.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/constant.dart';
@@ -286,6 +287,14 @@ class _ReportState extends State<Report> {
               ),
             ),
             const SizedBox(height: 20),
+            const ShadCard(
+              title: Text('Report Visitor Weekly'),
+              content: Padding(
+                padding: EdgeInsets.only(top: 20.0),
+                child: ReportVisitorWeekLy(),
+              ),
+            ),
+            const SizedBox(height: 20),
             ShadCard(
               title: const Text('List Sales'),
               content: Padding(
@@ -337,7 +346,7 @@ class _ReportState extends State<Report> {
                                             .small,
                                       ),
                                       Text(
-                                          dateWithTime.format(detail.createdAt),
+                                          dateDayWithTime.format(detail.createdAt),
                                           style: ShadTheme.of(context)
                                               .textTheme
                                               .muted),

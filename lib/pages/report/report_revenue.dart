@@ -55,7 +55,7 @@ class ReportRevenue extends StatelessWidget {
           LineTouchTooltipData(getTooltipItems: (touchedSpots) {
         return touchedSpots.map((touchedSpot) {
           return LineTooltipItem(currency.format(touchedSpot.y),
-              const TextStyle(fontWeight: FontWeight.bold));
+              const TextStyle(fontWeight: FontWeight.bold, color: Colors.white));
         }).toList();
       })),
       lineBarsData: [

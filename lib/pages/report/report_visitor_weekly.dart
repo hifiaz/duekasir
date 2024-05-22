@@ -2,6 +2,7 @@ import 'package:due_kasir/controller/report_controller.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
 class ReportVisitorWeekLy extends StatefulWidget {
@@ -58,24 +59,58 @@ class _ReportVisitorWeekLyState extends State<ReportVisitorWeekLy> {
 
   @override
   Widget build(BuildContext context) {
-    return loading
-        ? const Center(
-            child: CircularProgressIndicator(),
-          )
-        : SizedBox(
-            height: 250,
-            child: BarChart(
-              BarChartData(
-                barTouchData: barTouchData,
-                titlesData: titlesData,
-                borderData: borderData,
-                barGroups: barGroups,
-                gridData: const FlGridData(show: false),
-                alignment: BarChartAlignment.spaceAround,
-                maxY: 20,
+    final reportIncome = reportController.reportIncome.watch(context);
+    return ShadCard(
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text('Report Visitor Weekly'),
+          ShadButton.ghost(
+            onPressed: () async {
+              setState(() {
+                loading = true;
+              });
+              if (reportIncome.hasValue) {
+                initiateData(reportIncome.value!);
+              } else {
+                setState(() {
+                  loading = false;
+                });
+              }
+            },
+            text: const Text('Refresh'),
+            icon: const Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Icon(
+                Icons.refresh,
+                size: 16,
               ),
             ),
-          );
+          ),
+        ],
+      ),
+      content: Padding(
+        padding: const EdgeInsets.only(top: 20.0),
+        child: loading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : SizedBox(
+                height: 250,
+                child: BarChart(
+                  BarChartData(
+                    barTouchData: barTouchData,
+                    titlesData: titlesData,
+                    borderData: borderData,
+                    barGroups: barGroups,
+                    gridData: const FlGridData(show: false),
+                    alignment: BarChartAlignment.spaceAround,
+                    maxY: 20,
+                  ),
+                ),
+              ),
+      ),
+    );
   }
 
   BarTouchData get barTouchData => BarTouchData(

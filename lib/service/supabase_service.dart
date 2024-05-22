@@ -399,7 +399,6 @@ class SupabaseHelper {
       if (value.isEmpty) {
         addStore(item.toJson());
       } else {
-        print('update ${item.toJson()}');
         await supabase
             .from('store')
             .update(item.toJson())

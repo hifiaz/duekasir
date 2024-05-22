@@ -135,9 +135,9 @@ class CustomerForm extends HookWidget {
                             onPressed: () {
                               Database()
                                   .deleteCustomer(customer.id!)
-                                  .whenComplete(() {
-                                customerController.customer.refresh();
-                                Navigator.pop(context);
+                                  .whenComplete(() async {
+                                await customerController.customer.refresh();
+                                if (context.mounted) Navigator.pop(context);
                               });
                             },
                           ),

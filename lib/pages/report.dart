@@ -6,6 +6,7 @@ import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/pages/drawer.dart';
 import 'package:due_kasir/pages/report/report_bestseller.dart';
+import 'package:due_kasir/pages/report/report_out_of_stock_all.dart';
 import 'package:due_kasir/pages/report/report_revenue.dart';
 import 'package:due_kasir/pages/report/report_visitor_weekly.dart';
 import 'package:due_kasir/pages/report/report_visitors.dart';
@@ -17,6 +18,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
+
+final isRefreshReport = signal(false);
 
 class Report extends StatefulWidget {
   const Report({super.key});
@@ -48,12 +51,15 @@ class _ReportState extends State<Report> {
         centerTitle: false,
         actions: [
           ShadButton.ghost(
-            onPressed: () {
+            onPressed: () async {
+              isRefreshReport.value = true;
               reportController.report.refresh();
               reportController.reportToday.refresh();
               reportController.reportYesterday.refresh();
+              await Future.delayed(Durations.medium2);
+              isRefreshReport.value = false;
             },
-            text: const Text('Refresh'),
+            text: Text(isRefreshReport.value ? 'Loading...' : 'Refresh'),
             icon: const Padding(
               padding: EdgeInsets.only(right: 8),
               child: Icon(
@@ -223,8 +229,8 @@ class _ReportState extends State<Report> {
                   content: Column(
                     children: [
                       const SizedBox(height: 16),
-                      if (reportOutOfStcok.hasValue)
-                        ...reportOutOfStcok.value!.take(10).map(
+                      if (reportOutOfStcok.hasValue) ...[
+                        ...reportOutOfStcok.value!.take(8).map(
                               (n) => Column(
                                 children: [
                                   Row(
@@ -272,6 +278,19 @@ class _ReportState extends State<Report> {
                                 ],
                               ),
                             ),
+                        ShadButton(
+                          width: double.infinity,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ReportOutOfStock(
+                                      items: reportOutOfStcok.value!)),
+                            );
+                          },
+                          text: const Text('See All'),
+                        ),
+                      ]
                     ],
                   ),
                 ),
@@ -287,13 +306,7 @@ class _ReportState extends State<Report> {
               ),
             ),
             const SizedBox(height: 20),
-            const ShadCard(
-              title: Text('Report Visitor Weekly'),
-              content: Padding(
-                padding: EdgeInsets.only(top: 20.0),
-                child: ReportVisitorWeekLy(),
-              ),
-            ),
+            const ReportVisitorWeekLy(),
             const SizedBox(height: 20),
             ShadCard(
               title: const Text('List Sales'),
@@ -346,7 +359,8 @@ class _ReportState extends State<Report> {
                                             .small,
                                       ),
                                       Text(
-                                          dateDayWithTime.format(detail.createdAt),
+                                          dateDayWithTime
+                                              .format(detail.createdAt),
                                           style: ShadTheme.of(context)
                                               .textTheme
                                               .muted),

@@ -1,13 +1,15 @@
 import 'package:collection/collection.dart';
 import 'package:due_kasir/controller/report_controller.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
+import 'package:due_kasir/pages/report/report_bestseller_all.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
 final totalItem = Signal(0, autoDispose: true);
 
-class ReportBestSeller extends StatelessWidget {
+class ReportBestSeller extends HookWidget {
   final double width;
   const ReportBestSeller({super.key, required this.width});
 
@@ -81,6 +83,17 @@ class ReportBestSeller extends StatelessWidget {
                   ],
                 ),
               ),
+          ShadButton(
+            width: double.infinity,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ReportBestSellerAll(items: items)),
+              );
+            },
+            text: const Text('See All'),
+          ),
         ],
       ),
     );

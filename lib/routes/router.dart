@@ -52,7 +52,7 @@ class StoreRoute extends GoRouteData {
   const StoreRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => Store();
+  Widget build(BuildContext context, GoRouterState state) => const Store();
 }
 
 @TypedGoRoute<InventoryRoute>(

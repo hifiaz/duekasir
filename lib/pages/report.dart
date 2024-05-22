@@ -34,6 +34,7 @@ class _ReportState extends State<Report> {
   int touchedIndex = -1;
   @override
   Widget build(BuildContext context) {
+    final isLoading = isRefreshReport.watch(context);
     final dateRange = reportController.dateRange.watch(context);
     final isMobile = context.isMobile;
     final report = reportController.report.watch(context);
@@ -51,15 +52,17 @@ class _ReportState extends State<Report> {
         centerTitle: false,
         actions: [
           ShadButton.ghost(
-            onPressed: () async {
-              isRefreshReport.value = true;
-              reportController.report.refresh();
-              reportController.reportToday.refresh();
-              reportController.reportYesterday.refresh();
-              await Future.delayed(Durations.medium2);
-              isRefreshReport.value = false;
-            },
-            text: Text(isRefreshReport.value ? 'Loading...' : 'Refresh'),
+            onPressed: isLoading
+                ? null
+                : () async {
+                    isRefreshReport.value = true;
+                    await reportController.report.refresh();
+                    await reportController.reportToday.refresh();
+                    await reportController.reportYesterday.refresh();
+                    await Future.delayed(Durations.medium1);
+                    isRefreshReport.value = false;
+                  },
+            text: Text(isLoading ? 'Loading...' : 'Refresh'),
             icon: const Padding(
               padding: EdgeInsets.only(right: 8),
               child: Icon(

@@ -32,6 +32,7 @@ class SellingRight extends StatefulHookWidget {
 }
 
 class SellingRightState extends State<SellingRight> {
+  // final formWhatsappKey = GlobalKey<ShadFormState>();
   late Future<CapabilityProfile> _profile;
   bool isConnected = false;
 
@@ -248,6 +249,11 @@ class SellingRightState extends State<SellingRight> {
                             .whenComplete(() => getIt
                                 .get<SellingController>()
                                 .dispatch(CartPaid()));
+                        // sendWhatsapp(
+                        //   store: store.value!,
+                        //   sales: newItem,
+                        //   customer: pelanggan,
+                        // );
                       });
                     });
                   }
@@ -269,6 +275,112 @@ class SellingRightState extends State<SellingRight> {
       ),
     );
   }
+
+  // void sendWhatsapp(
+  //     {required StoreModel store,
+  //     required PenjualanModel sales,
+  //     CustomerModel? customer}) {
+  //   showShadDialog(
+  //     context: context,
+  //     builder: (context) => ShadDialog(
+  //       title: const Text('Kirim ke Whatsaap?'),
+  //       description:
+  //           const Text("Rincian ringkas akan di kirim ke nomor whatsapp"),
+  //       content: ShadForm(
+  //         key: formWhatsappKey,
+  //         child: Container(
+  //           width: 375,
+  //           padding: const EdgeInsets.symmetric(vertical: 20),
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             crossAxisAlignment: CrossAxisAlignment.end,
+  //             children: [
+  //               ShadInputFormField(
+  //                 id: "name",
+  //                 label: const Text('Nama'),
+  //                 initialValue: customer?.nama,
+  //                 validator: (v) {
+  //                   if (v.length < 2) {
+  //                     return 'Name must be at least 2 characters.';
+  //                   }
+  //                   return null;
+  //                 },
+  //               ),
+  //               ShadInputFormField(
+  //                 id: "phone",
+  //                 label: const Text('Phone'),
+  //                 initialValue: customer?.phone,
+  //                 description: const Text(
+  //                     'Pastikan nomor tidak ada angka 0 di depan dan berawalan 62 (tanpa tanda +)'),
+  //                 validator: (v) {
+  //                   if (v.length < 2) {
+  //                     return 'Phone must valid';
+  //                   }
+  //                   return null;
+  //                 },
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //       actions: [
+  //         ShadButton(
+  //             onPressed: () => context.pop(), text: const Text('Cancel')),
+  //         ShadButton(
+  //             onPressed: () async {
+  //               final newCustomer = CustomerModel(
+  //                 nama: formWhatsappKey.currentState!.value['name'],
+  //                 status: true,
+  //                 phone: formWhatsappKey.currentState!.value['phone'],
+  //                 keterangan: 'Add From Seling Page',
+  //                 masuk: DateTime.now(),
+  //                 createdAt: DateTime.now(),
+  //               );
+
+  //               Database().addNewCustomer(newCustomer).whenComplete(() {
+  //                 customerController.customer.refresh();
+  //               });
+
+  //               try {
+  //                 await DioClient.instance.dio.post('/messages', data: {
+  //                   "messaging_product": "whatsapp",
+  //                   "to": formWhatsappKey.currentState!.value['phone'],
+  //                   "type": "template",
+  //                   "template": {
+  //                     "name": "order",
+  //                     "language": {"code": "id"},
+  //                     'components': [
+  //                       {
+  //                         "type": "body",
+  //                         "parameters": [
+  //                           {
+  //                             "type": "text",
+  //                             "text":
+  //                                 formWhatsappKey.currentState!.value['name']
+  //                           },
+  //                           {"type": "text", "text": store.title},
+  //                           {
+  //                             "type": "text",
+  //                             "text": currency.format(sales.totalHarga)
+  //                           },
+  //                           {"type": "text", "text": store.footer}
+  //                         ],
+  //                       }
+  //                     ]
+  //                   }
+  //                 });
+  //                 if (context.mounted) {
+  //                   context.pop();
+  //                 }
+  //               } on DioException catch (e) {
+  //                 print(e);
+  //               }
+  //             },
+  //             text: const Text('Kirim'))
+  //       ],
+  //     ),
+  //   );
+  // }
 
   void checkConnection() async {
     isConnected = await PrintBluetoothThermal.connectionStatus;

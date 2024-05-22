@@ -6,6 +6,7 @@ import 'package:due_kasir/pages/salaries/salaries_form.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/widget/pdf_generator.dart';
+import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -19,9 +20,11 @@ class Salaries extends StatefulWidget {
 }
 
 class _SalariesState extends State<Salaries> {
+  EmailOTP myAuth = EmailOTP();
   final forSalariesmKey = GlobalKey<ShadFormState>();
   String? password;
   bool obscure = true;
+
   @override
   Widget build(BuildContext context) {
     final store = storeController.store.watch(context);
@@ -119,17 +122,61 @@ class _SalariesState extends State<Salaries> {
                       },
                     ),
                   ),
-                  footer: ShadButton(
-                    text: const Text('Access'),
-                    onPressed: () {
-                      if (forSalariesmKey.currentState!.value['password'] ==
-                          '111111') {
-                        setState(() {
-                          password =
-                              forSalariesmKey.currentState!.value['password'];
-                        });
-                      }
-                    },
+                  footer: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ShadButton.outline(
+                        text: const Text('Send Request Access'),
+                        onPressed: () async {
+                          myAuth.setConfig(
+                              appEmail: "fiazhari@gmail.com",
+                              appName: "Email OTP",
+                              userEmail: "fiazhari@gmail.com",
+                              otpLength: 6,
+                              otpType: OTPType.digitsOnly);
+                          if (await myAuth.sendOTP() == true) {
+                            if (context.mounted) {
+                              ShadToaster.of(context).show(
+                                const ShadToast(
+                                  backgroundColor: Colors.green,
+                                  description: Text('OTP has been sent'),
+                                ),
+                              );
+                            }
+                          } else {
+                            if (context.mounted) {
+                              ShadToaster.of(context).show(
+                                const ShadToast(
+                                  backgroundColor: Colors.red,
+                                  description: Text('Oops, OTP send failed'),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                      ),
+                      ShadButton(
+                        text: const Text('Access'),
+                        onPressed: () async {
+                          if (await myAuth.verifyOTP(
+                                  otp: forSalariesmKey
+                                      .currentState!.value['password']) ==
+                              true) {
+                            setState(() {
+                              password = forSalariesmKey
+                                  .currentState!.value['password'];
+                            });
+                          }
+                          // if (forSalariesmKey.currentState!.value['password'] ==
+                          //     '111111') {
+                          //   setState(() {
+                          //     password = forSalariesmKey
+                          //         .currentState!.value['password'];
+                          //   });
+                          // }
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),

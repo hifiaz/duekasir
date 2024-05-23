@@ -6,6 +6,7 @@ import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/pages/drawer.dart';
 import 'package:due_kasir/pages/report/report_bestseller.dart';
+import 'package:due_kasir/pages/report/report_delete_dialog.dart';
 import 'package:due_kasir/pages/report/report_out_of_stock_all.dart';
 import 'package:due_kasir/pages/report/report_revenue.dart';
 import 'package:due_kasir/pages/report/report_visitor_weekly.dart';
@@ -29,8 +30,6 @@ class Report extends StatefulWidget {
 }
 
 class _ReportState extends State<Report> {
-  final reportFormKey = GlobalKey<ShadFormState>();
-  bool obscure = true;
   int touchedIndex = -1;
   @override
   Widget build(BuildContext context) {
@@ -403,76 +402,10 @@ class _ReportState extends State<Report> {
                                   ShadButton.outline(
                                     onPressed: () {
                                       showShadDialog(
-                                        context: context,
-                                        builder: (context) => ShadDialog(
-                                          title: const Text('Delete Report'),
-                                          description: const Text(
-                                              "Are you sure to delete this report, this action can't be undo"),
-                                          content: Container(
-                                            width: 375,
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 20),
-                                            child: ShadInputFormField(
-                                              id: 'password',
-                                              label: const Text('Password'),
-                                              placeholder: const Text(
-                                                  'Enter your password'),
-                                              validator: (v) {
-                                                if (v.length < 2) {
-                                                  return 'Password must be at least 2 characters.';
-                                                }
-                                                return null;
-                                              },
-                                              obscureText: obscure,
-                                              prefix: const Padding(
-                                                padding: EdgeInsets.all(4.0),
-                                                child: ShadImage.square(
-                                                    size: 16, LucideIcons.lock),
-                                              ),
-                                              suffix: ShadButton(
-                                                width: 24,
-                                                height: 24,
-                                                padding: EdgeInsets.zero,
-                                                decoration: ShadDecoration.none,
-                                                icon: ShadImage.square(
-                                                  size: 16,
-                                                  obscure
-                                                      ? LucideIcons.eyeOff
-                                                      : LucideIcons.eye,
-                                                ),
-                                                onPressed: () {
-                                                  setState(
-                                                      () => obscure = !obscure);
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                          actions: [
-                                            ShadButton(
-                                                onPressed: () => context.pop(),
-                                                text: const Text('Cancel')),
-                                            ShadButton(
-                                                onPressed: () async {
-                                                  if (reportFormKey
-                                                          .currentState!
-                                                          .value['password'] ==
-                                                      '111111') {
-                                                    await Database()
-                                                        .removePenjualan(
-                                                            detail.id!);
-                                                    reportController.report
-                                                        .refresh();
-                                                    reportController.reportToday
-                                                        .refresh();
-                                                    reportController
-                                                        .reportYesterday
-                                                        .refresh();
-                                                  }
-                                                },
-                                                text: const Text('Delete'))
-                                          ],
-                                        ),
-                                      );
+                                          context: context,
+                                          builder: (context) =>
+                                              ReportDeleteDialog(
+                                                  id: detail.id!));
                                     },
                                     text: const Text('Delete'),
                                     icon: const Padding(

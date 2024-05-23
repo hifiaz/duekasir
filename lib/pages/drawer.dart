@@ -66,6 +66,13 @@ class NavDrawer extends StatelessWidget {
               onTap: () => context.go('/inventory'),
             ),
             ListTile(
+              title: const Text('Due Payment'),
+              leading: const Icon(Icons.payment),
+              onTap: () {
+                context.go('/due-payment');
+              },
+            ),
+            ListTile(
               title: const Text('Presence'),
               leading: const Icon(Icons.adobe_sharp),
               onTap: () {

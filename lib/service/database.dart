@@ -7,6 +7,7 @@ import 'package:due_kasir/controller/selling_controller.dart';
 import 'package:due_kasir/main.dart';
 import 'package:due_kasir/model/auth_model.dart';
 import 'package:due_kasir/model/customer_model.dart';
+import 'package:due_kasir/model/due_payment_model.dart';
 import 'package:due_kasir/model/expenses_model.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
@@ -962,6 +963,83 @@ class Database {
     }
   }
 
+  // due payment
+  // inventory
+  Future<void> addDuePayment(DuePaymentModel val) async {
+    val.isSynced = isDeviceConnected.value;
+    final isar = await db;
+    isar.writeTxnSync<int>(() => isar.duePaymentModels.putSync(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.addDuePayment(val.toJson());
+    }
+  }
+
+  Future<void> deleteDuePayment(int val) async {
+    final isar = await db;
+    isar.writeTxn<bool>(() async => await isar.duePaymentModels.delete(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.removeDuePayment(val);
+    }
+  }
+
+  Future<void> updateDuePayment(DuePaymentModel val) async {
+    final isar = await db;
+    isar.writeTxn<int>(() async => await isar.duePaymentModels.put(val));
+    if (isDeviceConnected.value) {
+      _supabaseHelper.updateDuePayment(val);
+    }
+  }
+
+  Future<List<DuePaymentModel>> getDuePayments({String? value}) async {
+    final isar = await db;
+    IsarCollection<DuePaymentModel> duePaymentCollection =
+        isar.collection<DuePaymentModel>();
+    return await duePaymentCollection.where().findAll();
+  }
+
+  // sync due payment
+  Future<void> duePaymentSync() async {
+    final duePayments = await getDuePayments();
+    if (duePayments.isNotEmpty) {
+      final res = await _supabaseHelper.getDuePayment();
+      if (res.length != duePayments.length) {
+        if (duePayments.length >= res.length) {
+          await Future.forEach(duePayments, (val) async {
+            final res = await _supabaseHelper.getDuePaymentById(val.id!);
+            if (res == false) {
+              _supabaseHelper.addDuePayment(val.toJson());
+            }
+          });
+          final res = await _supabaseHelper.getDuePayment();
+          insertDuePaymentFresh(res);
+        } else {
+          insertDuePaymentFresh(res);
+        }
+      }
+    } else {
+      final res = await _supabaseHelper.getDuePayment();
+      insertDuePaymentFresh(res);
+    }
+  }
+
+  Future<void> clearDuePayment() async {
+    final isar = await db;
+    IsarCollection<DuePaymentModel> duePaymentCollection =
+        isar.collection<DuePaymentModel>();
+    isar.writeTxn<void>(() => duePaymentCollection.clear());
+  }
+
+  insertDuePaymentFresh(List<DuePaymentModel> duePaymentList) async {
+    final isar = await db;
+    await clearDuePayment();
+    if (duePaymentList.isNotEmpty) {
+      await Future.forEach(
+          duePaymentList,
+          (val) async =>
+              await isar.writeTxn<int>(() => isar.duePaymentModels.put(val)));
+    }
+  }
+
   Future<void> createBackUp() async {
     final isar = await db;
     final backUpDir = await getDownloadsDirectory();
@@ -991,7 +1069,13 @@ class Database {
             PenjualanModelSchema,
             UserModelSchema,
             AuthModelSchema,
-            StoreModelSchema
+            StoreModelSchema,
+            PresenceModelSchema,
+            RentItemModelSchema,
+            RentModelSchema,
+            ExpensesModelSchema,
+            SalaryModelSchema,
+            DuePaymentModelSchema
           ],
           directory: dbDirectory.path,
         );
@@ -1021,6 +1105,7 @@ class Database {
           RentModelSchema,
           ExpensesModelSchema,
           SalaryModelSchema,
+          DuePaymentModelSchema
         ],
         directory: dir.path,
         inspector: true,

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:due_kasir/model/customer_model.dart';
+import 'package:due_kasir/model/due_payment_model.dart';
 import 'package:due_kasir/model/expenses_model.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
@@ -540,6 +541,66 @@ class SupabaseHelper {
       } else {
         await supabase
             .from('salary')
+            .update(item.toJson())
+            .match({'id': item.id!});
+      }
+    });
+  }
+
+  // due payment
+  Future<List<DuePaymentModel>> getDuePayment() async {
+    List data = [];
+    List<DuePaymentModel> duePayments = [];
+
+    final result = await supabase
+        .from('due_payment')
+        .select()
+        .eq('user', supabase.auth.currentUser!.id);
+    if (result.isNotEmpty) {
+      await Future.forEach(result, (val) async => data.add(val));
+    }
+    await Future.forEach(data, (val) async {
+      duePayments.add(DuePaymentModel.fromJson(val));
+    });
+
+    return duePayments;
+  }
+
+  addDuePayment(Map data) async {
+    data.putIfAbsent('user', () => supabase.auth.currentUser!.id);
+    await supabase.from('due_payment').insert(data).then((value) {
+      log('success add due payment $value');
+    }).catchError((error) {
+      log('error add due payment $error');
+    });
+  }
+
+  Future<bool> getDuePaymentById(int id) async {
+    final res = await supabase.from('due_payment').select().eq("id", id);
+    return res.isNotEmpty;
+  }
+
+  removeDuePayment(int id) async {
+    await supabase
+        .from('due_payment')
+        .select()
+        .eq("id", id)
+        .then((value) async {
+      await supabase.from('due_payment').delete().eq('id', id);
+    });
+  }
+
+  updateDuePayment(DuePaymentModel item) async {
+    await supabase
+        .from('due_payment')
+        .select()
+        .eq("id", item.id!)
+        .then((value) async {
+      if (value.isEmpty) {
+        addDuePayment(item.toJson());
+      } else {
+        await supabase
+            .from('due_payment')
             .update(item.toJson())
             .match({'id': item.id!});
       }

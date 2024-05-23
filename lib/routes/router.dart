@@ -1,5 +1,7 @@
 import 'package:due_kasir/pages/customer.dart';
 import 'package:due_kasir/pages/customer/customer_form.dart';
+import 'package:due_kasir/pages/due_payment.dart';
+import 'package:due_kasir/pages/due_payment/due_payment_form.dart';
 import 'package:due_kasir/pages/expenses.dart';
 import 'package:due_kasir/pages/home.dart';
 import 'package:due_kasir/pages/inventory.dart';
@@ -227,7 +229,30 @@ class SalariesFormRoute extends GoRouteData {
   const SalariesFormRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const SalariesForm();
+  Widget build(BuildContext context, GoRouterState state) =>
+      const SalariesForm();
+}
+
+@TypedGoRoute<DuePaymentRoute>(
+  path: '/due-payment',
+  routes: <TypedGoRoute<GoRouteData>>[
+    TypedGoRoute<DuePaymentFormRoute>(
+      path: 'form',
+    )
+  ],
+)
+class DuePaymentRoute extends GoRouteData {
+  const DuePaymentRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const DuePayment();
+}
+
+class DuePaymentFormRoute extends GoRouteData {
+  const DuePaymentFormRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => DuePaymentForm();
 }
 
 @TypedGoRoute<TestingRoute>(path: '/testing')

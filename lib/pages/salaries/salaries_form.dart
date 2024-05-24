@@ -1,9 +1,12 @@
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
 import 'package:due_kasir/controller/salary_controller.dart';
 import 'package:due_kasir/controller/user_controller.dart';
 import 'package:due_kasir/model/salary_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/utils/constant.dart';
+import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -80,6 +83,8 @@ class _SalariesFormState extends State<SalariesForm> {
     final items = itemSalary.watch(context);
     final deductions = itemDeductions.watch(context);
     final users = userController.users.watch(context);
+    final reportBonus = salaryController.calculate.watch(context);
+    final dateRange = salaryController.dateRange.watch(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Form'),
@@ -106,7 +111,10 @@ class _SalariesFormState extends State<SalariesForm> {
                           id: 'user',
                           initialValue: widget.selectedUser,
                           label: const Text('User'),
-                          onChanged: (v) => setState(() => user = v),
+                          onChanged: (v) {
+                            salaryController.userId.value = v;
+                            setState(() => user = v);
+                          },
                           options: users.value!
                               .map((u) =>
                                   ShadOption(value: u, child: Text(u.nama)))
@@ -153,6 +161,39 @@ class _SalariesFormState extends State<SalariesForm> {
                           },
                         ),
                       ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      ShadButton.outline(
+                        text: Text(
+                            'Filter: ${dateWithoutTime.format(dateRange.first)} - ${dateWithoutTime.format(dateRange.last)}'),
+                        onPressed: () async {
+                          var results = await showCalendarDatePicker2Dialog(
+                            context: context,
+                            config: CalendarDatePicker2WithActionButtonsConfig(
+                              calendarType: CalendarDatePicker2Type.range,
+                            ),
+                            dialogSize: const Size(325, 400),
+                            value: dateRange,
+                            borderRadius: BorderRadius.circular(15),
+                          );
+                          if (results != null) {
+                            salaryController.dateRange.value = [
+                              results.first!,
+                              results.last!
+                            ];
+                          }
+                        },
+                      ),
+                      reportBonus.map(
+                        data: (data) {
+                          return Text(
+                              'Hitungan ${currency.format(data.fold(0, (p, c) => p + c.totalHarga.toInt()))} >> Bonus : ${currency.format(data.fold(0, (p, c) => p + c.totalHarga.toInt()) * 1 / 100)}');
+                        },
+                        error: (error, __) => const Text('Error'),
+                        loading: () => const CircularProgressIndicator(),
+                      )
                     ],
                   ),
                   const SizedBox(height: 10),

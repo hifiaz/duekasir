@@ -453,6 +453,28 @@ class Database {
     return [];
   }
 
+  Future<List<PenjualanModel>> getReportById({
+    required DateTime start,
+    required DateTime end,
+    int? userId,
+  }) async {
+    final isar = await db;
+    IsarCollection<PenjualanModel> reportCollection =
+        isar.collection<PenjualanModel>();
+
+    final items = await reportCollection
+        .where()
+        .filter()
+        .createdAtBetween(
+          start.copyWith(hour: 0, minute: 0, second: 0),
+          end.copyWith(hour: 23, minute: 59, second: 59),
+        )
+        .kasirEqualTo(userId ?? 0)
+        .findAll();
+
+    return items;
+  }
+
   Future<List<PenjualanModel>> getReportToday() async {
     final isar = await db;
     IsarCollection<PenjualanModel> inventoryCollection =

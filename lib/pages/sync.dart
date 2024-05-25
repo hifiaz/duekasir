@@ -1,4 +1,5 @@
 import 'package:due_kasir/controller/customer_controller.dart';
+import 'package:due_kasir/controller/due_payment_controller.dart';
 import 'package:due_kasir/controller/expenses_controller.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/controller/presence_controller.dart';
@@ -115,10 +116,13 @@ class Sync extends StatelessWidget {
               // inventory
               await Database().checkIsInventorySynced();
               await Database().getInventorys();
-              inventoryController.inventorys.refresh();
+              await inventoryController.inventorys.refresh();
               // customer
               await Database().syncCustomers();
-              customerController.customer.refresh();
+              await customerController.customer.refresh();
+              //due payment
+              await Database().duePaymentSync();
+              await duePaymentController.payments.refresh();
               isSync.value = false;
               if (context.mounted) {
                 ShadToaster.of(context).show(

@@ -162,31 +162,56 @@ class InventoryList extends HookWidget {
                 if (Platform.isAndroid || Platform.isIOS) {
                   return Column(
                     children: items
-                        .map((i) => ListTile(
-                              leading: Text(i.id.toString()),
-                              title: Text(i.nama),
-                              subtitle: Text(
-                                  '${i.diskonPersen == null || i.diskonPersen == 0 ? currency.format(i.hargaJual) : currency.format(i.hargaJual - i.hargaJual * (i.diskonPersen! / 100))} - ${i.code} (${i.jumlahBarang} Stock)'),
+                        .map((item) => ListTile(
+                              leading: Text(item.id.toString()),
+                              title: Text('${item.nama} (${item.jumlahBarang} Stock)'),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    currency.format(item.hargaJual),
+                                    style: TextStyle(
+                                        color: item.diskonPersen != null &&
+                                                item.diskonPersen != 0
+                                            ? Colors.red
+                                            : null,
+                                        decoration: item.diskonPersen != null &&
+                                                item.diskonPersen != 0
+                                            ? TextDecoration.lineThrough
+                                            : null),
+                                  ),
+                                  if (item.diskonPersen != null &&
+                                      item.diskonPersen != 0) ...[
+                                    Text(
+                                      'Dasar: ${currency.format(item.hargaDasar)}',
+                                      style: const TextStyle(fontSize: 10),
+                                    ),
+                                    Text(
+                                      'Disc: ${item.diskonPersen}',
+                                      style: const TextStyle(fontSize: 10),
+                                    ),
+                                    Text(
+                                      currency.format(item.hargaJual -
+                                          item.hargaJual *
+                                              (item.diskonPersen! / 100)),
+                                      style: const TextStyle(
+                                          fontSize: 12, color: Colors.green),
+                                    )
+                                  ]
+                                ],
+                              ),
+                              // subtitle: Text(
+                              //     '${i.diskonPersen == null || i.diskonPersen == 0 ? currency.format(i.hargaJual) : currency.format(i.hargaJual - i.hargaJual * (i.diskonPersen! / 100))} - ${i.code} (${i.jumlahBarang} Stock)'),
                               trailing: const Icon(Icons.arrow_right_outlined),
                               onTap: () {
-                                inventoryController.inventorySelected.value = i;
+                                inventoryController.inventorySelected.value =
+                                    item;
                                 context.go('/inventory/form');
                               },
                             ))
                         .toList(),
                   );
-                  // for (ItemModel i in inventorySearch)
-                  //   ListTile(
-                  //     leading: Text(i.id.toString()),
-                  //     title: Text(i.nama),
-                  //     subtitle: Text(
-                  //         '${i.diskonPersen == null || i.diskonPersen == 0 ? currency.format(i.hargaJual) : currency.format(i.hargaJual - i.hargaJual * (i.diskonPersen! / 100))} - ${i.code} (${i.jumlahBarang} Stock)'),
-                  //     trailing: const Icon(Icons.arrow_right_outlined),
-                  //     onTap: () {
-                  //       inventoryController.inventorySelected.value = i;
-                  //       context.go('/inventory/form');
-                  //     },
-                  //   );
                 }
                 return DataTable(
                   columns: const [

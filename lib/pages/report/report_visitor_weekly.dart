@@ -64,7 +64,7 @@ class _ReportVisitorWeekLyState extends State<ReportVisitorWeekLy> {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text('Report Visitor Weekly'),
+          const Text('Visitor Weekly'),
           ShadButton.ghost(
             onPressed: () async {
               setState(() {

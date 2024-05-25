@@ -126,12 +126,12 @@ class Database {
       });
       final res = await _supabaseHelper.getUsers();
       if (res.isNotEmpty) {
-        insertUserFresh(res);
+        await insertUserFresh(res);
       }
     } else {
       final res = await _supabaseHelper.getUsers();
       if (res.isNotEmpty) {
-        insertUserFresh(res);
+        await insertUserFresh(res);
       }
     }
   }
@@ -636,14 +636,14 @@ class Database {
             }
           });
           final res = await _supabaseHelper.getPresense();
-          insertPresenseFresh(res);
+          await insertPresenseFresh(res);
         } else {
-          insertPresenseFresh(res);
+          await insertPresenseFresh(res);
         }
       }
     } else {
       final res = await _supabaseHelper.getPresense();
-      insertPresenseFresh(res);
+      await insertPresenseFresh(res);
     }
   }
 
@@ -722,14 +722,14 @@ class Database {
             }
           });
           final res = await _supabaseHelper.getRentItems();
-          insertRentItemsFresh(res);
+          await insertRentItemsFresh(res);
         } else {
-          insertRentItemsFresh(res);
+          await insertRentItemsFresh(res);
         }
       }
     } else {
       final res = await _supabaseHelper.getRentItems();
-      insertRentItemsFresh(res);
+      await insertRentItemsFresh(res);
     }
   }
 
@@ -796,14 +796,14 @@ class Database {
             }
           });
           final res = await _supabaseHelper.getRent();
-          insertRentFresh(res);
+          await insertRentFresh(res);
         } else {
-          insertRentFresh(res);
+          await insertRentFresh(res);
         }
       }
     } else {
       final res = await _supabaseHelper.getRent();
-      insertRentFresh(res);
+      await insertRentFresh(res);
     }
   }
 
@@ -1033,14 +1033,14 @@ class Database {
             }
           });
           final res = await _supabaseHelper.getDuePayment();
-          insertDuePaymentFresh(res);
+          await insertDuePaymentFresh(res);
         } else {
-          insertDuePaymentFresh(res);
+          await insertDuePaymentFresh(res);
         }
       }
     } else {
       final res = await _supabaseHelper.getDuePayment();
-      insertDuePaymentFresh(res);
+      await insertDuePaymentFresh(res);
     }
   }
 

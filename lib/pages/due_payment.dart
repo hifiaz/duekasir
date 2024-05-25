@@ -90,7 +90,10 @@ class _DuePaymentState extends State<DuePayment> {
                               Text(currency.format(i.amount)),
                               Text(
                                 dateWithoutTime.format(i.dueDate),
-                                style: const TextStyle(color: Colors.red),
+                                style: TextStyle(
+                                    color: i.status == 'paid'
+                                        ? Colors.green
+                                        : Colors.red),
                               )
                             ],
                           ),

@@ -1,4 +1,6 @@
 import 'package:due_kasir/controller/report_controller.dart';
+import 'package:due_kasir/pages/report/report_visitors_all.dart';
+import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -18,19 +20,36 @@ class ReportVisitors extends StatelessWidget {
       content: Column(
         children: [
           const SizedBox(height: 16),
-          if (reportIncome.hasValue)
-            for (var i in reportIncome.value!.entries.toList().reversed.take(10))
+          if (reportIncome.hasValue) ...[
+            for (var i in reportIncome.value!.entries.toList().reversed.take(7))
               Column(
                 children: [
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     title: Text(dateWithoutTime.format(i.key)),
+                    subtitle: Text(
+                      currency.format(
+                          i.value.fold(0, (p, c) => p + c.totalHarga.toInt())),
+                    ),
                     trailing: Text('${i.value.length} People',
                         style: ShadTheme.of(context).textTheme.muted),
                   ),
                   const Divider()
                 ],
-              )
+              ),
+            ShadButton(
+              width: double.infinity,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ReportVisitorAll(items: reportIncome.value!)),
+                );
+              },
+              text: const Text('See All'),
+            ),
+          ]
         ],
       ),
     );

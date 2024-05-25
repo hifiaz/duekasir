@@ -491,23 +491,16 @@ class SupabaseHelper {
         .select()
         .eq('user', supabase.auth.currentUser!.id);
 
-    // if (result.isNotEmpty) {
-    //   await Future.forEach(result, (val) async {
-    //     salaryItems.add(SalaryModel.fromJson(val));
-    //   });
-    // }
     if (result.isNotEmpty) {
       await Future.forEach(result, (val) async {
-        final List<dynamic> convertItem = jsonDecode(val['items']);
         List<ItemSalary> items = [];
-        await Future.forEach(convertItem, (p) async {
+        await Future.forEach(val['items'], (p) async {
           items.add(ItemSalary.fromJson(p));
         });
 
         List<ItemSalary> deductions = [];
         if (val['deductions'] != null) {
-          final List<dynamic> convertDeduction = jsonDecode(val['deductions']);
-          await Future.forEach(convertDeduction, (p) async {
+          await Future.forEach(val['deductions'], (p) async {
             deductions.add(ItemSalary.fromJson(p));
           });
         }
@@ -515,14 +508,16 @@ class SupabaseHelper {
         salaryItems.add(
           SalaryModel(
             id: val['id'],
-            periode: val['perionde'],
+            periode: val['periode'],
             status: val['status'],
             total: val['total'].toInt(),
             userId: val['userId'].toInt(),
             note: val['note'],
             items: items,
             deductions: deductions,
-            createdAt: DateTime.parse(val['createdAt']),
+            createdAt: val['createdAt'] != null
+                ? DateTime.parse(val['createdAt'])
+                : null,
           ),
         );
       });

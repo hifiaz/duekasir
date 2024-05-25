@@ -311,6 +311,7 @@ class _SalariesFormState extends State<SalariesForm> {
                             note: note.text,
                             management: management.text,
                             total: int.parse(total.text),
+                            createdAt: DateTime.now()
                           );
 
                           Database().addSalary(salary).whenComplete(() {

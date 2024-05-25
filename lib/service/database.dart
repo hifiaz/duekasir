@@ -955,14 +955,14 @@ class Database {
             }
           });
           final res = await _supabaseHelper.getSalarys();
-          insertSalaryFresh(res);
+          await insertSalaryFresh(res);
         } else {
-          insertSalaryFresh(res);
+          await insertSalaryFresh(res);
         }
       }
     } else {
       final res = await _supabaseHelper.getSalarys();
-      insertSalaryFresh(res);
+      await insertSalaryFresh(res);
     }
   }
 

@@ -54,16 +54,26 @@ class NavDrawer extends StatelessWidget {
               onTap: () => context.go('/'),
             ),
             ListTile(
-              title: const Text('Rent'),
-              leading: const Icon(Icons.shopping_bag),
-              onTap: () {
-                context.go('/rent');
-              },
+              title: const Text('Report'),
+              leading: const Icon(Icons.home_repair_service_outlined),
+              onTap: () => context.go('/report'),
             ),
             ListTile(
               title: const Text('Inventory'),
               leading: const Icon(Icons.inventory),
               onTap: () => context.go('/inventory'),
+            ),
+            ListTile(
+              title: const Text('Request'),
+              leading: const Icon(Icons.edit_note),
+              onTap: () => context.go('/request'),
+            ),
+            ListTile(
+              title: const Text('Rent'),
+              leading: const Icon(Icons.shopping_bag),
+              onTap: () {
+                context.go('/rent');
+              },
             ),
             ListTile(
               title: const Text('Due Payment'),
@@ -85,11 +95,6 @@ class NavDrawer extends StatelessWidget {
               onTap: () {
                 context.go('/expenses');
               },
-            ),
-            ListTile(
-              title: const Text('Report'),
-              leading: const Icon(Icons.home_repair_service_outlined),
-              onTap: () => context.go('/report'),
             ),
             ListTile(
               title: const Text('Users'),

@@ -8,6 +8,7 @@ import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/presence_model.dart';
 import 'package:due_kasir/model/rent_item_model.dart';
+import 'package:due_kasir/model/request_model.dart';
 import 'package:due_kasir/model/salary_model.dart';
 import 'package:due_kasir/model/store_model.dart';
 import 'package:due_kasir/model/user_model.dart';
@@ -596,6 +597,59 @@ class SupabaseHelper {
       } else {
         await supabase
             .from('due_payment')
+            .update(item.toJson())
+            .match({'id': item.id!});
+      }
+    });
+  }
+
+  // request
+  addRequest(Map data) async {
+    data.putIfAbsent('user', () => supabase.auth.currentUser!.id);
+    await supabase.from('request').insert(data).then((value) {
+      log('success add request $value');
+    }).catchError((error) {
+      log('error add request $error');
+    });
+  }
+
+  removeRequest(int id) async {
+    await supabase.from('request').select().eq("id", id).then((value) async {
+      await supabase.from('request').delete().eq('id', id);
+    });
+  }
+
+  Future<bool> getRequestId(int id) async {
+    final res = await supabase.from('request').select().eq("id", id);
+    return res.isNotEmpty;
+  }
+
+  Future<List<RequestModel>> getRequests() async {
+    List<RequestModel> requestItems = [];
+
+    final result = await supabase
+        .from('request')
+        .select()
+        .eq('user', supabase.auth.currentUser!.id);
+
+    await Future.forEach(result, (val) async {
+      requestItems.add(RequestModel.fromJson(val));
+    });
+
+    return requestItems;
+  }
+
+  updateRequest(RequestModel item) async {
+    await supabase
+        .from('request')
+        .select()
+        .eq("id", item.id!)
+        .then((value) async {
+      if (value.isEmpty) {
+        addRent(item.toJson());
+      } else {
+        await supabase
+            .from('request')
             .update(item.toJson())
             .match({'id': item.id!});
       }

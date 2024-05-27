@@ -23,6 +23,7 @@ List<RouteBase> get $appRoutes => [
       $syncRoute,
       $salariesRoute,
       $duePaymentRoute,
+      $requestRoute,
       $testingRoute,
     ];
 
@@ -536,6 +537,52 @@ extension $DuePaymentFormRouteExtension on DuePaymentFormRoute {
 
   String get location => GoRouteData.$location(
         '/due-payment/form',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $requestRoute => GoRouteData.$route(
+      path: '/request',
+      factory: $RequestRouteExtension._fromState,
+      routes: [
+        GoRouteData.$route(
+          path: 'form',
+          factory: $RequestFormRouteExtension._fromState,
+        ),
+      ],
+    );
+
+extension $RequestRouteExtension on RequestRoute {
+  static RequestRoute _fromState(GoRouterState state) => const RequestRoute();
+
+  String get location => GoRouteData.$location(
+        '/request',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $RequestFormRouteExtension on RequestFormRoute {
+  static RequestFormRoute _fromState(GoRouterState state) =>
+      const RequestFormRoute();
+
+  String get location => GoRouteData.$location(
+        '/request/form',
       );
 
   void go(BuildContext context) => context.go(location);

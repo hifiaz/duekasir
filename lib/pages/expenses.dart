@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:due_kasir/controller/expenses_controller.dart';
 import 'package:due_kasir/pages/drawer.dart';
@@ -7,6 +5,7 @@ import 'package:due_kasir/pages/expenses/expenses_form.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/date_utils.dart';
+import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
@@ -105,7 +104,7 @@ class Expanses extends StatelessWidget {
                     ),
                   );
                 }
-                if (Platform.isAndroid || Platform.isIOS) {
+                if (PlatformExtension.isMobile) {
                   return Column(
                     children: data
                         .map((v) => ListTile(

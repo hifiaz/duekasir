@@ -29,10 +29,12 @@ class _RequestState extends State<Request> {
             if (item.isEmpty) {
               return const Center(child: Text('There is no Data'));
             }
-            return Wrap(
-              runSpacing: 10,
-              spacing: 10,
-              children: item.map((val) => RequestCard(val: val)).toList(),
+            return SingleChildScrollView(
+              child: Wrap(
+                runSpacing: 10,
+                spacing: 10,
+                children: item.map((val) => RequestCard(val: val)).toList(),
+              ),
             );
           },
           error: (e) => Center(child: Text('$e')),

@@ -4,6 +4,7 @@ import 'package:csv/csv.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/utils/constant.dart';
+import 'package:due_kasir/utils/extension.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
@@ -159,7 +160,7 @@ class InventoryList extends HookWidget {
                 if (items.isEmpty) {
                   return const Center(child: Text('There is no Data'));
                 }
-                if (Platform.isAndroid || Platform.isIOS) {
+                if (PlatformExtension.isMobile) {
                   return Column(
                     children: items
                         .map((item) => ListTile(

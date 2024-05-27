@@ -1,17 +1,15 @@
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:signals/signals_flutter.dart';
-
 import 'package:due_kasir/controller/selling/events.dart';
 import 'package:due_kasir/controller/selling_controller.dart';
 import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/service/get_it.dart';
 import 'package:due_kasir/utils/constant.dart';
+import 'package:due_kasir/utils/extension.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class SellingLeft extends HookWidget {
@@ -29,7 +27,7 @@ class SellingLeft extends HookWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (Platform.isAndroid)
+                if (PlatformExtension.isMobile)
                   ShadButton.ghost(
                     icon: const Icon(Icons.camera_alt),
                     onPressed: () async {

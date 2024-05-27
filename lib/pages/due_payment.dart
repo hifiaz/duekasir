@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:due_kasir/controller/due_payment_controller.dart';
 import 'package:due_kasir/pages/drawer.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/date_utils.dart';
+import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -70,7 +69,7 @@ class _DuePaymentState extends State<DuePayment> {
             if (items.isEmpty) {
               return const Center(child: Text('There is no Data'));
             }
-            if (Platform.isAndroid || Platform.isIOS) {
+            if (PlatformExtension.isMobile) {
               return Column(
                 children: items
                     .map((i) => ListTile(

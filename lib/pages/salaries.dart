@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:due_kasir/controller/salary_controller.dart';
 import 'package:due_kasir/controller/store_controller.dart';
 import 'package:due_kasir/model/salary_model.dart';
@@ -7,6 +5,7 @@ import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/pages/drawer.dart';
 import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/constant.dart';
+import 'package:due_kasir/utils/extension.dart';
 import 'package:due_kasir/widget/pdf_generator.dart';
 import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
@@ -191,7 +190,7 @@ class _SalariesState extends State<Salaries> {
                 if (salary.isEmpty) {
                   return const Center(child: Text('There is No Data'));
                 }
-                if (Platform.isAndroid || Platform.isIOS) {
+                if (PlatformExtension.isMobile) {
                   return SingleChildScrollView(
                     child: Column(
                       children: salary.map((item) {

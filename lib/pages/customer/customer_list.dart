@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:due_kasir/controller/customer_controller.dart';
 import 'package:due_kasir/utils/date_utils.dart';
+import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -32,7 +31,7 @@ class CustomerList extends HookWidget {
             const SizedBox(height: 20),
             customers.map(
               data: (customers) {
-                if (Platform.isAndroid || Platform.isIOS) {
+                if (PlatformExtension.isMobile) {
                   return Column(
                     children: customers.map((user) {
                       return ListTile(

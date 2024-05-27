@@ -18,6 +18,7 @@ class RequestForm extends StatefulWidget {
 
 class _RequestFormState extends State<RequestForm> {
   final status = ['Draf', 'Hold', 'Process', 'Finish'];
+  late final EditorScrollController editorScrollController;
   EditorState? editorState;
   late Future<String> _jsonString;
   String? selectedStatus = 'Draf';
@@ -38,7 +39,19 @@ class _RequestFormState extends State<RequestForm> {
       final json = jsonDecode(await _jsonString);
       editorState = EditorState(document: Document.fromJson(json));
     }
+    editorScrollController = EditorScrollController(
+      editorState: editorState!,
+      shrinkWrap: false,
+    );
+
     setState(() {});
+  }
+
+  @override
+  void dispose() {
+    editorScrollController.dispose();
+    editorState?.dispose();
+    super.dispose();
   }
 
   @override
@@ -73,6 +86,7 @@ class _RequestFormState extends State<RequestForm> {
                     if (widget.request != null) {
                       RequestModel request = RequestModel(
                           id: widget.request!.id,
+                          title: widget.request?.title,
                           note: jsonEncode(editorState?.document.toJson()),
                           status: selectedStatus,
                           createdAt: widget.request?.createdAt);
@@ -117,9 +131,92 @@ class _RequestFormState extends State<RequestForm> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : AppFlowyEditor(
-              editorState: editorState!,
-            ),
+          : PlatformExtension.isDesktopOrWeb
+              ? FloatingToolbar(
+                  items: [
+                    paragraphItem,
+                    ...headingItems,
+                    ...markdownFormatItems,
+                    quoteItem,
+                    bulletedListItem,
+                    numberedListItem,
+                    linkItem,
+                    buildTextColorItem(),
+                    buildHighlightColorItem(),
+                    ...textDirectionItems,
+                    ...alignmentItems,
+                  ],
+                  editorScrollController: editorScrollController,
+                  editorState: editorState!,
+                  textDirection: TextDirection.ltr,
+                  child: AppFlowyEditor(
+                    editorStyle: EditorStyle.desktop(
+                      cursorWidth: 2.0,
+                      cursorColor: Colors.blue,
+                      selectionColor: Colors.grey.shade300,
+                      padding: const EdgeInsets.symmetric(horizontal: 80.0),
+                    ),
+                    editorScrollController: editorScrollController,
+                    editorState: editorState!,
+                  ),
+                )
+              : MobileToolbarV2(
+                  toolbarHeight: 48.0,
+                  toolbarItems: [
+                    textDecorationMobileToolbarItemV2,
+                    buildTextAndBackgroundColorMobileToolbarItem(),
+                    blocksMobileToolbarItem,
+                    linkMobileToolbarItem,
+                    dividerMobileToolbarItem,
+                  ],
+                  editorState: editorState!,
+                  child: Column(
+                    children: [
+                      // build appflowy editor
+                      Expanded(
+                        child: MobileFloatingToolbar(
+                          editorState: editorState!,
+                          editorScrollController: editorScrollController,
+                          toolbarBuilder: (context, anchor, closeToolbar) {
+                            return AdaptiveTextSelectionToolbar.editable(
+                              clipboardStatus: ClipboardStatus.pasteable,
+                              onCopy: () {
+                                copyCommand.execute(editorState!);
+                                closeToolbar();
+                              },
+                              onCut: () => cutCommand.execute(editorState!),
+                              onPaste: () => pasteCommand.execute(editorState!),
+                              onSelectAll: () =>
+                                  selectAllCommand.execute(editorState!),
+                              onLiveTextInput: null,
+                              onLookUp: null,
+                              onSearchWeb: null,
+                              onShare: null,
+                              anchors: TextSelectionToolbarAnchors(
+                                primaryAnchor: anchor,
+                              ),
+                            );
+                          },
+                          child: AppFlowyEditor(
+                            editorStyle: const EditorStyle.mobile(
+                              textScaleFactor: 1.0,
+                              cursorColor: Color.fromARGB(255, 134, 46, 247),
+                              dragHandleColor:
+                                  Color.fromARGB(255, 134, 46, 247),
+                              selectionColor: Color.fromARGB(50, 134, 46, 247),
+                              padding: EdgeInsets.symmetric(horizontal: 24.0),
+                              magnifierSize: Size(144, 96),
+                              mobileDragHandleBallSize: Size(12, 12),
+                            ),
+                            editorState: editorState!,
+                            editorScrollController: editorScrollController,
+                            showMagnifier: true,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:due_kasir/model/request_model.dart';
 import 'package:due_kasir/pages/request/request_form.dart';
 import 'package:due_kasir/service/supabase_service.dart';
 import 'package:due_kasir/utils/date_utils.dart';
+import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -34,7 +35,7 @@ class _RequestCardState extends State<RequestCard> {
   @override
   Widget build(BuildContext context) {
     return ShadCard(
-      width: 340,
+      width: PlatformExtension.isDesktopOrWeb ? 340 : context.width,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/controller/rent_controller.dart';
 import 'package:due_kasir/main.dart';
 import 'package:due_kasir/model/rent_item_model.dart';
 import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
@@ -93,7 +92,7 @@ class RentItemForm extends HookWidget {
                         ),
                       ),
                     ),
-                    if (Platform.isAndroid || Platform.isIOS)
+                    if (PlatformExtension.isMobile)
                       ShadButton.ghost(
                         icon: const Icon(Icons.camera_alt),
                         onPressed: () async {

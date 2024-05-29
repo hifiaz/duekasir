@@ -115,12 +115,14 @@ class _PresenceFormState extends State<PresenceForm> {
                   // final fileName = basename(image.path);
                   // await image.saveTo('$duplicateFilePath/$fileName');
                   Database().addPresense(PresenceModel(
+                      id: DateTime.now().microsecondsSinceEpoch,
                       user: userSelected!.id!,
                       status: status!.name,
                       createdAt: DateTime.now()));
                 } else {
                   Database()
                       .addPresense(PresenceModel(
+                          id: DateTime.now().microsecondsSinceEpoch,
                           user: userSelected!.id!,
                           status: status!.name,
                           createdAt: DateTime.now()))

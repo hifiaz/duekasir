@@ -224,6 +224,7 @@ class RentItemForm extends HookWidget {
                               });
                             } else {
                               final newItem = RentItemModel(
+                                id: DateTime.now().microsecondsSinceEpoch,
                                 name: editingName.text.replaceAll(',', ' '),
                                 code: editingCode.text,
                                 rentThreeDay: int.parse(rentThreeDay.text),

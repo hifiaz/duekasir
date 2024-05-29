@@ -213,6 +213,7 @@ class SellingRightState extends State<SellingRight> {
                       );
                     }
                     final newItem = PenjualanModel(
+                      id: DateTime.now().microsecondsSinceEpoch,
                       items: products,
                       kasir: kasir?.id ?? 1,
                       keterangan: note.text,

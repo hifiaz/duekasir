@@ -227,7 +227,7 @@ class InventoryList extends HookWidget {
                   dataRowMaxHeight: 80.0,
                   rows: items
                       .map((item) => DataRow(cells: [
-                            DataCell(Text(item.id.toString())),
+                            DataCell(Text((items.indexOf(item) + 1).toString())),
                             DataCell(Text(item.nama)),
                             DataCell(Text(item.code)),
                             DataCell(Text(item.jumlahBarang.toString())),

@@ -166,6 +166,7 @@ class _StoreState extends State<Store> {
                                   );
                                 } else {
                                   final val = StoreModel(
+                                    id: DateTime.now().microsecondsSinceEpoch,
                                     title: title.text,
                                     description: description.text,
                                     phone: phone.text,

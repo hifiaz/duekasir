@@ -166,6 +166,7 @@ class UserForm extends HookWidget {
                               });
                             } else {
                               final newUser = UserModel(
+                                id: DateTime.now().microsecondsSinceEpoch,
                                 nama: editingName.text,
                                 dob: lahir.value,
                                 status: status.value,

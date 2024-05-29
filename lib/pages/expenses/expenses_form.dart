@@ -49,7 +49,9 @@ class ExpensesForm extends HookWidget {
                         validator: (val) =>
                             val.isEmpty == true ? 'Amount is required' : null,
                         label: const Text('Amount'),
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
                         placeholder: const Text('ex. 25000'),
                       ),
                     ),
@@ -91,17 +93,15 @@ class ExpensesForm extends HookWidget {
         ),
         actions: [
           ShadButton(
-              onPressed: () {
+              onPressed: () async {
                 if (expensesFormKey.currentState!.validate()) {
-                  Database()
-                      .addExpenses(
-                    ExpensesModel(
-                        title: title.text,
-                        amount: int.parse(amount.text),
-                        note: note.text,
-                        createdAt: date.value),
-                  )
-                      .whenComplete(() {
+                  final newItem = ExpensesModel(
+                      id: DateTime.now().microsecondsSinceEpoch,
+                      title: title.text,
+                      amount: int.parse(amount.text),
+                      note: note.text,
+                      createdAt: date.value);
+                  await Database().addExpenses(newItem).whenComplete(() {
                     expensesController.expenses.refresh();
                     context.pop();
                   });

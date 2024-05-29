@@ -166,6 +166,7 @@ class CustomerForm extends HookWidget {
                                 });
                               } else {
                                 final newCustomer = CustomerModel(
+                                  id: DateTime.now().microsecondsSinceEpoch,
                                   nama: editingName.text,
                                   dob: lahir.value,
                                   ktp: editingKtp.text,
@@ -197,119 +198,5 @@ class CustomerForm extends HookWidget {
         ),
       ),
     );
-    // final editingName = useTextEditingController();
-    // final editingKTP = useTextEditingController();
-    // final editingKeterangan = useTextEditingController();
-    // final lahirTemp = useTextEditingController();
-    // final lahir = useState(DateTime.now());
-    // final status = useState(true);
-    // return SingleChildScrollView(
-    //   child: Container(
-    //     decoration: const BoxDecoration(
-    //         borderRadius: BorderRadius.only(
-    //             topLeft: Radius.circular(8), topRight: Radius.circular(8))),
-    //     padding: const EdgeInsets.all(20),
-    //     child: Column(
-    //       mainAxisAlignment: MainAxisAlignment.start,
-    //       crossAxisAlignment: CrossAxisAlignment.start,
-    //       mainAxisSize: MainAxisSize.min,
-    //       children: <Widget>[
-    //         Text(
-    //           'New Customer',
-    //           style: Theme.of(context).textTheme.headlineMedium,
-    //         ),
-    //         const SizedBox(height: 10),
-    //         TextFormField(
-    //           controller: editingName,
-    //           validator: (val) =>
-    //               val?.isEmpty == true ? 'Nama wajib di isi' : null,
-    //           decoration: const InputDecoration(
-    //             hintText: 'Nama',
-    //             label: Text('Nama'),
-    //           ),
-    //         ),
-    //         const SizedBox(height: 10),
-    //         TextFormField(
-    //           controller: editingKTP,
-    //           decoration: const InputDecoration(
-    //             hintText: 'No KTP',
-    //             label: Text('No KTP'),
-    //           ),
-    //         ),
-    //         const SizedBox(height: 10),
-    //         TextField(
-    //           controller: lahirTemp,
-    //           decoration: const InputDecoration(
-    //             suffixIcon: Icon(Icons.calendar_today),
-    //             labelText: "Masukkan Tanggal",
-    //           ),
-    //           readOnly: true,
-    //           onTap: () async {
-    //             DateTime? pickedDate = await showDatePicker(
-    //                 context: context,
-    //                 initialDate: DateTime.now(),
-    //                 firstDate: DateTime(1950),
-    //                 //DateTime.now() - not to allow to choose before today.
-    //                 lastDate: DateTime(2100));
-
-    //             if (pickedDate != null) {
-    //               lahirTemp.text = dateWithoutTime.format(lahir.value);
-    //               lahir.value = pickedDate;
-    //             }
-    //           },
-    //         ),
-    //         const SizedBox(height: 10),
-    //         const Text('Status'),
-    //         DropdownButton<bool>(
-    //           isExpanded: true,
-    //           value: status.value,
-    //           onChanged: (bool? value) => status.value = value!,
-    //           items: const [
-    //             DropdownMenuItem<bool>(
-    //               value: true,
-    //               child: Text('Active'),
-    //             ),
-    //             DropdownMenuItem<bool>(
-    //               value: false,
-    //               child: Text('Non Active'),
-    //             )
-    //           ],
-    //         ),
-    //         const SizedBox(height: 10),
-    //         TextFormField(
-    //           controller: editingKeterangan,
-    //           maxLines: 3,
-    //           decoration: const InputDecoration(
-    //             hintText: 'Keterangan',
-    //             label: Text('Keterangan'),
-    //           ),
-    //         ),
-    //         const SizedBox(height: 10),
-    //         SizedBox(
-    //           width: double.infinity,
-    //           child: ElevatedButton(
-    //             style: active,
-    //             child: const Text('Save'),
-    //             onPressed: () {
-    //               final newUser = PembeliModel()
-    //                 ..nama = editingName.text
-    //                 ..dob = lahir.value
-    //                 ..ktp = editingKTP.text
-    //                 ..status = status.value
-    //                 ..keterangan = editingKeterangan.text
-    //                 ..masuk = DateTime.now();
-
-    //               Database().addNewCustomer(newUser).whenComplete(() {
-    //                 customerController.customer.refresh();
-    //                 Navigator.pop(context);
-    //               });
-    //             },
-    //           ),
-    //         ),
-    //         const SizedBox(height: 20),
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 }

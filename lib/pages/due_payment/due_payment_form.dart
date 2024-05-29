@@ -264,6 +264,7 @@ class DuePaymentForm extends HookWidget {
                               });
                             } else {
                               final newItem = DuePaymentModel(
+                                id: DateTime.now().microsecondsSinceEpoch,
                                 name: editingName.text.replaceAll(',', ' '),
                                 invoice: editingInvoice.text,
                                 itemName: editingItemName.text,

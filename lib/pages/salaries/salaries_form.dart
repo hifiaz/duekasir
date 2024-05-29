@@ -301,6 +301,7 @@ class _SalariesFormState extends State<SalariesForm> {
                       onPressed: () {
                         if (salariesFormKey.currentState!.saveAndValidate()) {
                           SalaryModel salary = SalaryModel(
+                            id: DateTime.now().microsecondsSinceEpoch,
                             userId: user!.id!,
                             status:
                                 salariesFormKey.currentState!.value['status'],
@@ -311,7 +312,7 @@ class _SalariesFormState extends State<SalariesForm> {
                             note: note.text,
                             management: management.text,
                             total: int.parse(total.text),
-                            createdAt: DateTime.now()
+                            createdAt: DateTime.now(),
                           );
 
                           Database().addSalary(salary).whenComplete(() {

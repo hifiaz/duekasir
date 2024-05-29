@@ -293,6 +293,7 @@ class InventoryForm extends HookWidget {
                               });
                             } else {
                               final newItem = ItemModel(
+                                  id: DateTime.now().microsecondsSinceEpoch,
                                   nama: editingName.text.replaceAll(',', ' '),
                                   code: editingCode.text,
                                   quantity: 1,

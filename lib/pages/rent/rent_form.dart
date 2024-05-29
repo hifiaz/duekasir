@@ -246,6 +246,7 @@ class RentForm extends HookWidget {
                               });
                             } else {
                               final newItem = RentModel(
+                                id: DateTime.now().microsecondsSinceEpoch,
                                 name: editingName.text,
                                 item: item.id!,
                                 amount: amount.value,

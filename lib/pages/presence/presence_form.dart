@@ -57,7 +57,7 @@ class _PresenceFormState extends State<PresenceForm> {
                         .map((user) => DataRow(cells: [
                               DataCell(Text(user.id.toString())),
                               DataCell(Text(user.nama)),
-                              DataCell(ShadButton.outline(
+                              DataCell(ShadButton(
                                 text: Text(user == userSelected
                                     ? 'Selected'
                                     : 'Select'),

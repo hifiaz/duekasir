@@ -278,6 +278,7 @@ class InventoryForm extends HookWidget {
                                 diskonPersen:
                                     double.tryParse(editingDiscount.text),
                                 jumlahBarang: stock.value,
+                                createdAt: item.createdAt,
                               );
 
                               Database()

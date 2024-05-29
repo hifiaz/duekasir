@@ -22,6 +22,7 @@ import 'package:due_kasir/service/supabase_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Database {
   late Future<Isar> db;
@@ -31,6 +32,7 @@ class Database {
   }
 
   final SupabaseHelper _supabaseHelper = SupabaseHelper();
+  static final SupabaseClient supabase = Supabase.instance.client;
 
   // Auth Local
   Future<void> loginUser(AuthModel val) async {
@@ -58,7 +60,7 @@ class Database {
   Future<void> addNewUser(UserModel val) async {
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.userModels.putSync(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.addUsers(val.toJson());
     }
   }
@@ -66,7 +68,7 @@ class Database {
   Future<void> deleteUser(int val) async {
     final isar = await db;
     isar.writeTxn<bool>(() async => await isar.userModels.delete(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.removeUsers(val);
     }
   }
@@ -74,7 +76,7 @@ class Database {
   Future<void> updateUser(UserModel val) async {
     final isar = await db;
     isar.writeTxn<int>(() => isar.userModels.put(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.updateUsers(val);
     }
   }
@@ -138,10 +140,10 @@ class Database {
 
   // Customer
   Future<void> addNewCustomer(CustomerModel val) async {
-    val.isSynced = isDeviceConnected.value;
+    val.isSynced = isDeviceConnected.value && supabase.auth.currentUser != null;
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.customerModels.putSync(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.addCustomer(val.toJson());
     }
   }
@@ -149,7 +151,7 @@ class Database {
   Future<void> deleteCustomer(int val) async {
     final isar = await db;
     isar.writeTxn<bool>(() async => await isar.customerModels.delete(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.removeCustomer(val);
     }
   }
@@ -157,7 +159,7 @@ class Database {
   Future<void> updateCustomer(CustomerModel val) async {
     final isar = await db;
     isar.writeTxn<int>(() async => await isar.customerModels.put(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.updateCustomer(val);
     }
   }
@@ -237,10 +239,10 @@ class Database {
 
   // inventory
   Future<void> addInventory(ItemModel val) async {
-    val.isSynced = isDeviceConnected.value;
+    val.isSynced = isDeviceConnected.value && supabase.auth.currentUser != null;
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.itemModels.putSync(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.addInventory(val.toJson());
     }
   }
@@ -248,9 +250,10 @@ class Database {
   Future<void> addAllInventory(List<ItemModel> vals) async {
     final isar = await db;
     for (var val in vals) {
-      val.isSynced = isDeviceConnected.value;
+      val.isSynced =
+          isDeviceConnected.value && supabase.auth.currentUser != null;
       isar.writeTxnSync<int>(() => isar.itemModels.putSync(val));
-      if (isDeviceConnected.value) {
+      if (isDeviceConnected.value && supabase.auth.currentUser != null) {
         _supabaseHelper.addInventory(val.toJson());
       }
     }
@@ -259,7 +262,7 @@ class Database {
   Future<void> deleteInventory(int val) async {
     final isar = await db;
     isar.writeTxn<bool>(() async => await isar.itemModels.delete(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.removeInventory(val);
     }
   }
@@ -267,7 +270,7 @@ class Database {
   Future<void> updateInventory(ItemModel val) async {
     final isar = await db;
     isar.writeTxn<int>(() async => await isar.itemModels.put(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.updateInventory(val);
     }
   }
@@ -389,7 +392,7 @@ class Database {
   Future<void> addPenjualan(PenjualanModel val) async {
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.penjualanModels.putSync(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.addReport(val.toJson());
     }
   }
@@ -397,7 +400,7 @@ class Database {
   Future<void> removePenjualan(int val) async {
     final isar = await db;
     isar.writeTxn<bool>(() => isar.penjualanModels.delete(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.removeReport(val);
     }
   }
@@ -426,7 +429,7 @@ class Database {
     final isar = await db;
     IsarCollection<PenjualanModel> reportCollection =
         isar.collection<PenjualanModel>();
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       final List<PenjualanModel> res = await _supabaseHelper.getRepots(
         start: start.copyWith(hour: 0, minute: 0, second: 0),
         end: end.copyWith(hour: 23, minute: 59, second: 59),
@@ -540,7 +543,7 @@ class Database {
     final isar = await db;
     IsarCollection<PenjualanModel> reportCollection =
         isar.collection<PenjualanModel>();
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       final List<PenjualanModel> res = await _supabaseHelper.getRepots();
       final items = await reportCollection.where().findAll();
       if (res.length == items.length) {
@@ -571,7 +574,7 @@ class Database {
   Future<void> addStore(StoreModel val) async {
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.storeModels.putSync(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.updateStore(val);
     }
   }
@@ -597,10 +600,10 @@ class Database {
 
   // presense
   Future<void> addPresense(PresenceModel val) async {
-    val.isSynced = isDeviceConnected.value;
+    val.isSynced = isDeviceConnected.value && supabase.auth.currentUser != null;
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.presenceModels.putSync(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.addPresense(val.toJson());
     }
   }
@@ -668,10 +671,10 @@ class Database {
 
   // rent item
   Future<void> addRentItem(RentItemModel val) async {
-    val.isSynced = isDeviceConnected.value;
+    val.isSynced = isDeviceConnected.value && supabase.auth.currentUser != null;
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.rentItemModels.putSync(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.addRentItem(val.toJson());
     }
   }
@@ -695,7 +698,7 @@ class Database {
   Future<void> deleteRentItem(int val) async {
     final isar = await db;
     isar.writeTxn<bool>(() async => await isar.rentItemModels.delete(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.removeRentItem(val);
     }
   }
@@ -703,7 +706,7 @@ class Database {
   Future<void> updateRentItem(RentItemModel val) async {
     final isar = await db;
     isar.writeTxn<int>(() async => await isar.rentItemModels.put(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.updateRentItem(val);
     }
   }
@@ -753,10 +756,10 @@ class Database {
 
   // rent
   Future<void> addRent(RentModel val) async {
-    val.isSynced = isDeviceConnected.value;
+    val.isSynced = isDeviceConnected.value && supabase.auth.currentUser != null;
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.rentModels.putSync(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.addRent(val.toJson());
     }
   }
@@ -770,7 +773,7 @@ class Database {
   Future<void> updateRent(RentModel val) async {
     final isar = await db;
     isar.writeTxn<int>(() async => await isar.rentModels.put(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.updateRent(val);
     }
   }
@@ -826,10 +829,10 @@ class Database {
 
   // expenses
   Future<void> addExpenses(ExpensesModel val) async {
-    val.isSynced = isDeviceConnected.value;
+    val.isSynced = isDeviceConnected.value && supabase.auth.currentUser != null;
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.expensesModels.putSync(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.addExpenses(val.toJson());
     }
   }
@@ -837,7 +840,7 @@ class Database {
   Future<void> deleteExpenses(int val) async {
     final isar = await db;
     isar.writeTxn<bool>(() async => await isar.expensesModels.delete(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.removeExpenses(val);
     }
   }
@@ -905,10 +908,10 @@ class Database {
 
   // Salary
   Future<void> addSalary(SalaryModel val) async {
-    val.isSynced = isDeviceConnected.value;
+    val.isSynced = isDeviceConnected.value && supabase.auth.currentUser != null;
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.salaryModels.putSync(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.addSalary(val.toJson());
     }
   }
@@ -924,7 +927,7 @@ class Database {
   Future<void> updateSalary(SalaryModel val) async {
     final isar = await db;
     isar.writeTxn<int>(() async => await isar.salaryModels.put(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.updateSalary(val);
     }
   }
@@ -932,7 +935,7 @@ class Database {
   Future<void> deleteSalary(int val) async {
     final isar = await db;
     isar.writeTxn<bool>(() async => await isar.salaryModels.delete(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.removeSalary(val);
     }
   }
@@ -988,10 +991,10 @@ class Database {
   // due payment
   // inventory
   Future<void> addDuePayment(DuePaymentModel val) async {
-    val.isSynced = isDeviceConnected.value;
+    val.isSynced = isDeviceConnected.value && supabase.auth.currentUser != null;
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.duePaymentModels.putSync(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.addDuePayment(val.toJson());
     }
   }
@@ -999,7 +1002,7 @@ class Database {
   Future<void> deleteDuePayment(int val) async {
     final isar = await db;
     isar.writeTxn<bool>(() async => await isar.duePaymentModels.delete(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.removeDuePayment(val);
     }
   }
@@ -1007,7 +1010,7 @@ class Database {
   Future<void> updateDuePayment(DuePaymentModel val) async {
     final isar = await db;
     isar.writeTxn<int>(() async => await isar.duePaymentModels.put(val));
-    if (isDeviceConnected.value) {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
       _supabaseHelper.updateDuePayment(val);
     }
   }

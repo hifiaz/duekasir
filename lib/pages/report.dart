@@ -9,6 +9,7 @@ import 'package:due_kasir/pages/report/report_bestseller.dart';
 import 'package:due_kasir/pages/report/report_delete_dialog.dart';
 import 'package:due_kasir/pages/report/report_out_of_stock_all.dart';
 import 'package:due_kasir/pages/report/report_revenue.dart';
+import 'package:due_kasir/pages/report/report_sync_dialog.dart';
 import 'package:due_kasir/pages/report/report_visitor_weekly.dart';
 import 'package:due_kasir/pages/report/report_visitors.dart';
 import 'package:due_kasir/service/database.dart';
@@ -399,22 +400,47 @@ class _ReportState extends State<Report> {
                                               val.quantity!)),
                                     ),
                                   ),
-                                  ShadButton.outline(
-                                    onPressed: () {
-                                      showShadDialog(
-                                          context: context,
-                                          builder: (context) =>
-                                              ReportDeleteDialog(
-                                                  id: detail.id!));
-                                    },
-                                    text: const Text('Delete'),
-                                    icon: const Padding(
-                                      padding: EdgeInsets.only(right: 8),
-                                      child: Icon(
-                                        Icons.delete,
-                                        size: 16,
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      ShadButton.secondary(
+                                        onPressed: () {
+                                          showShadDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                ReportSyncDialog(
+                                              id: detail.id!,
+                                              detail: detail,
+                                            ),
+                                          );
+                                        },
+                                        text: const Text('Sync'),
+                                        icon: const Padding(
+                                          padding: EdgeInsets.only(right: 8),
+                                          child: Icon(
+                                            Icons.sync,
+                                            size: 16,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      ShadButton.outline(
+                                        onPressed: () {
+                                          showShadDialog(
+                                              context: context,
+                                              builder: (context) =>
+                                                  ReportDeleteDialog(
+                                                      id: detail.id!));
+                                        },
+                                        text: const Text('Delete'),
+                                        icon: const Padding(
+                                          padding: EdgeInsets.only(right: 8),
+                                          child: Icon(
+                                            Icons.delete,
+                                            size: 16,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),

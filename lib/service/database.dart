@@ -397,6 +397,12 @@ class Database {
     }
   }
 
+  Future<void> syncItemPenjualan(PenjualanModel val) async {
+    if (isDeviceConnected.value && supabase.auth.currentUser != null) {
+      _supabaseHelper.addReport(val.toJson());
+    }
+  }
+
   Future<void> removePenjualan(int val) async {
     final isar = await db;
     isar.writeTxn<bool>(() => isar.penjualanModels.delete(val));

@@ -86,7 +86,7 @@ class _ReportSyncDialogState extends State<ReportSyncDialog> {
                   }
                 }
               },
-              text: const Text('Delete'))
+              text: const Text('Sync'))
         ],
       ),
     );

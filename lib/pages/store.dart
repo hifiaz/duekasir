@@ -75,68 +75,11 @@ class _StoreState extends State<Store> {
                       title: Text('Account Login', style: theme.textTheme.h4),
                       description: const Text(
                           'Make sure you have login with your account'),
-                      content: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            ShadInputFormField(
-                              initialValue: t?.title,
-                              label: const Text('Title Store'),
-                              placeholder: const Text('Store'),
-                              controller: title,
-                              validator: (v) {
-                                if (v.length < 2) {
-                                  return 'Title must be at least 2 characters.';
-                                }
-                                return null;
-                              },
-                            ),
-                            ShadInputFormField(
-                              label: const Text('Description/Location'),
-                              placeholder: const Text('Texas, US'),
-                              controller: description,
-                              maxLines: 2,
-                              validator: (v) {
-                                if (v.length < 2) {
-                                  return 'Description must be at least 2 characters.';
-                                }
-                                return null;
-                              },
-                            ),
-                            ShadInputFormField(
-                              label: const Text('Phone'),
-                              placeholder:
-                                  const Text('Whatsapp/Phone: +6285111222333'),
-                              controller: phone,
-                              validator: (v) {
-                                if (v.length < 2) {
-                                  return 'Phone must be at least 2 characters.';
-                                }
-                                return null;
-                              },
-                            ),
-                            ShadInputFormField(
-                              label: const Text('Footer'),
-                              placeholder:
-                                  const Text('Thanks for visiting us!'),
-                              controller: footer,
-                            ),
-                            ShadInputFormField(
-                              label: const Text('Sub Footer'),
-                              placeholder:
-                                  const Text('Follow us on social media'),
-                              controller: subFooter,
-                            ),
-                          ],
-                        ),
-                      ),
                       footer: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           ShadButton(
-                            text: const Text('Save'),
+                            child: const Text('Save'),
                             onPressed: () {
                               if (_storeFormKey.currentState!.validate()) {
                                 if (store.value != null) {
@@ -194,6 +137,63 @@ class _StoreState extends State<Store> {
                             },
                           ),
                         ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ShadInputFormField(
+                              initialValue: t?.title,
+                              label: const Text('Title Store'),
+                              placeholder: const Text('Store'),
+                              controller: title,
+                              validator: (v) {
+                                if (v.length < 2) {
+                                  return 'Title must be at least 2 characters.';
+                                }
+                                return null;
+                              },
+                            ),
+                            ShadInputFormField(
+                              label: const Text('Description/Location'),
+                              placeholder: const Text('Texas, US'),
+                              controller: description,
+                              maxLines: 2,
+                              validator: (v) {
+                                if (v.length < 2) {
+                                  return 'Description must be at least 2 characters.';
+                                }
+                                return null;
+                              },
+                            ),
+                            ShadInputFormField(
+                              label: const Text('Phone'),
+                              placeholder:
+                                  const Text('Whatsapp/Phone: +6285111222333'),
+                              controller: phone,
+                              validator: (v) {
+                                if (v.length < 2) {
+                                  return 'Phone must be at least 2 characters.';
+                                }
+                                return null;
+                              },
+                            ),
+                            ShadInputFormField(
+                              label: const Text('Footer'),
+                              placeholder:
+                                  const Text('Thanks for visiting us!'),
+                              controller: footer,
+                            ),
+                            ShadInputFormField(
+                              label: const Text('Sub Footer'),
+                              placeholder:
+                                  const Text('Follow us on social media'),
+                              controller: subFooter,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

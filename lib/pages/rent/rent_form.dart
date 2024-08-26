@@ -55,7 +55,7 @@ class RentForm extends HookWidget {
                     Icon(Icons.circle,
                         color: isConnected ? Colors.green : null),
                     ShadButton.ghost(
-                      text: const Text('Close'),
+                      child: const Text('Close'),
                       onPressed: () {
                         inventoryController.inventorySelected.value = null;
                         context.pop();
@@ -180,7 +180,7 @@ class RentForm extends HookWidget {
                     children: [
                       if (rent != null)
                         ShadButton.outline(
-                          text: const Text('Update'),
+                          child: const Text('Update'),
                           onPressed: () {
                             if (!rentFormKey.currentState!.validate()) {
                               return;
@@ -205,7 +205,7 @@ class RentForm extends HookWidget {
                                     .updateRent(updateitem)
                                     .whenComplete(() {
                                   Future.delayed(Durations.short1).then((_) {
-                                    context.pop();
+                                    if (context.mounted) context.pop();
                                     rentController.rents.refresh();
                                   });
                                 });
@@ -214,7 +214,7 @@ class RentForm extends HookWidget {
                           },
                         ),
                       ShadButton(
-                        text: Text(
+                        child: Text(
                             rent != null ? 'Customer Pay' : 'Save changes'),
                         onPressed: () {
                           if (!rentFormKey.currentState!.validate()) {
@@ -240,7 +240,7 @@ class RentForm extends HookWidget {
                                   .updateRent(updateitem)
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
-                                  context.pop();
+                                  if (context.mounted) context.pop();
                                   rentController.rents.refresh();
                                 });
                               });
@@ -261,7 +261,7 @@ class RentForm extends HookWidget {
                               );
                               Database().addRent(newItem).whenComplete(() {
                                 rentController.rents.refresh();
-                                context.pop();
+                                if (context.mounted) context.pop();
                               });
                             }
                           }

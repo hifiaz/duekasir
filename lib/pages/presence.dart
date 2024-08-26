@@ -26,7 +26,6 @@ class Presence extends StatelessWidget {
             onPressed: () {
               presenceController.presence.refresh();
             },
-            text: const Text('Refresh'),
             icon: const Padding(
               padding: EdgeInsets.only(right: 8),
               child: Icon(
@@ -34,6 +33,7 @@ class Presence extends StatelessWidget {
                 size: 16,
               ),
             ),
+            child: const Text('Refresh'),
           ),
           PopupMenuButton<String>(
             onSelected: (item) async {
@@ -65,7 +65,7 @@ class Presence extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ShadButton.outline(
-                    text: Text(
+                    child: Text(
                         'Filter Date: ${dateWithoutTime.format(dateRange.first)} - ${dateWithoutTime.format(dateRange.last)}'),
                     onPressed: () async {
                       var results = await showCalendarDatePicker2Dialog(
@@ -85,7 +85,7 @@ class Presence extends StatelessWidget {
                       }
                     }),
                 ShadButton(
-                  text: const Text('Reset'),
+                  child: const Text('Reset'),
                   onPressed: () => presenceController.dateRange.value = [
                     DateTime.now().subtract(const Duration(days: 30)),
                     DateTime.now()
@@ -120,11 +120,11 @@ class Presence extends StatelessWidget {
                                   DataCell(
                                     val.status == 'checkin'
                                         ? ShadBadge(
-                                            text:
+                                            child:
                                                 Text(val.status.toUpperCase()),
                                           )
                                         : ShadBadge.destructive(
-                                            text:
+                                            child:
                                                 Text(val.status.toUpperCase()),
                                           ),
                                   ),

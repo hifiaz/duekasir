@@ -44,7 +44,7 @@ class UserForm extends HookWidget {
                 Align(
                   alignment: Alignment.centerRight,
                   child: ShadButton.ghost(
-                    text: const Text('Close'),
+                    child: const Text('Close'),
                     onPressed: () => context.pop(),
                   ),
                 ),
@@ -132,7 +132,7 @@ class UserForm extends HookWidget {
                     children: [
                       if (user != null)
                         ShadButton.destructive(
-                          text: const Text('Delete'),
+                          child: const Text('Delete'),
                           onPressed: () {
                             Database().deleteUser(user.id!).whenComplete(() {
                               userController.users.refresh();
@@ -141,7 +141,7 @@ class UserForm extends HookWidget {
                           },
                         ),
                       ShadButton(
-                        text: const Text('Save changes'),
+                        child: const Text('Save changes'),
                         onPressed: () {
                           if (editingName.text.isEmpty) {
                             return;

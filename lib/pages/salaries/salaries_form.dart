@@ -166,7 +166,7 @@ class _SalariesFormState extends State<SalariesForm> {
                   Row(
                     children: [
                       ShadButton.outline(
-                        text: Text(
+                        child: Text(
                             'Filter: ${dateWithoutTime.format(dateRange.first)} - ${dateWithoutTime.format(dateRange.last)}'),
                         onPressed: () async {
                           var results = await showCalendarDatePicker2Dialog(
@@ -209,7 +209,6 @@ class _SalariesFormState extends State<SalariesForm> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: ShadButton.secondary(
-                      text: const Text('Add'),
                       icon: const Padding(
                         padding: EdgeInsets.only(right: 8),
                         child: Icon(
@@ -223,6 +222,7 @@ class _SalariesFormState extends State<SalariesForm> {
                           formItems.add(buildItemField(itemsCount));
                         });
                       },
+                      child: const Text('Add'),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -237,7 +237,6 @@ class _SalariesFormState extends State<SalariesForm> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: ShadButton.secondary(
-                      text: const Text('Add Deduction'),
                       icon: const Padding(
                         padding: EdgeInsets.only(right: 8),
                         child: Icon(
@@ -252,6 +251,7 @@ class _SalariesFormState extends State<SalariesForm> {
                               .add(buildDeductionField(deductionCount));
                         });
                       },
+                      child: const Text('Add Deduction'),
                     ),
                   ),
                   ShadInputFormField(
@@ -259,7 +259,7 @@ class _SalariesFormState extends State<SalariesForm> {
                     label: const Text('Total'),
                     placeholder: const Text('ex: 10000'),
                     description: ShadButton.outline(
-                      text: Text('Count Total: ${tempTotal ?? ''}'),
+                      child: Text('Count Total: ${tempTotal ?? ''}'),
                       onPressed: () {
                         int itemTotal = 0;
                         int deductionsTotal = 0;
@@ -297,7 +297,7 @@ class _SalariesFormState extends State<SalariesForm> {
                   Align(
                     alignment: Alignment.bottomRight,
                     child: ShadButton(
-                      text: const Text('Save'),
+                      child: const Text('Save'),
                       onPressed: () {
                         if (salariesFormKey.currentState!.saveAndValidate()) {
                           SalaryModel salary = SalaryModel(
@@ -370,7 +370,7 @@ class _SalariesFormState extends State<SalariesForm> {
               Icons.delete,
               size: 16,
             ),
-            size: ShadButtonSize.icon,
+            size: ShadButtonSize.regular,
             onPressed: () {
               setState(() {
                 itemsCount--;
@@ -420,7 +420,7 @@ class _SalariesFormState extends State<SalariesForm> {
               Icons.delete,
               size: 16,
             ),
-            size: ShadButtonSize.icon,
+            size: ShadButtonSize.regular,
             onPressed: () {
               setState(() {
                 deductionCount--;

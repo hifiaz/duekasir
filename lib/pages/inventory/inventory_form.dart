@@ -83,7 +83,7 @@ class InventoryForm extends HookWidget {
                     Icon(Icons.circle,
                         color: isConnected ? Colors.green : null),
                     ShadButton.ghost(
-                      text: const Text('Close'),
+                      child: const Text('Close'),
                       onPressed: () {
                         inventoryController.inventorySelected.value = null;
                         context.pop();
@@ -234,13 +234,13 @@ class InventoryForm extends HookWidget {
                     children: [
                       if (item != null)
                         ShadButton.destructive(
-                          text: const Text('Delete'),
+                          child: const Text('Delete'),
                           onPressed: () {
                             Database()
                                 .deleteInventory(item.id!)
                                 .whenComplete(() {
                               inventoryController.inventorys.refresh();
-                              Navigator.pop(context);
+                              if (context.mounted) Navigator.pop(context);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -258,7 +258,7 @@ class InventoryForm extends HookWidget {
                           },
                         ),
                       ShadButton(
-                        text: const Text('Save changes'),
+                        child: const Text('Save changes'),
                         onPressed: () {
                           if (!inventoryFormKey.currentState!.validate()) {
                             return;
@@ -285,7 +285,7 @@ class InventoryForm extends HookWidget {
                                   .updateInventory(updateitem)
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
-                                  context.pop();
+                                  if (context.mounted) context.pop();
                                   inventoryController.inventorys.refresh();
                                   inventoryController.inventorySelected.value =
                                       null;
@@ -310,7 +310,7 @@ class InventoryForm extends HookWidget {
 
                               Database().addInventory(newItem).whenComplete(() {
                                 inventoryController.inventorys.refresh();
-                                context.pop();
+                                if (context.mounted) context.pop();
                               });
                             }
                           }

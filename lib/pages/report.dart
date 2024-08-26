@@ -62,7 +62,6 @@ class _ReportState extends State<Report> {
                     await Future.delayed(Durations.medium1);
                     isRefreshReport.value = false;
                   },
-            text: Text(isLoading ? 'Loading...' : 'Refresh'),
             icon: const Padding(
               padding: EdgeInsets.only(right: 8),
               child: Icon(
@@ -70,6 +69,7 @@ class _ReportState extends State<Report> {
                 size: 16,
               ),
             ),
+            child: Text(isLoading ? 'Loading...' : 'Refresh'),
           ),
           PopupMenuButton<String>(
             onSelected: (item) async {
@@ -105,7 +105,7 @@ class _ReportState extends State<Report> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ShadButton.outline(
-                    text: Text(
+                    child: Text(
                         'Filter: ${dateWithoutTime.format(dateRange.first)} - ${dateWithoutTime.format(dateRange.last)}'),
                     onPressed: () async {
                       var results = await showCalendarDatePicker2Dialog(
@@ -125,7 +125,7 @@ class _ReportState extends State<Report> {
                       }
                     }),
                 ShadButton(
-                  text: const Text('Reset'),
+                  child: const Text('Reset'),
                   onPressed: () => reportController.dateRange.value = [
                     DateTime.now().subtract(const Duration(days: 30)),
                     DateTime.now()
@@ -229,7 +229,7 @@ class _ReportState extends State<Report> {
                   title: const Text('Out of Stock'),
                   description: Text(
                       'You have ${reportOutOfStcok.value?.length} item out of stock.'),
-                  content: Column(
+                  child: Column(
                     children: [
                       const SizedBox(height: 16),
                       if (reportOutOfStcok.hasValue) ...[
@@ -291,7 +291,7 @@ class _ReportState extends State<Report> {
                                       items: reportOutOfStcok.value!)),
                             );
                           },
-                          text: const Text('See All'),
+                          child: const Text('See All'),
                         ),
                       ]
                     ],
@@ -303,7 +303,7 @@ class _ReportState extends State<Report> {
             const SizedBox(height: 20),
             const ShadCard(
               title: Text('Report Revenue by Day'),
-              content: Padding(
+              child: Padding(
                 padding: EdgeInsets.only(top: 20.0),
                 child: ReportRevenue(),
               ),
@@ -313,7 +313,7 @@ class _ReportState extends State<Report> {
             const SizedBox(height: 20),
             ShadCard(
               title: const Text('List Sales'),
-              content: Padding(
+              child: Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Column(
                   children: [
@@ -371,7 +371,7 @@ class _ReportState extends State<Report> {
                                   ),
                                 ],
                               ),
-                              content: Column(
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   ...detail.items.map(
@@ -414,7 +414,6 @@ class _ReportState extends State<Report> {
                                             ),
                                           );
                                         },
-                                        text: const Text('Sync'),
                                         icon: const Padding(
                                           padding: EdgeInsets.only(right: 8),
                                           child: Icon(
@@ -422,6 +421,7 @@ class _ReportState extends State<Report> {
                                             size: 16,
                                           ),
                                         ),
+                                        child: const Text('Sync'),
                                       ),
                                       ShadButton.outline(
                                         onPressed: () {
@@ -431,7 +431,6 @@ class _ReportState extends State<Report> {
                                                   ReportDeleteDialog(
                                                       id: detail.id!));
                                         },
-                                        text: const Text('Delete'),
                                         icon: const Padding(
                                           padding: EdgeInsets.only(right: 8),
                                           child: Icon(
@@ -439,6 +438,7 @@ class _ReportState extends State<Report> {
                                             size: 16,
                                           ),
                                         ),
+                                        child: const Text('Delete'),
                                       ),
                                     ],
                                   ),

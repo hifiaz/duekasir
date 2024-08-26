@@ -17,7 +17,7 @@ class ReportVisitors extends StatelessWidget {
       width: width,
       title: const Text('Total Visitors'),
       description: const Text('How many people come to buy'),
-      content: Column(
+      child: Column(
         children: [
           const SizedBox(height: 16),
           if (reportIncome.hasValue) ...[
@@ -47,7 +47,7 @@ class ReportVisitors extends StatelessWidget {
                           ReportVisitorAll(items: reportIncome.value!)),
                 );
               },
-              text: const Text('See All'),
+              child: const Text('See All'),
             ),
           ]
         ],

@@ -102,7 +102,6 @@ class _RequestFormState extends State<RequestForm> {
                     requestController.requests.refresh();
                     if (context.mounted) Navigator.pop(context);
                   },
-            text: const Text('Simpan'),
             icon: const Padding(
               padding: EdgeInsets.only(right: 8),
               child: Icon(
@@ -110,6 +109,7 @@ class _RequestFormState extends State<RequestForm> {
                 size: 16,
               ),
             ),
+            child: const Text('Simpan'),
           ),
           if (widget.request != null)
             ShadButton.destructive(

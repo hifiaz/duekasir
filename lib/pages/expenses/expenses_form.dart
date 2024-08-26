@@ -23,7 +23,25 @@ class ExpensesForm extends HookWidget {
       child: ShadSheet(
         title: const Text('Expenses'),
         description: const Text("Make every money out, write here"),
-        content: Form(
+        actions: [
+          ShadButton(
+              onPressed: () async {
+                if (expensesFormKey.currentState!.validate()) {
+                  final newItem = ExpensesModel(
+                      id: DateTime.now().microsecondsSinceEpoch,
+                      title: title.text,
+                      amount: int.parse(amount.text),
+                      note: note.text,
+                      createdAt: date.value);
+                  await Database().addExpenses(newItem).whenComplete(() {
+                    expensesController.expenses.refresh();
+                    if (context.mounted) context.pop();
+                  });
+                }
+              },
+              child: const Text('Save changes')),
+        ],
+        child: Form(
           key: expensesFormKey,
           child: SizedBox(
             width: side == ShadSheetSide.bottom || side == ShadSheetSide.top
@@ -67,9 +85,6 @@ class ExpensesForm extends HookWidget {
                               lastDate: DateTime(2101));
                           date.value = pickedDate!;
                         },
-                        text: Text(date.value == null
-                            ? 'Pick Date'
-                            : dateWithoutTime.format(date.value!)),
                         icon: const Padding(
                           padding: EdgeInsets.only(right: 8),
                           child: Icon(
@@ -77,6 +92,9 @@ class ExpensesForm extends HookWidget {
                             size: 16,
                           ),
                         ),
+                        child: Text(date.value == null
+                            ? 'Pick Date'
+                            : dateWithoutTime.format(date.value!)),
                       ),
                     ),
                   ],
@@ -91,24 +109,6 @@ class ExpensesForm extends HookWidget {
             ),
           ),
         ),
-        actions: [
-          ShadButton(
-              onPressed: () async {
-                if (expensesFormKey.currentState!.validate()) {
-                  final newItem = ExpensesModel(
-                      id: DateTime.now().microsecondsSinceEpoch,
-                      title: title.text,
-                      amount: int.parse(amount.text),
-                      note: note.text,
-                      createdAt: date.value);
-                  await Database().addExpenses(newItem).whenComplete(() {
-                    expensesController.expenses.refresh();
-                    context.pop();
-                  });
-                }
-              },
-              text: const Text('Save changes')),
-        ],
       ),
     );
   }

@@ -21,7 +21,6 @@ class Users extends StatelessWidget {
             onPressed: () {
               userController.users.refresh();
             },
-            text: const Text('Refresh'),
             icon: const Padding(
               padding: EdgeInsets.only(right: 8),
               child: Icon(
@@ -29,6 +28,7 @@ class Users extends StatelessWidget {
                 size: 16,
               ),
             ),
+            child: const Text('Refresh'),
           ),
           PopupMenuButton<String>(
             onSelected: (item) async {

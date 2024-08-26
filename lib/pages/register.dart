@@ -74,7 +74,7 @@ class _RegisterState extends State<Register> {
                 ),
                 const SizedBox(height: 16),
                 ShadButton(
-                  text: const Text('Register'),
+                  child: const Text('Register'),
                   onPressed: () async {
                     if (formKey.currentState!.saveAndValidate()) {
                       try {
@@ -91,14 +91,16 @@ class _RegisterState extends State<Register> {
                                 description:
                                     const Text('Login and Enjoy Due Kasir!'),
                                 action: ShadButton.outline(
-                                  text: const Text('Back!'),
+                                  child: const Text('Back!'),
                                   onPressed: () =>
                                       ShadToaster.of(context).hide(),
                                 ),
                               ),
                             );
                             Future.delayed(const Duration(seconds: 2))
-                                .then((_) => context.go('/login'));
+                                .then((_) {
+                              if (context.mounted) context.go('/login');
+                            });
                           }
                         }
                       } on AuthException catch (e) {

@@ -78,7 +78,6 @@ class _ReportVisitorWeekLyState extends State<ReportVisitorWeekLy> {
                 });
               }
             },
-            text: const Text('Refresh'),
             icon: const Padding(
               padding: EdgeInsets.only(right: 8),
               child: Icon(
@@ -86,10 +85,11 @@ class _ReportVisitorWeekLyState extends State<ReportVisitorWeekLy> {
                 size: 16,
               ),
             ),
+            child: const Text('Refresh'),
           ),
         ],
       ),
-      content: Padding(
+      child: Padding(
         padding: const EdgeInsets.only(top: 20.0),
         child: loading
             ? const Center(

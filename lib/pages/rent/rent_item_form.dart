@@ -55,7 +55,7 @@ class RentItemForm extends HookWidget {
                     Icon(Icons.circle,
                         color: isConnected ? Colors.green : null),
                     ShadButton.ghost(
-                      text: const Text('Close'),
+                      child: const Text('Close'),
                       onPressed: () {
                         inventoryController.inventorySelected.value = null;
                         context.pop();
@@ -171,13 +171,13 @@ class RentItemForm extends HookWidget {
                     children: [
                       if (item != null)
                         ShadButton.destructive(
-                          text: const Text('Delete'),
+                          child: const Text('Delete'),
                           onPressed: () {
                             Database()
                                 .deleteRentItem(item.id!)
                                 .whenComplete(() {
                               rentController.rentItems.refresh();
-                              Navigator.pop(context);
+                              if (context.mounted) Navigator.pop(context);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -195,7 +195,7 @@ class RentItemForm extends HookWidget {
                           },
                         ),
                       ShadButton(
-                        text: const Text('Save changes'),
+                        child: const Text('Save changes'),
                         onPressed: () {
                           if (!rentItemFormKey.currentState!.validate()) {
                             return;
@@ -217,7 +217,7 @@ class RentItemForm extends HookWidget {
                                   .updateRentItem(updateitem)
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
-                                  context.pop();
+                                  if (context.mounted) context.pop();
                                   rentController.rentItems.refresh();
                                   rentController.rentItemSelected.value = null;
                                 });
@@ -237,7 +237,7 @@ class RentItemForm extends HookWidget {
 
                               Database().addRentItem(newItem).whenComplete(() {
                                 rentController.rentItems.refresh();
-                                context.pop();
+                                if (context.mounted) context.pop();
                               });
                             }
                           }

@@ -48,7 +48,7 @@ class CustomerForm extends HookWidget {
                   Align(
                     alignment: Alignment.centerRight,
                     child: ShadButton.ghost(
-                        text: const Text('Close'),
+                        child: const Text('Close'),
                         onPressed: () => context.pop()),
                   ),
                   ShadInputFormField(
@@ -131,7 +131,7 @@ class CustomerForm extends HookWidget {
                       children: [
                         if (customer != null)
                           ShadButton.destructive(
-                            text: const Text('Delete'),
+                            child: const Text('Delete'),
                             onPressed: () {
                               Database()
                                   .deleteCustomer(customer.id!)
@@ -142,7 +142,7 @@ class CustomerForm extends HookWidget {
                             },
                           ),
                         ShadButton(
-                          text: const Text('Save changes'),
+                          child: const Text('Save changes'),
                           onPressed: () {
                             if (customerFormKey.currentState!.validate()) {
                               if (customer != null) {
@@ -161,7 +161,7 @@ class CustomerForm extends HookWidget {
                                     .whenComplete(() {
                                   Future.delayed(Durations.short1).then((_) {
                                     customerController.customer.refresh();
-                                    context.pop();
+                                    if (context.mounted) context.pop();
                                   });
                                 });
                               } else {
@@ -181,7 +181,7 @@ class CustomerForm extends HookWidget {
                                     .addNewCustomer(newCustomer)
                                     .whenComplete(() {
                                   customerController.customer.refresh();
-                                  context.pop();
+                                  if (context.mounted) context.pop();
                                 });
                               }
                             }

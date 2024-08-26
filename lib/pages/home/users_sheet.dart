@@ -21,7 +21,7 @@ class UsersSheet extends StatelessWidget {
         title: const Text('List Profile'),
         description: const Text(
             "Make changes to your profile here. Click save when you're done"),
-        content: SizedBox(
+        child: SizedBox(
           width: side == ShadSheetSide.bottom || side == ShadSheetSide.top
               ? MediaQuery.sizeOf(context).width
               : null,
@@ -36,9 +36,10 @@ class UsersSheet extends StatelessWidget {
                           .map((p) => ListTile(
                                 title: Text(p.nama),
                                 subtitle: Text(p.keterangan ?? ''),
-                                trailing: Icon(auth.value?.user.value?.id == p.id
-                                    ? Icons.check_box
-                                    : Icons.check_box_outline_blank),
+                                trailing: Icon(
+                                    auth.value?.user.value?.id == p.id
+                                        ? Icons.check_box
+                                        : Icons.check_box_outline_blank),
                                 onTap: () async {
                                   if (auth.hasValue) {
                                     final user = AuthModel()
@@ -47,7 +48,8 @@ class UsersSheet extends StatelessWidget {
                                     await Database()
                                         .changeUser(user)
                                         .whenComplete(
-                                          () => authController.customer.refresh(),
+                                          () =>
+                                              authController.customer.refresh(),
                                         );
                                   } else {
                                     final user = AuthModel()

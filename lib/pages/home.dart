@@ -24,7 +24,7 @@ class Home extends StatelessWidget {
           ShadButton.ghost(
             icon: const Padding(
                 padding: EdgeInsets.only(right: 8), child: Icon(Icons.store)),
-            text: const Text('Store'),
+            child: const Text('Store'),
             onPressed: () {
               context.push('/home/store');
             },
@@ -41,14 +41,29 @@ class Home extends StatelessWidget {
                 Text('Account Login', style: theme.textTheme.h4),
                 if (user == null)
                   ShadButton.outline(
-                    text: const Text('Login'),
+                    child: const Text('Login'),
                     onPressed: () => context.push('/login'),
                   ),
               ],
             ),
             description:
                 const Text('Make sure you have login with your account'),
-            content: Padding(
+            footer: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ShadButton(
+                  child: const Text('Change'),
+                  onPressed: () {
+                    showShadSheet(
+                      side: ShadSheetSide.right,
+                      context: context,
+                      builder: (context) => const UsersSheet(),
+                    );
+                  },
+                ),
+              ],
+            ),
+            child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -61,21 +76,6 @@ class Home extends StatelessWidget {
                   Text(auth.value?.user.value?.keterangan ?? 'Super User'),
                 ],
               ),
-            ),
-            footer: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ShadButton(
-                  text: const Text('Change'),
-                  onPressed: () {
-                    showShadSheet(
-                      side: ShadSheetSide.right,
-                      context: context,
-                      builder: (context) => const UsersSheet(),
-                    );
-                  },
-                ),
-              ],
             ),
           ),
         ),

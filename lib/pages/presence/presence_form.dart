@@ -33,7 +33,42 @@ class _PresenceFormState extends State<PresenceForm> {
       title: const Text('Present'),
       description: const Text(
           "Make sure you have choise your profile and check in or out"),
-      content: Form(
+      actions: [
+        ShadButton(
+            onPressed: () async {
+              if (formPresenseKey.currentState!.validate() &&
+                  userSelected != null) {
+                if (Platform.isWindows) {
+                  // final XFile image =
+                  //     await CameraPlatform.instance.takePicture(_cameraId);
+
+                  // final Directory duplicateFilePath =
+                  //     await getApplicationDocumentsDirectory();
+
+                  // final fileName = basename(image.path);
+                  // await image.saveTo('$duplicateFilePath/$fileName');
+                  Database().addPresense(PresenceModel(
+                      id: DateTime.now().microsecondsSinceEpoch,
+                      user: userSelected!.id!,
+                      status: status!.name,
+                      createdAt: DateTime.now()));
+                } else {
+                  Database()
+                      .addPresense(PresenceModel(
+                          id: DateTime.now().microsecondsSinceEpoch,
+                          user: userSelected!.id!,
+                          status: status!.name,
+                          createdAt: DateTime.now()))
+                      .whenComplete(() {
+                    presenceController.presence.refresh();
+                    if (context.mounted) context.pop();
+                  });
+                }
+              }
+            },
+            child: const Text('Save')),
+      ],
+      child: Form(
         key: formPresenseKey,
         child: SizedBox(
           width: widget.side == ShadSheetSide.bottom ||
@@ -58,7 +93,7 @@ class _PresenceFormState extends State<PresenceForm> {
                               DataCell(Text(user.id.toString())),
                               DataCell(Text(user.nama)),
                               DataCell(ShadButton(
-                                text: Text(user == userSelected
+                                child: Text(user == userSelected
                                     ? 'Selected'
                                     : 'Select'),
                                 onPressed: () {
@@ -100,41 +135,6 @@ class _PresenceFormState extends State<PresenceForm> {
           ),
         ),
       ),
-      actions: [
-        ShadButton(
-            onPressed: () async {
-              if (formPresenseKey.currentState!.validate() &&
-                  userSelected != null) {
-                if (Platform.isWindows) {
-                  // final XFile image =
-                  //     await CameraPlatform.instance.takePicture(_cameraId);
-
-                  // final Directory duplicateFilePath =
-                  //     await getApplicationDocumentsDirectory();
-
-                  // final fileName = basename(image.path);
-                  // await image.saveTo('$duplicateFilePath/$fileName');
-                  Database().addPresense(PresenceModel(
-                      id: DateTime.now().microsecondsSinceEpoch,
-                      user: userSelected!.id!,
-                      status: status!.name,
-                      createdAt: DateTime.now()));
-                } else {
-                  Database()
-                      .addPresense(PresenceModel(
-                          id: DateTime.now().microsecondsSinceEpoch,
-                          user: userSelected!.id!,
-                          status: status!.name,
-                          createdAt: DateTime.now()))
-                      .whenComplete(() {
-                    presenceController.presence.refresh();
-                    context.pop();
-                  });
-                }
-              }
-            },
-            text: const Text('Save')),
-      ],
     );
   }
 }

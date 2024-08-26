@@ -128,16 +128,20 @@ class NavDrawer extends StatelessWidget {
                         description:
                             const Text('Please pick isar file to restore'),
                         action: ShadButton.outline(
-                          text: const Text('Select'),
-                          onPressed: () => Database()
-                              .restoreDB()
-                              .whenComplete(() => ShadToaster.of(context).show(
-                                    const ShadToast(
-                                      title: Text('Restore Database Success!'),
-                                      description: Text(
-                                          'Please make sure all data is imported'),
-                                    ),
-                                  )),
+                          child: const Text('Select'),
+                          onPressed: () => Database().restoreDB().whenComplete(
+                            () {
+                              if (context.mounted) {
+                                ShadToaster.of(context).show(
+                                  const ShadToast(
+                                    title: Text('Restore Database Success!'),
+                                    description: Text(
+                                        'Please make sure all data is imported'),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
                         ),
                       ),
                     );
@@ -164,15 +168,17 @@ class NavDrawer extends StatelessWidget {
                         ),
                         actions: [
                           ShadButton.outline(
-                            text: const Text('Cancel'),
+                            child: const Text('Cancel'),
                             onPressed: () => Navigator.of(context).pop(false),
                           ),
                           ShadButton(
-                            text: const Text('Continue'),
+                            child: const Text('Continue'),
                             onPressed: () async {
                               await Database().clearAllData().whenComplete(() {
-                                Navigator.of(context).pop(true);
-                                context.go('/');
+                                if (context.mounted) {
+                                  Navigator.of(context).pop(true);
+                                  context.go('/');
+                                }
                               });
                             },
                           ),

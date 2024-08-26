@@ -16,7 +16,7 @@ class DuePayment extends StatefulWidget {
   State<DuePayment> createState() => _DuePaymentState();
 }
 
-class _DuePaymentState extends State<DuePayment> {
+class _DuePaymentState extends State<DuePayment> with SignalsMixin {
   @override
   Widget build(BuildContext context) {
     final payment = duePaymentController.payments.watch(context);
@@ -30,7 +30,6 @@ class _DuePaymentState extends State<DuePayment> {
             onPressed: () {
               duePaymentController.payments.refresh();
             },
-            text: const Text('Refresh'),
             icon: const Padding(
               padding: EdgeInsets.only(right: 8),
               child: Icon(
@@ -38,6 +37,7 @@ class _DuePaymentState extends State<DuePayment> {
                 size: 16,
               ),
             ),
+            child: const Text('Refresh'),
           ),
           PopupMenuButton<String>(
             onSelected: (item) async {
@@ -81,10 +81,10 @@ class _DuePaymentState extends State<DuePayment> {
                               i.status == 'paid'
                                   ? ShadBadge(
                                       backgroundColor: Colors.green,
-                                      text: Text(i.status.toUpperCase()),
+                                      child: Text(i.status.toUpperCase()),
                                     )
                                   : ShadBadge.destructive(
-                                      text: Text(i.status.toUpperCase()),
+                                      child: Text(i.status.toUpperCase()),
                                     ),
                               Text(currency.format(i.amount)),
                               Text(
@@ -145,10 +145,10 @@ class _DuePaymentState extends State<DuePayment> {
                           item.status == 'paid'
                               ? ShadBadge(
                                   backgroundColor: Colors.green,
-                                  text: Text(item.status.toUpperCase()),
+                                  child: Text(item.status.toUpperCase()),
                                 )
                               : ShadBadge.destructive(
-                                  text: Text(item.status.toUpperCase()),
+                                  child: Text(item.status.toUpperCase()),
                                 ),
                         ),
                         DataCell(Text(item.note ?? '')),

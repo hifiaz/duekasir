@@ -14,7 +14,7 @@ class UserSheet extends StatelessWidget {
     return ShadSheet(
       title: const Text('List Customer'),
       description: const Text("Pick customer who whant to buy"),
-      content: SizedBox(
+      child: SizedBox(
         width: side == ShadSheetSide.bottom || side == ShadSheetSide.top
             ? MediaQuery.sizeOf(context).width
             : null,

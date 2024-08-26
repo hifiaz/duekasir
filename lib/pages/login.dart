@@ -24,7 +24,7 @@ class _LoginState extends State<Login> {
         title: const Text('Login'),
         actions: [
           ShadButton.outline(
-            text: const Text('Back'),
+            child: const Text('Back'),
             onPressed: () {
               context.go('/sync');
             },
@@ -81,7 +81,7 @@ class _LoginState extends State<Login> {
                 ),
                 const SizedBox(height: 16),
                 ShadButton(
-                  text: const Text('Login'),
+                  child: const Text('Login'),
                   onPressed: () async {
                     if (formKey.currentState!.saveAndValidate()) {
                       try {
@@ -97,14 +97,16 @@ class _LoginState extends State<Login> {
                                 title: const Text('Login Success'),
                                 description: const Text('Enjoy Due Kasir!'),
                                 action: ShadButton.outline(
-                                  text: const Text('Back!'),
+                                  child: const Text('Back!'),
                                   onPressed: () =>
                                       ShadToaster.of(context).hide(),
                                 ),
                               ),
                             );
                             Future.delayed(const Duration(seconds: 2))
-                                .then((_) => context.go('/sync'));
+                                .then((_) {
+                              if (context.mounted) context.go('/sync');
+                            });
                           }
                         }
                       } on AuthException catch (e) {

@@ -63,7 +63,7 @@ class _RequestCardState extends State<RequestCard> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 5.0),
                         child: ShadButton(
-                          text: const Text('Save'),
+                          child: const Text('Save'),
                           onPressed: () async {
                             if (title.text.isNotEmpty) {
                               RequestModel request = RequestModel(
@@ -95,22 +95,12 @@ class _RequestCardState extends State<RequestCard> {
         ],
       ),
       description: Text(dateWithTime.format(widget.val.createdAt!)),
-      content: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text('Document Size: ${(widget.val.note ?? '').length}'),
-          ],
-        ),
-      ),
       footer: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text('Status: ${widget.val.status ?? ''}'),
           ShadButton(
-            text: const Text('See Detail'),
+            child: const Text('See Detail'),
             onPressed: () {
               Navigator.push(
                 context,
@@ -120,6 +110,16 @@ class _RequestCardState extends State<RequestCard> {
             },
           ),
         ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('Document Size: ${(widget.val.note ?? '').length}'),
+          ],
+        ),
       ),
     );
   }

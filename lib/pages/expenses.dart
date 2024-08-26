@@ -27,7 +27,6 @@ class Expanses extends StatelessWidget {
             onPressed: () {
               expensesController.expenses.refresh();
             },
-            text: const Text('Refresh'),
             icon: const Padding(
               padding: EdgeInsets.only(right: 8),
               child: Icon(
@@ -35,6 +34,7 @@ class Expanses extends StatelessWidget {
                 size: 16,
               ),
             ),
+            child: const Text('Refresh'),
           ),
           PopupMenuButton<String>(
             onSelected: (item) async {
@@ -66,7 +66,7 @@ class Expanses extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ShadButton.outline(
-                    text: Text(
+                    child: Text(
                         'Filter Date: ${dateWithoutTime.format(dateRange.first)} - ${dateWithoutTime.format(dateRange.last)}'),
                     onPressed: () async {
                       var results = await showCalendarDatePicker2Dialog(
@@ -86,7 +86,7 @@ class Expanses extends StatelessWidget {
                       }
                     }),
                 ShadButton(
-                  text: const Text('Reset'),
+                  child: const Text('Reset'),
                   onPressed: () => expensesController.dateRange.value = [
                     DateTime.now().subtract(const Duration(days: 30)),
                     DateTime.now()
@@ -141,7 +141,6 @@ class Expanses extends StatelessWidget {
                                       onPressed: () {
                                         expensesController.expenses.refresh();
                                       },
-                                      text: const Text('Delete'),
                                       icon: const Padding(
                                         padding: EdgeInsets.only(right: 8),
                                         child: Icon(
@@ -149,6 +148,7 @@ class Expanses extends StatelessWidget {
                                           size: 16,
                                         ),
                                       ),
+                                      child: const Text('Delete'),
                                     ),
                                   ),
                                 ]))

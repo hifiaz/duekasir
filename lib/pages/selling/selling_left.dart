@@ -52,7 +52,7 @@ class SellingLeft extends HookWidget {
                               description:
                                   const Text('You can add it on inventory'),
                               action: ShadButton.outline(
-                                text: const Text('Ok'),
+                                child: const Text('Ok'),
                                 onPressed: () => ShadToaster.of(context).hide(),
                               ),
                             ),
@@ -179,7 +179,7 @@ class SellingLeft extends HookWidget {
                               description:
                                   const Text('You can add it on inventory'),
                               action: ShadButton.outline(
-                                text: const Text('Ok'),
+                                child: const Text('Ok'),
                                 onPressed: () => ShadToaster.of(context).hide(),
                               ),
                             ),
@@ -269,13 +269,13 @@ class SellingLeft extends HookWidget {
                                           ),
                                           actions: [
                                             ShadButton.outline(
-                                              text: const Text('Batal'),
+                                              child: const Text('Batal'),
                                               onPressed: () =>
                                                   Navigator.of(context)
                                                       .pop(false),
                                             ),
                                             ShadButton(
-                                                text: const Text('Lanjutkan'),
+                                                child: const Text('Lanjutkan'),
                                                 onPressed: () {
                                                   getIt
                                                       .get<SellingController>()

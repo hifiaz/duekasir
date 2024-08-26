@@ -42,7 +42,7 @@ class ReportBestSeller extends HookWidget {
       width: width,
       title: const Text('Best Seller'),
       description: const Text('Items base on how many item sold'),
-      content: Column(
+      child: Column(
         children: [
           const SizedBox(height: 16),
           ...items
@@ -92,7 +92,7 @@ class ReportBestSeller extends HookWidget {
                     builder: (context) => ReportBestSellerAll(items: items)),
               );
             },
-            text: const Text('See All'),
+            child: const Text('See All'),
           ),
         ],
       ),

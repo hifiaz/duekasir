@@ -34,7 +34,6 @@ class _RentState extends State<Rent> {
               rentController.rentItems.refresh();
               rentController.rents.refresh();
             },
-            text: const Text('Refresh'),
             icon: const Padding(
               padding: EdgeInsets.only(right: 8),
               child: Icon(
@@ -42,6 +41,7 @@ class _RentState extends State<Rent> {
                 size: 16,
               ),
             ),
+            child: const Text('Refresh'),
           ),
           PopupMenuButton<String>(
             onSelected: (item) async {
@@ -77,7 +77,7 @@ class _RentState extends State<Rent> {
               width: screen,
               title: const Text('Ready to Rent'),
               description: const Text('Available item to rent'),
-              content: items.map(
+              child: items.map(
                 data: (val) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +116,7 @@ class _RentState extends State<Rent> {
               width: screen,
               title: const Text('Rental Periode'),
               description: const Text('List customer who rent our item'),
-              content: rents.map(
+              child: rents.map(
                 data: (rest) {
                   return Column(
                       children: rest.map(

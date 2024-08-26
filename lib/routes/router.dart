@@ -276,7 +276,8 @@ class RequestFormRoute extends GoRouteData {
   const RequestFormRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const RequestForm();
+  Widget build(BuildContext context, GoRouterState state) =>
+      const RequestForm();
 }
 
 @TypedGoRoute<TestingRoute>(path: '/testing')

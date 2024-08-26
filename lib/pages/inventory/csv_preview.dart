@@ -55,10 +55,9 @@ class _CsvPreviewState extends State<CsvPreview> {
                 ? Database().addAllInventory(d).whenComplete(() {
                     inventoryController.listItemFromCsv.clear();
                     inventoryController.inventorys.refresh();
-                    context.pop();
+                    if (context.mounted) context.pop();
                   })
                 : null,
-            text: const Text('Export'),
             icon: const Padding(
               padding: EdgeInsets.only(right: 8),
               child: Icon(
@@ -66,6 +65,7 @@ class _CsvPreviewState extends State<CsvPreview> {
                 size: 16,
               ),
             ),
+            child: const Text('Export'),
           )
         ],
       ),

@@ -26,7 +26,36 @@ class _ReportSyncDialogState extends State<ReportSyncDialog> {
         title: const Text('Sync Item Penjualan'),
         description: const Text(
             "Are you sure to sync this Item, this action can't be undo"),
-        content: Container(
+        actions: [
+          ShadButton(
+              onPressed: () => context.pop(), child: const Text('Cancel')),
+          ShadButton(
+              onPressed: () async {
+                if (reportFormKey.currentState!.validate()) {
+                  if (_password.text == '111111') {
+                    await Database().addPenjualan(widget.detail);
+                    await reportController.report.refresh();
+                    await reportController.reportToday.refresh();
+                    await reportController.reportYesterday.refresh();
+                    if (context.mounted) {
+                      context.pop();
+                    }
+                  } else {
+                    ShadToaster.of(context).show(
+                      const ShadToast(
+                        backgroundColor: Colors.red,
+                        description: Text(
+                          'Incorrect Password!',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    );
+                  }
+                }
+              },
+              child: const Text('Sync'))
+        ],
+        child: Container(
           width: 375,
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: ShadInputFormField(
@@ -59,35 +88,6 @@ class _ReportSyncDialogState extends State<ReportSyncDialog> {
             ),
           ),
         ),
-        actions: [
-          ShadButton(
-              onPressed: () => context.pop(), text: const Text('Cancel')),
-          ShadButton(
-              onPressed: () async {
-                if (reportFormKey.currentState!.validate()) {
-                  if (_password.text == '111111') {
-                    await Database().addPenjualan(widget.detail);
-                    await reportController.report.refresh();
-                    await reportController.reportToday.refresh();
-                    await reportController.reportYesterday.refresh();
-                    if (context.mounted) {
-                      context.pop();
-                    }
-                  } else {
-                    ShadToaster.of(context).show(
-                      const ShadToast(
-                        backgroundColor: Colors.red,
-                        description: Text(
-                          'Incorrect Password!',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    );
-                  }
-                }
-              },
-              text: const Text('Sync'))
-        ],
       ),
     );
   }

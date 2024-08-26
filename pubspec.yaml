@@ -34,45 +34,49 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.6
-  signals: ^5.2.1
-  go_router: ^13.2.4
-  path_provider: ^2.1.3
+  cupertino_icons: ^1.0.8
+  signals: ^5.4.0
+  go_router: ^14.2.7
+  path_provider: ^2.1.4
   path: ^1.9.0
-  sqlite3: ^2.4.0
+  sqlite3: ^2.4.6
   get_it: ^7.7.0
   flutter_hooks: ^0.20.5
   get_time_ago: ^1.3.1
-  isar: ^3.1.0+1
-  isar_flutter_libs: ^3.1.0+1
-  shadcn_ui: ^0.5.6
+  isar: ^3.1.0
+  isar_flutter_libs: ^3.1.0
+  shadcn_ui: ^0.8.0
   intl: ^0.19.0
   equatable: ^2.0.5
   collection: ^1.18.0
   csv: ^6.0.0
-  file_picker: ^8.0.3
+  file_picker: ^8.1.2
   visibility_detector: ^0.4.0+2
   flutter_barcode_listener: ^0.1.4
-  file_saver: ^0.2.12
-  esc_pos_utils: ^1.1.0
+  file_saver: ^0.2.14
+  esc_pos_utils: #^1.1.0
+    git:
+      url: https://github.com/ES-fooshen/esc_pos_utils.git
+      ref: master
   simple_barcode_scanner: ^0.1.1
   usb_esc_printer_windows: ^0.0.3
-  print_bluetooth_thermal: ^1.1.0
-  share_plus: ^9.0.0
-  image: ^3.3.0
-  connectivity_plus: ^6.0.3
+  print_bluetooth_thermal: ^1.1.1
+  share_plus: ^7.2.2
+  image: ^4.2.0
+  connectivity_plus: ^6.0.5
   internet_connection_checker: ^1.0.0+1
   fl_chart: ^0.68.0
-  supabase_flutter: ^2.5.2
-  calendar_date_picker2: ^1.0.2
-  pdf: ^3.8.4
-  email_otp: ^2.1.2
-  dio: ^5.4.3+1
-  appflowy_editor: ^2.4.0
+  supabase_flutter: ^2.6.0
+  calendar_date_picker2: ^1.1.5
+  pdf: ^3.11.1
+  email_otp: ^3.0.2
+  dio: ^5.6.0
+  appflowy_editor: ^3.1.0
   universal_html: ^2.2.4
 
 dependency_overrides:
   intl: ^0.19.0
+  archive: ^3.6.1
 
 
 dev_dependencies:
@@ -84,10 +88,10 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.2
-  build_runner: ^2.4.9
-  go_router_builder: ^2.6.2
-  isar_generator: ^3.1.0+1
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.12
+  go_router_builder: ^2.7.1
+  isar_generator: ^3.1.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -33,7 +33,7 @@ class CustomerSheet extends HookWidget {
         children: [
           const Text("Pick customer who whan to buy"),
           ShadButton.outline(
-            text: const Text('Umum'),
+            child: const Text('Umum'),
             onPressed: () {
               getIt.get<SellingController>().pelanggan.value = null;
               context.pop();
@@ -41,7 +41,7 @@ class CustomerSheet extends HookWidget {
           )
         ],
       ),
-      content: SizedBox(
+      child: SizedBox(
         width: side == ShadSheetSide.bottom || side == ShadSheetSide.top
             ? MediaQuery.sizeOf(context).width
             : null,
@@ -79,7 +79,7 @@ class CustomerSheet extends HookWidget {
                                   ? 'Active'
                                   : 'Non Active')),
                               DataCell(ShadButton.outline(
-                                text: const Text('Select'),
+                                child: const Text('Select'),
                                 onPressed: () {
                                   getIt
                                       .get<SellingController>()

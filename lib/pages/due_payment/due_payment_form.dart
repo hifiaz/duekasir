@@ -59,7 +59,7 @@ class DuePaymentForm extends HookWidget {
                     Icon(Icons.circle,
                         color: isConnected ? Colors.green : null),
                     ShadButton.ghost(
-                      text: const Text('Close'),
+                      child: const Text('Close'),
                       onPressed: () {
                         duePaymentController.paymentSelected.value = null;
                         context.pop();
@@ -151,7 +151,7 @@ class DuePaymentForm extends HookWidget {
                         const Text('Barang Masuk'),
                         const SizedBox(height: 10),
                         ShadButton.outline(
-                            text: Text(dateWithoutTime.format(dateIn.value)),
+                            child: Text(dateWithoutTime.format(dateIn.value)),
                             onPressed: () async {
                               var results = await showCalendarDatePicker2Dialog(
                                 context: context,
@@ -175,7 +175,7 @@ class DuePaymentForm extends HookWidget {
                         const Text('Jatuh Tempo'),
                         const SizedBox(height: 10),
                         ShadButton.outline(
-                            text: Text(dateWithoutTime.format(dueDate.value)),
+                            child: Text(dateWithoutTime.format(dueDate.value)),
                             onPressed: () async {
                               var results = await showCalendarDatePicker2Dialog(
                                 context: context,
@@ -208,13 +208,13 @@ class DuePaymentForm extends HookWidget {
                     children: [
                       if (item != null)
                         ShadButton.destructive(
-                          text: const Text('Delete'),
+                          child: const Text('Delete'),
                           onPressed: () {
                             Database()
                                 .deleteInventory(item.id!)
                                 .whenComplete(() {
                               duePaymentController.payments.refresh();
-                              Navigator.pop(context);
+                              if (context.mounted) Navigator.pop(context);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -232,7 +232,7 @@ class DuePaymentForm extends HookWidget {
                           },
                         ),
                       ShadButton(
-                        text: const Text('Save changes'),
+                        child: const Text('Save changes'),
                         onPressed: () {
                           if (!duePaymentFormKey.currentState!.validate()) {
                             return;
@@ -256,7 +256,7 @@ class DuePaymentForm extends HookWidget {
                                   .updateDuePayment(updateitem)
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
-                                  context.pop();
+                                  if (context.mounted) context.pop();
                                   duePaymentController.payments.refresh();
                                   duePaymentController.paymentSelected.value =
                                       null;
@@ -281,7 +281,7 @@ class DuePaymentForm extends HookWidget {
                                   .addDuePayment(newItem)
                                   .whenComplete(() {
                                 duePaymentController.payments.refresh();
-                                context.pop();
+                                if (context.mounted) context.pop();
                               });
                             }
                           }

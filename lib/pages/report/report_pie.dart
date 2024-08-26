@@ -20,7 +20,7 @@ class ReportPie extends StatelessWidget {
     return ShadCard(
       width: width,
       title: const Text('Admin'),
-      content: Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (reportUsers.hasValue && report.hasValue)

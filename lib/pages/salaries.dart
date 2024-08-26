@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:due_kasir/controller/salary_controller.dart';
 import 'package:due_kasir/controller/store_controller.dart';
 import 'package:due_kasir/model/salary_model.dart';
@@ -22,7 +24,6 @@ class Salaries extends StatefulWidget {
 }
 
 class _SalariesState extends State<Salaries> {
-  EmailOTP myAuth = EmailOTP();
   final forSalariesmKey = GlobalKey<ShadFormState>();
   String? password;
   bool obscure = true;
@@ -41,7 +42,6 @@ class _SalariesState extends State<Salaries> {
           if (password != null)
             ShadButton.ghost(
               onPressed: () => context.push('/salaries/form'),
-              text: const Text('Add Payment'),
               icon: const Padding(
                 padding: EdgeInsets.only(right: 8),
                 child: Icon(
@@ -49,12 +49,12 @@ class _SalariesState extends State<Salaries> {
                   size: 16,
                 ),
               ),
+              child: const Text('Add Payment'),
             ),
           ShadButton.ghost(
             onPressed: () {
               salaryController.salaries.refresh();
             },
-            text: const Text('Refresh'),
             icon: const Padding(
               padding: EdgeInsets.only(right: 8),
               child: Icon(
@@ -62,6 +62,7 @@ class _SalariesState extends State<Salaries> {
                 size: 16,
               ),
             ),
+            child: const Text('Refresh'),
           ),
           PopupMenuButton<String>(
             onSelected: (item) async {
@@ -96,7 +97,66 @@ class _SalariesState extends State<Salaries> {
                       style: ShadTheme.of(context).textTheme.h4),
                   description:
                       const Text('Ask your administration to access this page'),
-                  content: ShadInputFormField(
+                  footer: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ShadButton.outline(
+                        child: const Text('Send Request Access'),
+                        onPressed: () async {
+                          EmailOTP.config(
+                              appEmail: "fiazhari@gmail.com",
+                              appName: "Email OTP",
+                              otpLength: 6,
+                              otpType: OTPType.numeric);
+                          if (await EmailOTP.sendOTP(
+                                email: user?.email ?? 'fiazhari@gmail.com',
+                              ) ==
+                              true) {
+                            if (context.mounted) {
+                              ShadToaster.of(context).show(
+                                const ShadToast(
+                                  backgroundColor: Colors.green,
+                                  description: Text('OTP has been sent'),
+                                ),
+                              );
+                            }
+                          } else {
+                            if (context.mounted) {
+                              ShadToaster.of(context).show(
+                                const ShadToast(
+                                  backgroundColor: Colors.red,
+                                  description: Text('Oops, OTP send failed'),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                      ),
+                      ShadButton(
+                        child: const Text('Access'),
+                        onPressed: () async {
+                          if (forSalariesmKey.currentState!.value['password'] ==
+                              '111111') {
+                            setState(() {
+                              password = forSalariesmKey
+                                  .currentState!.value['password'];
+                            });
+                          } else {
+                            if (EmailOTP.verifyOTP(
+                                    otp: forSalariesmKey
+                                        .currentState!.value['password']) ==
+                                true) {
+                              setState(() {
+                                password = forSalariesmKey
+                                    .currentState!.value['password'];
+                              });
+                            }
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  child: ShadInputFormField(
                     id: 'password',
                     label: const Text('Password'),
                     placeholder: const Text('Enter your password'),
@@ -124,63 +184,6 @@ class _SalariesState extends State<Salaries> {
                         setState(() => obscure = !obscure);
                       },
                     ),
-                  ),
-                  footer: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ShadButton.outline(
-                        text: const Text('Send Request Access'),
-                        onPressed: () async {
-                          myAuth.setConfig(
-                              appEmail: "fiazhari@gmail.com",
-                              appName: "Email OTP",
-                              userEmail: user?.email ?? 'fiazhari@gmail.com',
-                              otpLength: 6,
-                              otpType: OTPType.digitsOnly);
-                          if (await myAuth.sendOTP() == true) {
-                            if (context.mounted) {
-                              ShadToaster.of(context).show(
-                                const ShadToast(
-                                  backgroundColor: Colors.green,
-                                  description: Text('OTP has been sent'),
-                                ),
-                              );
-                            }
-                          } else {
-                            if (context.mounted) {
-                              ShadToaster.of(context).show(
-                                const ShadToast(
-                                  backgroundColor: Colors.red,
-                                  description: Text('Oops, OTP send failed'),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                      ),
-                      ShadButton(
-                        text: const Text('Access'),
-                        onPressed: () async {
-                          if (forSalariesmKey.currentState!.value['password'] ==
-                              '111111') {
-                            setState(() {
-                              password = forSalariesmKey
-                                  .currentState!.value['password'];
-                            });
-                          } else {
-                            if (await myAuth.verifyOTP(
-                                    otp: forSalariesmKey
-                                        .currentState!.value['password']) ==
-                                true) {
-                              setState(() {
-                                password = forSalariesmKey
-                                    .currentState!.value['password'];
-                              });
-                            }
-                          }
-                        },
-                      ),
-                    ],
                   ),
                 ),
               ),
@@ -246,117 +249,120 @@ class _SalariesState extends State<Salaries> {
                     ),
                   );
                 }
-                return DataTable(
-                  columns: const [
-                    DataColumn(label: Text('Id')),
-                    DataColumn(label: Text('Status')),
-                    DataColumn(label: Text('Name')),
-                    DataColumn(label: Text('Date')),
-                    DataColumn(label: Text('Note')),
-                    DataColumn(label: Text('Amount')),
-                    DataColumn(label: Text('Options')),
-                  ],
-                  dataRowMaxHeight: 80,
-                  rows: salary.map(
-                    (item) {
-                      final status = ['Draf', 'Paid'];
-                      return DataRow(
-                        cells: [
-                          DataCell(
-                            Text(
-                              item.id.toString(),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
+                return SingleChildScrollView(
+                  child: DataTable(
+                    columns: const [
+                      DataColumn(label: Text('Id')),
+                      DataColumn(label: Text('Status')),
+                      DataColumn(label: Text('Name')),
+                      DataColumn(label: Text('Date')),
+                      DataColumn(label: Text('Note')),
+                      DataColumn(label: Text('Amount')),
+                      DataColumn(label: Text('Options')),
+                    ],
+                    dataRowMaxHeight: 80,
+                    rows: salary.map(
+                      (item) {
+                        final status = ['Draf', 'Paid'];
+                        return DataRow(
+                          cells: [
+                            DataCell(
+                              Text(
+                                item.id.toString(),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                          ),
-                          DataCell(Text(item.status)),
-                          DataCell(
-                            FutureBuilder<UserModel?>(
-                              future: Database().getUserById(item.userId),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  return Text(snapshot.data?.nama ?? 'Admin');
-                                }
-                                return const Text('Admin');
-                              },
+                            DataCell(Text(item.status)),
+                            DataCell(
+                              FutureBuilder<UserModel?>(
+                                future: Database().getUserById(item.userId),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    return Text(snapshot.data?.nama ?? 'Admin');
+                                  }
+                                  return const Text('Admin');
+                                },
+                              ),
                             ),
-                          ),
-                          DataCell(Text(item.periode)),
-                          DataCell(Text(item.note ?? '')),
-                          DataCell(Text(currency.format(item.total))),
-                          DataCell(
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  width: 100,
-                                  child: ShadSelectFormField<String>(
-                                    id: 'status',
-                                    initialValue: item.status,
-                                    onChanged: (v) async {
-                                      SalaryModel salary = SalaryModel(
-                                        id: item.id,
-                                        userId: item.userId,
-                                        status: v ?? 'Draf',
-                                        periode: item.periode,
-                                        items: item.items,
-                                        deductions: item.deductions,
-                                        note: item.note,
-                                        management: item.management,
-                                        total: item.total,
-                                        createdAt: item.createdAt,
-                                      );
-                                      await Database().updateSalary(salary);
+                            DataCell(Text(item.periode)),
+                            DataCell(Text(item.note ?? '')),
+                            DataCell(Text(currency.format(item.total))),
+                            DataCell(
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 100,
+                                    child: ShadSelectFormField<String>(
+                                      id: 'status',
+                                      initialValue: item.status,
+                                      onChanged: (v) async {
+                                        SalaryModel salary = SalaryModel(
+                                          id: item.id,
+                                          userId: item.userId,
+                                          status: v ?? 'Draf',
+                                          periode: item.periode,
+                                          items: item.items,
+                                          deductions: item.deductions,
+                                          note: item.note,
+                                          management: item.management,
+                                          total: item.total,
+                                          createdAt: item.createdAt,
+                                        );
+                                        await Database().updateSalary(salary);
+                                        Future.delayed(Durations.medium1).then(
+                                            (_) => salaryController.salaries
+                                                .refresh());
+                                      },
+                                      options: status
+                                          .map((u) => ShadOption(
+                                              value: u, child: Text(u)))
+                                          .toList(),
+                                      selectedOptionBuilder: (context, value) =>
+                                          Text(value),
+                                      placeholder: const Text('Status'),
+                                      validator: (v) {
+                                        if (v == null) {
+                                          return 'Please select an status to display';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+                                  ShadButton(
+                                    child: const Text('PDF'),
+                                    onPressed: () async {
+                                      var user = await Database()
+                                          .getUserById(item.userId);
+                                      if (user != null) {
+                                        log('hello ${item.items.first.toJson()}');
+                                        pdfGenerator(
+                                          user: user,
+                                          store: store.value!,
+                                          salary: item,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                  ShadButton.destructive(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () async {
+                                      await Database().deleteSalary(item.id!);
                                       Future.delayed(Durations.medium1).then(
                                           (_) => salaryController.salaries
                                               .refresh());
                                     },
-                                    options: status
-                                        .map((u) => ShadOption(
-                                            value: u, child: Text(u)))
-                                        .toList(),
-                                    selectedOptionBuilder: (context, value) =>
-                                        Text(value),
-                                    placeholder: const Text('Status'),
-                                    validator: (v) {
-                                      if (v == null) {
-                                        return 'Please select an status to display';
-                                      }
-                                      return null;
-                                    },
                                   ),
-                                ),
-                                ShadButton(
-                                  text: const Text('PDF'),
-                                  onPressed: () async {
-                                    var user = await Database()
-                                        .getUserById(item.userId);
-                                    if (user != null) {
-                                      pdfGenerator(
-                                        user: user,
-                                        store: store.value!,
-                                        salary: item,
-                                      );
-                                    }
-                                  },
-                                ),
-                                ShadButton.destructive(
-                                  icon: const Icon(Icons.delete),
-                                  onPressed: () async {
-                                    await Database().deleteSalary(item.id!);
-                                    Future.delayed(Durations.medium1).then(
-                                        (_) => salaryController.salaries
-                                            .refresh());
-                                  },
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      );
-                    },
-                  ).toList(),
+                          ],
+                        );
+                      },
+                    ).toList(),
+                  ),
                 );
               },
               error: (e, __) => Text('$e'),

@@ -150,7 +150,7 @@ class PrintSettingState extends State<PrintSetting> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ShadButton(
-                        text: const Text('Save'),
+                        child: const Text('Save'),
                         onPressed: () => getIt
                             .get<SellingController>()
                             .selectedPrint

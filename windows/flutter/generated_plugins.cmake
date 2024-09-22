@@ -6,10 +6,10 @@ list(APPEND FLUTTER_PLUGIN_LIST
   app_links
   connectivity_plus
   file_saver
-  isar_flutter_libs
   permission_handler_windows
-  printing
+  powersync_flutter_libs
   share_plus
+  sqlite3_flutter_libs
   url_launcher_windows
   webview_windows
 )

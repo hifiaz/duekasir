@@ -298,7 +298,7 @@ class SellingLeft extends HookWidget {
                     )
                     .toList(),
               ),
-              error: (e, __) => Text('$__'),
+              error: (e, error) => Text('$error'),
               loading: () => const Text('Loading'),
             ),
           ],

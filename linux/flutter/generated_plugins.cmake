@@ -5,8 +5,8 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   file_saver
   gtk
-  isar_flutter_libs
-  printing
+  powersync_flutter_libs
+  sqlite3_flutter_libs
   url_launcher_linux
 )
 

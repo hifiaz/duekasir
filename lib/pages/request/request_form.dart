@@ -4,6 +4,7 @@ import 'package:appflowy_editor/appflowy_editor.dart';
 import 'package:due_kasir/controller/request_controller.dart';
 import 'package:due_kasir/model/request_model.dart';
 import 'package:due_kasir/service/supabase_service.dart';
+import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';

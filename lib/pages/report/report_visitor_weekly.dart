@@ -14,13 +14,13 @@ class ReportVisitorWeekLy extends StatefulWidget {
 
 class _ReportVisitorWeekLyState extends State<ReportVisitorWeekLy> {
   bool loading = true;
-  List<MapEntry<DateTime, List<PenjualanModel>>> sun = [];
-  List<MapEntry<DateTime, List<PenjualanModel>>> mon = [];
-  List<MapEntry<DateTime, List<PenjualanModel>>> tue = [];
-  List<MapEntry<DateTime, List<PenjualanModel>>> wed = [];
-  List<MapEntry<DateTime, List<PenjualanModel>>> thu = [];
-  List<MapEntry<DateTime, List<PenjualanModel>>> fri = [];
-  List<MapEntry<DateTime, List<PenjualanModel>>> sat = [];
+  List<MapEntry<DateTime, List<Report>>> sun = [];
+  List<MapEntry<DateTime, List<Report>>> mon = [];
+  List<MapEntry<DateTime, List<Report>>> tue = [];
+  List<MapEntry<DateTime, List<Report>>> wed = [];
+  List<MapEntry<DateTime, List<Report>>> thu = [];
+  List<MapEntry<DateTime, List<Report>>> fri = [];
+  List<MapEntry<DateTime, List<Report>>> sat = [];
 
   @override
   void initState() {
@@ -33,7 +33,7 @@ class _ReportVisitorWeekLyState extends State<ReportVisitorWeekLy> {
     super.initState();
   }
 
-  Future<void> initiateData(Map<DateTime, List<PenjualanModel>> data) async {
+  Future<void> initiateData(Map<DateTime, List<Report>> data) async {
     await Future.forEach(data.entries, (i) {
       if (i.key.weekday == 7) {
         sun.add(i);

@@ -1,4 +1,4 @@
-import 'package:due_kasir/model/item_model.dart';
+import 'package:due_kasir/model/inventory_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +15,7 @@ final class CartStarted extends CartEvent {
 final class CartItemAdded extends CartEvent {
   const CartItemAdded(this.item);
 
-  final ItemModel item;
+  final Inventory item;
 
   @override
   List<Object> get props => [item];
@@ -24,7 +24,7 @@ final class CartItemAdded extends CartEvent {
 final class CartItemRemoved extends CartEvent {
   const CartItemRemoved(this.item);
 
-  final ItemModel item;
+  final Inventory item;
 
   @override
   List<Object> get props => [item];

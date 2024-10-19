@@ -10,9 +10,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
 Future<dynamic> pdfGenerator(
-    {required StoreModel store,
-    required UserModel user,
-    required SalaryModel salary}) async {
+    {required StoreModel store, required Users user, required Salary salary}) async {
   final Document pdf = Document(deflate: zlib.encode);
   pdf.addPage(
     Page(
@@ -47,7 +45,7 @@ Future<dynamic> pdfGenerator(
                           child: Text(store.title,
                               style: const TextStyle(color: PdfColors.blue)),
                         ),
-                        Container(child: Text(store.description)),
+                        Container(child: Text(store.description ?? '')),
                         Container(
                             child: Text(
                                 "Date : ${dateWithoutTime.format(DateTime.now())}")),
@@ -135,7 +133,7 @@ Future<dynamic> pdfGenerator(
                             padding: const EdgeInsets.all(5),
                             child: Text("Total")),
                       ]),
-                      for (ItemSalary i in salary.items)
+                      for (ItemSalary i in salary.items ?? [])
                         TableRow(children: <Widget>[
                           Container(
                               padding: const EdgeInsets.all(5),

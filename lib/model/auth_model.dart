@@ -1,11 +1,7 @@
 import 'package:due_kasir/model/user_model.dart';
-import 'package:isar/isar.dart';
+import 'package:json/json.dart';
 
-part 'auth_model.g.dart';
-
-@collection
+@JsonCodable()
 class AuthModel {
-  Id id = Isar.autoIncrement;
-  IsarLink<UserModel> user = IsarLink<UserModel>();
-  DateTime createdAt = DateTime.now();
+  late Users user;
 }

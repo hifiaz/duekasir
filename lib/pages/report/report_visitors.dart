@@ -29,7 +29,7 @@ class ReportVisitors extends StatelessWidget {
                     title: Text(dateWithoutTime.format(i.key)),
                     subtitle: Text(
                       currency.format(
-                          i.value.fold(0, (p, c) => p + c.totalHarga.toInt())),
+                          i.value.fold(0, (p, c) => p + c.totalHarga!.toInt())),
                     ),
                     trailing: Text('${i.value.length} People',
                         style: ShadTheme.of(context).textTheme.muted),

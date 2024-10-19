@@ -7,11 +7,10 @@ import 'package:due_kasir/service/supabase_service.dart';
 import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:due_kasir/utils/extension.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class RequestForm extends StatefulWidget {
-  final RequestModel? request;
+  final Request? request;
   const RequestForm({super.key, this.request});
 
   @override
@@ -86,19 +85,21 @@ class _RequestFormState extends State<RequestForm> {
                 ? null
                 : () async {
                     if (widget.request != null) {
-                      RequestModel request = RequestModel(
-                          id: widget.request!.id,
-                          title: widget.request?.title,
-                          note: jsonEncode(editorState?.document.toJson()),
-                          status: selectedStatus,
-                          createdAt: widget.request?.createdAt);
+                      Request request = Request.fromJson({
+                        'id': widget.request!.id,
+                        'title': widget.request?.title,
+                        'note': jsonEncode(editorState?.document.toJson()),
+                        'status': selectedStatus,
+                        'createdAt': widget.request?.createdAt
+                      });
                       await SupabaseHelper().updateRequest(request);
                     } else {
-                      RequestModel request = RequestModel(
-                          id: DateTime.now().millisecondsSinceEpoch,
-                          note: jsonEncode(editorState?.document.toJson()),
-                          status: selectedStatus,
-                          createdAt: DateTime.now());
+                      Request request = Request.fromJson({
+                        'id': DateTime.now().millisecondsSinceEpoch,
+                        'note': jsonEncode(editorState?.document.toJson()),
+                        'status': selectedStatus,
+                        'createdAt': DateTime.now()
+                      });
                       await SupabaseHelper().addRequest(request.toJson());
                     }
                     requestController.requests.refresh();
@@ -118,7 +119,7 @@ class _RequestFormState extends State<RequestForm> {
               onPressed: editorState == null
                   ? null
                   : () async {
-                      await SupabaseHelper().removeRequest(widget.request!.id!);
+                      await SupabaseHelper().removeRequest(widget.request!.id);
                       requestController.requests.refresh();
                       if (context.mounted) Navigator.pop(context);
                     },

@@ -3,7 +3,7 @@ import 'package:due_kasir/controller/rent_controller.dart';
 import 'package:due_kasir/main.dart';
 import 'package:due_kasir/model/rent_item_model.dart';
 import 'package:due_kasir/model/rent_model.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -12,8 +12,8 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
 
 class RentForm extends HookWidget {
-  final RentItemModel item;
-  final RentModel? rent;
+  final RentItems item;
+  final Rent? rent;
   const RentForm({super.key, required this.item, this.rent});
   @override
   Widget build(context) {
@@ -30,9 +30,15 @@ class RentForm extends HookWidget {
     useListenable(editingNote);
     useState(() {
       if (rent != null) {
-        if (!DateTime.now().difference(rent!.rentDate).inDays.isNegative) {
-          pinalty.value =
-              8000 * DateTime.now().difference(rent!.rentDate).inDays;
+        if (!DateTime.now()
+            .difference(DateTime.tryParse(rent!.rentDate!) ?? DateTime.now())
+            .inDays
+            .isNegative) {
+          pinalty.value = 8000 *
+              DateTime.now()
+                  .difference(
+                      DateTime.tryParse(rent!.rentDate!) ?? DateTime.now())
+                  .inDays;
         }
       }
     });
@@ -186,22 +192,22 @@ class RentForm extends HookWidget {
                               return;
                             } else {
                               if (rent != null) {
-                                final updateitem = RentModel(
-                                  name: editingName.text,
-                                  id: rent!.id,
-                                  item: item.id!,
-                                  amount: amount.value,
-                                  identity: identity.value,
-                                  picture: people.value,
-                                  paid: false,
-                                  note: editingNote.text,
-                                  rentDate: rent!.rentDate,
-                                  howManyDay: rent!.howManyDay,
-                                  updatedAt: DateTime.now(),
-                                  createdAt: rent!.createdAt,
-                                );
+                                final updateitem = Rent.fromJson({
+                                  'name': editingName.text,
+                                  'id': rent!.id,
+                                  'item': item.id,
+                                  'amount': amount.value,
+                                  'identity': identity.value,
+                                  'picture': people.value,
+                                  'paid': false,
+                                  'note': editingNote.text,
+                                  'rentDate': rent!.rentDate,
+                                  'howManyDay': rent!.howManyDay,
+                                  'updatedAt': DateTime.now(),
+                                  'createdAt': rent!.createdAt,
+                                });
 
-                                Database()
+                                SupabaseHelper()
                                     .updateRent(updateitem)
                                     .whenComplete(() {
                                   Future.delayed(Durations.short1).then((_) {
@@ -221,22 +227,22 @@ class RentForm extends HookWidget {
                             return;
                           } else {
                             if (rent != null) {
-                              final updateitem = RentModel(
-                                name: editingName.text,
-                                id: rent!.id,
-                                item: item.id!,
-                                amount: amount.value + pinalty.value,
-                                identity: identity.value,
-                                picture: people.value,
-                                paid: true,
-                                note: editingNote.text,
-                                rentDate: rent!.rentDate,
-                                howManyDay: rent!.howManyDay,
-                                updatedAt: DateTime.now(),
-                                createdAt: rent!.createdAt,
-                              );
+                              final updateitem = Rent.fromJson({
+                                'name': editingName.text,
+                                'id': rent!.id,
+                                'item': item.id,
+                                'amount': amount.value + pinalty.value,
+                                'identity': identity.value,
+                                'picture': people.value,
+                                'paid': true,
+                                'note': editingNote.text,
+                                'rentDate': rent!.rentDate,
+                                'howManyDay': rent!.howManyDay,
+                                'updatedAt': DateTime.now(),
+                                'createdAt': rent!.createdAt,
+                              });
 
-                              Database()
+                              SupabaseHelper()
                                   .updateRent(updateitem)
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
@@ -245,21 +251,23 @@ class RentForm extends HookWidget {
                                 });
                               });
                             } else {
-                              final newItem = RentModel(
-                                id: DateTime.now().microsecondsSinceEpoch,
-                                name: editingName.text,
-                                item: item.id!,
-                                amount: amount.value,
-                                identity: identity.value,
-                                picture: people.value,
-                                note: editingNote.text,
-                                paid: false,
-                                rentDate: DateTime.now()
+                              final newItem = {
+                                'id': DateTime.now().microsecondsSinceEpoch,
+                                'name': editingName.text,
+                                'item': item.id,
+                                'amount': amount.value,
+                                'identity': identity.value,
+                                'picture': people.value,
+                                'note': editingNote.text,
+                                'paid': false,
+                                'rentDate': DateTime.now()
                                     .add(Duration(days: days.value)),
-                                howManyDay: days.value,
-                                createdAt: DateTime.now(),
-                              );
-                              Database().addRent(newItem).whenComplete(() {
+                                'howManyDay': days.value,
+                                'createdAt': DateTime.now(),
+                              };
+                              SupabaseHelper()
+                                  .addRent(newItem)
+                                  .whenComplete(() {
                                 rentController.rents.refresh();
                                 if (context.mounted) context.pop();
                               });

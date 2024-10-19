@@ -1,7 +1,7 @@
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/main.dart';
-import 'package:due_kasir/model/item_model.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/model/inventory_model.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
@@ -236,8 +236,8 @@ class InventoryForm extends HookWidget {
                         ShadButton.destructive(
                           child: const Text('Delete'),
                           onPressed: () {
-                            Database()
-                                .deleteInventory(item.id!)
+                            SupabaseHelper()
+                                .removeInventory(item.id)
                                 .whenComplete(() {
                               inventoryController.inventorys.refresh();
                               if (context.mounted) Navigator.pop(context);
@@ -264,25 +264,26 @@ class InventoryForm extends HookWidget {
                             return;
                           } else {
                             if (item != null) {
-                              final updateitem = ItemModel(
-                                id: item.id,
-                                nama: editingName.text.replaceAll(',', ' '),
-                                code: editingCode.text,
-                                quantity: 1,
-                                hargaJual: hargaJual.value.toInt(),
-                                ukuran: editingUkuran.text,
-                                isHargaJualPersen: true,
-                                hargaJualPersen:
+                              final updateitem = {
+                                'id': item.id,
+                                'nama': editingName.text.replaceAll(',', ' '),
+                                'code': editingCode.text,
+                                'quantity': 1,
+                                'hargaJual': hargaJual.value.toInt(),
+                                'ukuran': editingUkuran.text,
+                                'isHargaJualPersen': true,
+                                'hargaJualPersen':
                                     double.parse(editingHargaJualPersen.text),
-                                hargaDasar: int.parse(editingHargaDasar.text),
-                                diskonPersen:
+                                'hargaDasar': int.parse(editingHargaDasar.text),
+                                'diskonPersen':
                                     double.tryParse(editingDiscount.text),
-                                jumlahBarang: stock.value,
-                                createdAt: item.createdAt,
-                              );
+                                'jumlahBarang': stock.value,
+                                'createdAt': item.createdAt,
+                              };
 
-                              Database()
-                                  .updateInventory(updateitem)
+                              SupabaseHelper()
+                                  .updateInventory(
+                                      Inventory.fromJson(updateitem))
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
                                   if (context.mounted) context.pop();
@@ -292,23 +293,26 @@ class InventoryForm extends HookWidget {
                                 });
                               });
                             } else {
-                              final newItem = ItemModel(
-                                  id: DateTime.now().microsecondsSinceEpoch,
-                                  nama: editingName.text.replaceAll(',', ' '),
-                                  code: editingCode.text,
-                                  quantity: 1,
-                                  hargaJual: hargaJual.value.toInt(),
-                                  ukuran: editingUkuran.text,
-                                  isHargaJualPersen: true,
-                                  hargaJualPersen:
-                                      double.parse(editingHargaJualPersen.text),
-                                  hargaDasar: int.parse(editingHargaDasar.text),
-                                  diskonPersen:
-                                      double.tryParse(editingDiscount.text),
-                                  jumlahBarang: stock.value,
-                                  createdAt: DateTime.now());
+                              final newItem = {
+                                'id': DateTime.now().microsecondsSinceEpoch,
+                                'nama': editingName.text.replaceAll(',', ' '),
+                                'code': editingCode.text,
+                                'quantity': 1,
+                                'hargaJual': hargaJual.value.toInt(),
+                                'ukuran': editingUkuran.text,
+                                'isHargaJualPersen': true,
+                                'hargaJualPersen':
+                                    double.parse(editingHargaJualPersen.text),
+                                'hargaDasar': int.parse(editingHargaDasar.text),
+                                'diskonPersen':
+                                    double.tryParse(editingDiscount.text),
+                                'jumlahBarang': stock.value,
+                                'createdAt': DateTime.now()
+                              };
 
-                              Database().addInventory(newItem).whenComplete(() {
+                              SupabaseHelper()
+                                  .addInventory(newItem)
+                                  .whenComplete(() {
                                 inventoryController.inventorys.refresh();
                                 if (context.mounted) context.pop();
                               });

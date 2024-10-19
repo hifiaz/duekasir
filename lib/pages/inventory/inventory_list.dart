@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
-import 'package:due_kasir/model/item_model.dart';
+import 'package:due_kasir/model/inventory_model.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/extension.dart';
 import 'package:file_picker/file_picker.dart';
@@ -72,7 +72,7 @@ class InventoryList extends HookWidget {
                           "item_out",
                           "created"
                         ]);
-                        for (ItemModel map in inventory.value!) {
+                        for (Inventory map in inventory.value!) {
                           rows.add([
                             map.id,
                             map.nama,
@@ -165,7 +165,8 @@ class InventoryList extends HookWidget {
                     children: items
                         .map((item) => ListTile(
                               leading: Text(item.id.toString()),
-                              title: Text('${item.nama} (${item.jumlahBarang} Stock)'),
+                              title: Text(
+                                  '${item.nama} (${item.jumlahBarang} Stock)'),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -193,8 +194,8 @@ class InventoryList extends HookWidget {
                                       style: const TextStyle(fontSize: 10),
                                     ),
                                     Text(
-                                      currency.format(item.hargaJual -
-                                          item.hargaJual *
+                                      currency.format(item.hargaJual! -
+                                          item.hargaJual! *
                                               (item.diskonPersen! / 100)),
                                       style: const TextStyle(
                                           fontSize: 12, color: Colors.green),
@@ -227,9 +228,10 @@ class InventoryList extends HookWidget {
                   dataRowMaxHeight: 80.0,
                   rows: items
                       .map((item) => DataRow(cells: [
-                            DataCell(Text((items.indexOf(item) + 1).toString())),
-                            DataCell(Text(item.nama)),
-                            DataCell(Text(item.code)),
+                            DataCell(
+                                Text((items.indexOf(item) + 1).toString())),
+                            DataCell(Text(item.nama ?? '')),
+                            DataCell(Text(item.code ?? '')),
                             DataCell(Text(item.jumlahBarang.toString())),
                             DataCell(ConstrainedBox(
                               constraints: const BoxConstraints(minWidth: 110),
@@ -260,8 +262,8 @@ class InventoryList extends HookWidget {
                                       style: const TextStyle(fontSize: 10),
                                     ),
                                     Text(
-                                      currency.format(item.hargaJual -
-                                          item.hargaJual *
+                                      currency.format(item.hargaJual! -
+                                          item.hargaJual! *
                                               (item.diskonPersen! / 100)),
                                       style: const TextStyle(
                                           fontSize: 12, color: Colors.green),
@@ -270,7 +272,7 @@ class InventoryList extends HookWidget {
                                 ],
                               ),
                             )),
-                            DataCell(Text(item.ukuran)),
+                            DataCell(Text(item.ukuran ?? '')),
                             DataCell(
                               const Icon(Icons.more_horiz),
                               onTap: () {

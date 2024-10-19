@@ -1,13 +1,13 @@
 import 'package:due_kasir/controller/report_controller.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class ReportSyncDialog extends StatefulWidget {
   final int id;
-  final PenjualanModel detail;
+  final Report detail;
   const ReportSyncDialog({super.key, required this.id, required this.detail});
 
   @override
@@ -33,7 +33,7 @@ class _ReportSyncDialogState extends State<ReportSyncDialog> {
               onPressed: () async {
                 if (reportFormKey.currentState!.validate()) {
                   if (_password.text == '111111') {
-                    await Database().addPenjualan(widget.detail);
+                    await SupabaseHelper().addReport(widget.detail.toJson());
                     await reportController.report.refresh();
                     await reportController.reportToday.refresh();
                     await reportController.reportYesterday.refresh();

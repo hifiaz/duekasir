@@ -2,7 +2,7 @@ import 'package:due_kasir/controller/rent_controller.dart';
 import 'package:due_kasir/model/rent_item_model.dart';
 import 'package:due_kasir/pages/drawer.dart';
 import 'package:due_kasir/pages/rent/rent_form.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
@@ -43,29 +43,29 @@ class _RentState extends State<Rent> {
             ),
             child: const Text('Refresh'),
           ),
-          PopupMenuButton<String>(
-            onSelected: (item) async {
-              if (item == 'sync') {
-                await Database().rentSync();
-                await rentController.rents.refresh();
-                await Database().rentItemSync();
-                await rentController.rentItems.refresh();
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'sync',
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.restore),
-                    SizedBox(width: 8),
-                    Text('Sync'),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          // PopupMenuButton<String>(
+          //   onSelected: (item) async {
+          //     if (item == 'sync') {
+          //       await Database().rentSync();
+          //       await rentController.rents.refresh();
+          //       await Database().rentItemSync();
+          //       await rentController.rentItems.refresh();
+          //     }
+          //   },
+          //   itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+          //     const PopupMenuItem<String>(
+          //       value: 'sync',
+          //       child: Row(
+          //         mainAxisSize: MainAxisSize.min,
+          //         children: [
+          //           Icon(Icons.restore),
+          //           SizedBox(width: 8),
+          //           Text('Sync'),
+          //         ],
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
       body: SingleChildScrollView(
@@ -91,7 +91,7 @@ class _RentState extends State<Rent> {
                                   context.go('/rent/form');
                                 },
                               ),
-                              title: Text(p.name),
+                              title: Text(p.name ?? ''),
                               subtitle: Text(
                                 '${currency.format(p.rentOneMonth)}/Month\n${currency.format(p.rentOneWeek)}/Week\n${currency.format(p.rentThreeDay)}/3 Days',
                                 style: ShadTheme.of(context).textTheme.muted,
@@ -121,29 +121,29 @@ class _RentState extends State<Rent> {
                   return Column(
                       children: rest.map(
                     (p) {
-                      return FutureBuilder<RentItemModel?>(
-                        future: Database().getRentItemById(p.item),
+                      return FutureBuilder<RentItems?>(
+                        future: SupabaseHelper().getRentItemById(p.item!),
                         builder: (context, snapshot) {
                           return ListTile(
                             contentPadding: EdgeInsets.zero,
-                            title: Text(p.name,
-                                style: p.paid
+                            title: Text(p.name ?? '',
+                                style: p.paid ?? false
                                     ? const TextStyle(
                                         decoration: TextDecoration.lineThrough)
                                     : null),
                             subtitle: Text(
-                              p.paid
+                              p.paid ?? false
                                   ? snapshot.data?.name ?? ''
-                                  : '${snapshot.data?.name} - Expired on ${(DateTime.now().difference(p.rentDate).inDays)} days - ${p.rentDate.day}/${p.rentDate.month}/${p.rentDate.year}',
-                              style: p.paid
+                                  : '${snapshot.data?.name} - Expired on ${(DateTime.now().difference(DateTime.parse(p.rentDate!)).inDays)} days - ${DateTime.parse(p.rentDate!).day}/${DateTime.parse(p.rentDate!).month}/${DateTime.parse(p.rentDate!).year}',
+                              style: p.paid ?? false
                                   ? const TextStyle(
                                       decoration: TextDecoration.lineThrough)
                                   : null,
                             ),
-                            trailing: p.paid
+                            trailing: p.paid ?? false
                                 ? null
                                 : DateTime.now()
-                                        .difference(p.rentDate)
+                                        .difference(DateTime.parse(p.rentDate!))
                                         .inDays
                                         .isNegative
                                     ? const Icon(Icons.check_circle,
@@ -151,7 +151,7 @@ class _RentState extends State<Rent> {
                                     : const Icon(Icons.close,
                                         color: Colors.red),
                             onTap: () {
-                              if (p.paid) return;
+                              if (p.paid ?? false) return;
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

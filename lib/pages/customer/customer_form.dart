@@ -1,6 +1,6 @@
 import 'package:due_kasir/controller/customer_controller.dart';
 import 'package:due_kasir/model/customer_model.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,9 +25,12 @@ class CustomerForm extends HookWidget {
         useTextEditingController(text: customer?.keterangan ?? '');
     final lahirTemp = useTextEditingController(
         text: customer?.dob != null
-            ? dateWithoutTime.format(customer!.dob!)
+            ? dateWithoutTime
+                .format(DateTime.tryParse(customer!.dob!) ?? DateTime.now())
             : '');
-    final lahir = useState(customer?.dob ?? DateTime.now());
+    final lahir = useState(
+        DateTime.tryParse(customer?.dob ?? DateTime.now().toString()) ??
+            DateTime.now());
     final status = useState(customer?.status ?? true);
     return Scaffold(
       body: SafeArea(
@@ -77,7 +80,9 @@ class CustomerForm extends HookWidget {
                           onTap: () async {
                             DateTime? pickedDate = await showDatePicker(
                                 context: context,
-                                initialDate: customer?.dob ?? DateTime.now(),
+                                initialDate:
+                                    DateTime.tryParse(customer!.dob!) ??
+                                        DateTime.now(),
                                 firstDate: DateTime(1950),
                                 //DateTime.now() - not to allow to choose before today.
                                 lastDate: DateTime(2100));
@@ -133,8 +138,8 @@ class CustomerForm extends HookWidget {
                           ShadButton.destructive(
                             child: const Text('Delete'),
                             onPressed: () {
-                              Database()
-                                  .deleteCustomer(customer.id!)
+                              SupabaseHelper()
+                                  .removeCustomer(customer.id)
                                   .whenComplete(() async {
                                 await customerController.customer.refresh();
                                 if (context.mounted) Navigator.pop(context);
@@ -146,18 +151,19 @@ class CustomerForm extends HookWidget {
                           onPressed: () {
                             if (customerFormKey.currentState!.validate()) {
                               if (customer != null) {
-                                final updateCustomer = CustomerModel(
-                                  id: customer.id,
-                                  nama: editingName.text,
-                                  dob: lahir.value,
-                                  ktp: editingKtp.text,
-                                  status: status.value,
-                                  phone: editingPhone.text,
-                                  keterangan: editingKeterangan.text,
-                                );
-
-                                Database()
-                                    .updateCustomer(updateCustomer)
+                                final updateCustomer = {
+                                  'id': customer.id,
+                                  'nama': editingName.text,
+                                  'dob': lahir.value,
+                                  'ktp': editingKtp.text,
+                                  'status': status.value,
+                                  'phone': editingPhone.text,
+                                  'keterangan': editingKeterangan.text,
+                                  'createdAt': customer.createdAt,
+                                };
+                                SupabaseHelper()
+                                    .updateCustomer(
+                                        Customer.fromJson(updateCustomer))
                                     .whenComplete(() {
                                   Future.delayed(Durations.short1).then((_) {
                                     customerController.customer.refresh();
@@ -165,20 +171,20 @@ class CustomerForm extends HookWidget {
                                   });
                                 });
                               } else {
-                                final newCustomer = CustomerModel(
-                                  id: DateTime.now().microsecondsSinceEpoch,
-                                  nama: editingName.text,
-                                  dob: lahir.value,
-                                  ktp: editingKtp.text,
-                                  status: status.value,
-                                  phone: editingPhone.text,
-                                  keterangan: editingKeterangan.text,
-                                  masuk: DateTime.now(),
-                                  createdAt: DateTime.now(),
-                                );
+                                final newCustomer = {
+                                  'id': DateTime.now().microsecondsSinceEpoch,
+                                  'nama': editingName.text,
+                                  'dob': lahir.value,
+                                  'ktp': editingKtp.text,
+                                  'status': status.value,
+                                  'phone': editingPhone.text,
+                                  'keterangan': editingKeterangan.text,
+                                  'masuk': DateTime.now(),
+                                  'createdAt': DateTime.now(),
+                                };
 
-                                Database()
-                                    .addNewCustomer(newCustomer)
+                                SupabaseHelper()
+                                    .addCustomer(newCustomer)
                                     .whenComplete(() {
                                   customerController.customer.refresh();
                                   if (context.mounted) context.pop();

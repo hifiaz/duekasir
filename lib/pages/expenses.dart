@@ -2,7 +2,6 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:due_kasir/controller/expenses_controller.dart';
 import 'package:due_kasir/pages/drawer.dart';
 import 'package:due_kasir/pages/expenses/expenses_form.dart';
-import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:due_kasir/utils/extension.dart';
@@ -36,27 +35,27 @@ class Expanses extends StatelessWidget {
             ),
             child: const Text('Refresh'),
           ),
-          PopupMenuButton<String>(
-            onSelected: (item) async {
-              if (item == 'sync') {
-                await Database().expensesSync();
-                await expensesController.expenses.refresh();
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'sync',
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.restore),
-                    SizedBox(width: 8),
-                    Text('Sync'),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          // PopupMenuButton<String>(
+          //   onSelected: (item) async {
+          //     if (item == 'sync') {
+          //       await Database().expensesSync();
+          //       await expensesController.expenses.refresh();
+          //     }
+          //   },
+          //   itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+          //     const PopupMenuItem<String>(
+          //       value: 'sync',
+          //       child: Row(
+          //         mainAxisSize: MainAxisSize.min,
+          //         children: [
+          //           Icon(Icons.restore),
+          //           SizedBox(width: 8),
+          //           Text('Sync'),
+          //         ],
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
       body: SingleChildScrollView(
@@ -108,10 +107,11 @@ class Expanses extends StatelessWidget {
                   return Column(
                     children: data
                         .map((v) => ListTile(
-                              title: Text(v.title),
+                              title: Text(v.title ?? ''),
                               subtitle: Text(currency.format(v.amount)),
-                              trailing:
-                                  Text(dateWithoutTime.format(v.createdAt!)),
+                              trailing: Text(dateWithoutTime.format(
+                                  DateTime.tryParse(v.createdAt) ??
+                                      DateTime.now())),
                             ))
                         .toList(),
                   );
@@ -131,11 +131,12 @@ class Expanses extends StatelessWidget {
                         rows: data
                             .map((val) => DataRow(cells: [
                                   DataCell(Text(val.id.toString())),
-                                  DataCell(Text(val.title)),
+                                  DataCell(Text(val.title ?? '')),
                                   DataCell(Text(currency.format(val.amount))),
                                   DataCell(Text(val.note ?? '')),
                                   DataCell(Text(dateWithTime.format(
-                                      val.createdAt ?? DateTime.now()))),
+                                      DateTime.tryParse(val.createdAt) ??
+                                          DateTime.now()))),
                                   DataCell(
                                     ShadButton.destructive(
                                       onPressed: () {

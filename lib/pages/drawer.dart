@@ -1,5 +1,4 @@
 import 'package:due_kasir/controller/auth_controller.dart';
-import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +28,7 @@ class NavDrawer extends StatelessWidget {
                       ? const Color(0xff164863)
                       : const Color(0xffF6F6F6)),
               accountName: Text(
-                  '${auth.value?.user.value?.nama ?? "Kasir"} - ${auth.value?.user.value?.keterangan ?? "Role"}',
+                  '${auth.value?.nama ?? "Kasir"} - ${auth.value?.keterangan ?? "Role"}',
                   style: ShadTheme.of(context).textTheme.h3),
               accountEmail: Text(user?.email ?? '',
                   style: ShadTheme.of(context).textTheme.muted),
@@ -122,38 +121,38 @@ class NavDrawer extends StatelessWidget {
                 icon: const Icon(Icons.more_vert),
                 onSelected: (item) async {
                   if (item == 'restore') {
-                    ShadToaster.of(context).show(
-                      ShadToast(
-                        title: const Text('Restore Backup?'),
-                        description:
-                            const Text('Please pick isar file to restore'),
-                        action: ShadButton.outline(
-                          child: const Text('Select'),
-                          onPressed: () => Database().restoreDB().whenComplete(
-                            () {
-                              if (context.mounted) {
-                                ShadToaster.of(context).show(
-                                  const ShadToast(
-                                    title: Text('Restore Database Success!'),
-                                    description: Text(
-                                        'Please make sure all data is imported'),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                        ),
-                      ),
-                    );
+                    // ShadToaster.of(context).show(
+                    //   ShadToast(
+                    //     title: const Text('Restore Backup?'),
+                    //     description:
+                    //         const Text('Please pick isar file to restore'),
+                    //     action: ShadButton.outline(
+                    //       child: const Text('Select'),
+                    //       onPressed: () => Database().restoreDB().whenComplete(
+                    //         () {
+                    //           if (context.mounted) {
+                    //             ShadToaster.of(context).show(
+                    //               const ShadToast(
+                    //                 title: Text('Restore Database Success!'),
+                    //                 description: Text(
+                    //                     'Please make sure all data is imported'),
+                    //               ),
+                    //             );
+                    //           }
+                    //         },
+                    //       ),
+                    //     ),
+                    //   ),
+                    // );
                   } else if (item == 'login') {
                     context.pop();
                     context.push('/login');
                   } else if (item == 'backup') {
                     context.pop();
-                    Database().createBackUp().then((_) => const ShadToast(
-                          title: Text('Backup Database Success!'),
-                          description: Text('All your data on download folder'),
-                        ));
+                    // Database().createBackUp().then((_) => const ShadToast(
+                    //       title: Text('Backup Database Success!'),
+                    //       description: Text('All your data on download folder'),
+                    //     ));
                   } else if (item == 'clear') {
                     context.pop();
                     showShadDialog(
@@ -174,12 +173,12 @@ class NavDrawer extends StatelessWidget {
                           ShadButton(
                             child: const Text('Continue'),
                             onPressed: () async {
-                              await Database().clearAllData().whenComplete(() {
-                                if (context.mounted) {
-                                  Navigator.of(context).pop(true);
-                                  context.go('/');
-                                }
-                              });
+                              // await Database().clearAllData().whenComplete(() {
+                              //   if (context.mounted) {
+                              //     Navigator.of(context).pop(true);
+                              //     context.go('/');
+                              //   }
+                              // });
                             },
                           ),
                         ],

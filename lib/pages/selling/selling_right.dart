@@ -5,12 +5,12 @@ import 'package:due_kasir/controller/selling/events.dart';
 import 'package:due_kasir/controller/selling_controller.dart';
 import 'package:due_kasir/controller/store_controller.dart';
 import 'package:due_kasir/enum/payment_enum.dart';
-import 'package:due_kasir/model/item_model.dart';
+import 'package:due_kasir/model/inventory_model.dart';
 import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/store_model.dart';
 import 'package:due_kasir/pages/customer/customer_sheet.dart';
-import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/service/get_it.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
@@ -96,38 +96,36 @@ class SellingRightState extends State<SellingRight> {
                 onPressed: () {
                   if (sellingFormKey.currentState!.validate() &&
                       store.hasValue) {
-                    List<ProductItemModel> products = [];
-                    for (ItemModel p in list.value!.items) {
-                      products.add(
-                        ProductItemModel()
-                          ..id = p.id!
-                          ..nama = p.nama
-                          ..code = p.code
-                          ..quantity = p.quantity
-                          ..hargaJual = p.hargaJual
-                          ..ukuran = p.ukuran
-                          ..isHargaJualPersen = p.isHargaJualPersen
-                          ..hargaJualPersen = p.hargaJualPersen
-                          ..hargaDasar = p.hargaDasar
-                          ..diskonPersen = p.diskonPersen
-                          ..deskripsi = p.deskripsi
-                          ..jumlahBarang = p.jumlahBarang
-                          ..isSynced = p.isSynced,
-                      );
+                    List<Inventory> products = [];
+                    for (Inventory p in list.value!.items) {
+                      products.add(Inventory.fromJson({
+                        'id': p.id,
+                        'nama': p.nama,
+                        'code': p.code,
+                        'quantity': p.quantity,
+                        'hargaJual': p.hargaJual,
+                        'ukuran': p.ukuran,
+                        'isHargaJualPersen': p.isHargaJualPersen,
+                        'hargaJualPersen': p.hargaJualPersen,
+                        'hargaDasar': p.hargaDasar,
+                        'diskonPersen': p.diskonPersen,
+                        'deskripsi': p.deskripsi,
+                        'jumlahBarang': p.jumlahBarang,
+                      }));
                     }
-                    final newItem = PenjualanModel(
-                      id: DateTime.now().microsecondsSinceEpoch,
-                      items: products,
-                      kasir: kasir?.id ?? 1,
-                      keterangan: note.text,
-                      diskon: 0,
-                      totalHarga: list.value?.totalPrice ?? 0.0,
-                      totalItem: list.value?.totalItem ?? 0,
-                      pembeli: pelanggan?.id,
-                      createdAt: DateTime.now(),
-                    );
+                    final newItem = {
+                      'id': DateTime.now().microsecondsSinceEpoch,
+                      'items': products,
+                      'kasir': kasir?.id ?? 1,
+                      'keterangan': note.text,
+                      'diskon': 0,
+                      'totalHarga': list.value?.totalPrice ?? 0.0,
+                      'totalItem': list.value?.totalItem ?? 0,
+                      'pembeli': pelanggan?.id,
+                      'createdAt': DateTime.now(),
+                    };
                     if (products.isEmpty) return;
-                    Database().addPenjualan(newItem).whenComplete(() {
+                    SupabaseHelper().addReport(newItem).whenComplete(() {
                       cashEditing.clear();
                       note.clear();
                       getIt.get<SellingController>().tipeBayar.value =
@@ -155,41 +153,39 @@ class SellingRightState extends State<SellingRight> {
                 onPressed: () {
                   if (sellingFormKey.currentState!.validate() &&
                       store.hasValue) {
-                    List<ProductItemModel> products = [];
-                    for (ItemModel p in list.value!.items) {
-                      products.add(
-                        ProductItemModel()
-                          ..id = p.id!
-                          ..nama = p.nama
-                          ..code = p.code
-                          ..quantity = p.quantity
-                          ..hargaJual = p.hargaJual
-                          ..ukuran = p.ukuran
-                          ..isHargaJualPersen = p.isHargaJualPersen
-                          ..hargaJualPersen = p.hargaJualPersen
-                          ..hargaDasar = p.hargaDasar
-                          ..diskonPersen = p.diskonPersen
-                          ..deskripsi = p.deskripsi
-                          ..jumlahBarang = p.jumlahBarang
-                          ..isSynced = p.isSynced,
-                      );
+                    List<Inventory> products = [];
+                    for (Inventory p in list.value!.items) {
+                      products.add(Inventory.fromJson({
+                        'id': p.id,
+                        'nama': p.nama,
+                        'code': p.code,
+                        'quantity': p.quantity,
+                        'hargaJual': p.hargaJual,
+                        'ukuran': p.ukuran,
+                        'isHargaJualPersen': p.isHargaJualPersen,
+                        'hargaJualPersen': p.hargaJualPersen,
+                        'hargaDasar': p.hargaDasar,
+                        'diskonPersen': p.diskonPersen,
+                        'deskripsi': p.deskripsi,
+                        'jumlahBarang': p.jumlahBarang,
+                      }));
                     }
-                    final newItem = PenjualanModel(
-                      id: DateTime.now().microsecondsSinceEpoch,
-                      items: products,
-                      kasir: kasir?.id ?? 1,
-                      keterangan: note.text,
-                      diskon: 0,
-                      totalHarga: list.value?.totalPrice ?? 0.0,
-                      totalItem: list.value?.totalItem ?? 0,
-                      pembeli: pelanggan?.id,
-                      createdAt: DateTime.now(),
-                    );
+                    final newItem = {
+                      'id': DateTime.now().microsecondsSinceEpoch,
+                      'items': products,
+                      'kasir': kasir?.id ?? 1,
+                      'keterangan': note.text,
+                      'diskon': 0,
+                      'totalHarga': list.value?.totalPrice ?? 0.0,
+                      'totalItem': list.value?.totalItem ?? 0,
+                      'pembeli': pelanggan?.id,
+                      'createdAt': DateTime.now(),
+                    };
                     if (products.isEmpty) return;
-                    Database().addPenjualan(newItem).whenComplete(() {
+                    SupabaseHelper().addReport(newItem).whenComplete(() {
                       letsPrint(
                               store: store.value!,
-                              model: newItem,
+                              model: Report.fromJson(newItem),
                               kasir: kasir?.nama ?? 'Umum',
                               tipe: tipeBayar,
                               total: cashEditing.text,
@@ -455,7 +451,7 @@ class SellingRightState extends State<SellingRight> {
 
   Future<void> letsPrint({
     required StoreModel store,
-    required PenjualanModel model,
+    required Report model,
     required String kasir,
     required TypePayment tipe,
     String? total,
@@ -484,9 +480,9 @@ class SellingRightState extends State<SellingRight> {
           width: PosTextSize.size2,
         ));
     bytes += generator.feed(1);
-    bytes += generator.text(store.description,
+    bytes += generator.text(store.description ?? '',
         styles: const PosStyles(align: PosAlign.center));
-    bytes += generator.text(store.phone,
+    bytes += generator.text(store.phone ?? '',
         styles: const PosStyles(align: PosAlign.center));
     bytes += generator.feed(1);
     bytes += generator.hr();
@@ -523,7 +519,7 @@ class SellingRightState extends State<SellingRight> {
       ),
     ]);
     bytes += generator.hr();
-    for (ProductItemModel i in model.items) {
+    for (Inventory i in model.items) {
       bytes += generator.text(i.nama!);
       bytes += generator.row([
         PosColumn(

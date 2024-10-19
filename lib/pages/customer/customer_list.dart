@@ -36,9 +36,9 @@ class CustomerList extends HookWidget {
                     children: customers.map((user) {
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text(user.nama),
+                        title: Text(user.nama ?? ''),
                         subtitle: Text(
-                            '(${user.status ? 'Active' : 'Non-Active'}) ${user.phone ?? '-'} '),
+                            '(${user.status == true ? 'Active' : 'Non-Active'}) ${user.phone ?? '-'} '),
                         trailing:
                             const Icon(Icons.keyboard_arrow_right_outlined),
                         onTap: () {
@@ -64,15 +64,15 @@ class CustomerList extends HookWidget {
                   rows: customers.map((user) {
                     return DataRow(cells: [
                       DataCell(Text(user.id.toString())),
-                      DataCell(Text(user.nama)),
+                      DataCell(Text(user.nama ?? '')),
                       DataCell(Text(user.phone ?? '-')),
-                      DataCell(Text(
-                          dateWithoutTime.format(user.dob ?? DateTime.now()))),
+                      DataCell(Text(dateWithoutTime.format(
+                          DateTime.tryParse(user.dob!) ?? DateTime.now()))),
                       DataCell(Text(user.ktp ?? '-')),
                       DataCell(
                           Text(user.status == true ? 'Active' : 'Non Active')),
-                      DataCell(Text(
-                          dateWithTime.format(user.masuk ?? DateTime.now()))),
+                      DataCell(Text(dateWithTime.format(
+                          DateTime.tryParse(user.masuk!) ?? DateTime.now()))),
                       DataCell(Text(user.keterangan ?? '')),
                       DataCell(
                         const Icon(Icons.keyboard_arrow_right_outlined),

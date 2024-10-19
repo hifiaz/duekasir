@@ -1,7 +1,6 @@
 import 'package:due_kasir/controller/store_controller.dart';
-import 'package:due_kasir/model/store_model.dart';
 import 'package:due_kasir/pages/drawer.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -31,28 +30,28 @@ class _StoreState extends State<Store> {
       appBar: AppBar(
         title: const Text('Store'),
         centerTitle: false,
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (item) async {
-              if (item == 'sync') {
-                Database().syncStore();
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'sync',
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.restore),
-                    SizedBox(width: 8),
-                    Text('Sync'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
+        // actions: [
+        //   PopupMenuButton<String>(
+        //     onSelected: (item) async {
+        //       if (item == 'sync') {
+        //         Database().syncStore();
+        //       }
+        //     },
+        //     itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        //       const PopupMenuItem<String>(
+        //         value: 'sync',
+        //         child: Row(
+        //           mainAxisSize: MainAxisSize.min,
+        //           children: [
+        //             Icon(Icons.restore),
+        //             SizedBox(width: 8),
+        //             Text('Sync'),
+        //           ],
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        // ],
       ),
       body: Form(
         key: _storeFormKey,
@@ -83,15 +82,15 @@ class _StoreState extends State<Store> {
                             onPressed: () {
                               if (_storeFormKey.currentState!.validate()) {
                                 if (store.value != null) {
-                                  final val = StoreModel(
-                                    id: store.value!.id,
-                                    title: title.text,
-                                    description: description.text,
-                                    phone: phone.text,
-                                    footer: footer.text,
-                                    subFooter: subFooter.text,
-                                  );
-                                  Database().addStore(val).whenComplete(
+                                  final val = {
+                                    'id': store.value!.id,
+                                    'title': title.text,
+                                    'description': description.text,
+                                    'phone': phone.text,
+                                    'footer': footer.text,
+                                    'subFooter': subFooter.text,
+                                  };
+                                  SupabaseHelper().addStore(val).whenComplete(
                                     () {
                                       storeController.store.refresh();
                                       context.pop();
@@ -108,15 +107,15 @@ class _StoreState extends State<Store> {
                                     },
                                   );
                                 } else {
-                                  final val = StoreModel(
-                                    id: DateTime.now().microsecondsSinceEpoch,
-                                    title: title.text,
-                                    description: description.text,
-                                    phone: phone.text,
-                                    footer: footer.text,
-                                    subFooter: subFooter.text,
-                                  );
-                                  Database().addStore(val).whenComplete(
+                                  final val = {
+                                    'id': DateTime.now().microsecondsSinceEpoch,
+                                    'title': title.text,
+                                    'description': description.text,
+                                    'phone': phone.text,
+                                    'footer': footer.text,
+                                    'subFooter': subFooter.text,
+                                  };
+                                  SupabaseHelper().addStore(val).whenComplete(
                                     () {
                                       storeController.store.refresh();
                                       context.pop();

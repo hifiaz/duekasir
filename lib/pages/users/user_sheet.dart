@@ -57,17 +57,17 @@ class UserSheet extends StatelessWidget {
                             error: (e) => Text('Error $e'),
                             data: (data) {
                               return [
-                                for (UserModel user in data)
+                                for (Users user in data)
                                   DataRow(cells: [
                                     DataCell(Text(user.id.toString())),
                                     DataCell(Text(user.nama)),
                                     DataCell(Text(dateWithoutTime
-                                        .format(user.dob ?? DateTime.now()))),
+                                        .format(DateTime.tryParse(user.dob!) ?? DateTime.now()))),
                                     DataCell(Text(user.status == true
                                         ? 'Active'
                                         : 'Non Active')),
                                     DataCell(Text(dateWithTime
-                                        .format(user.masuk ?? DateTime.now()))),
+                                        .format(DateTime.tryParse(user.masuk!) ?? DateTime.now()))),
                                     DataCell(Text(user.keterangan ?? '')),
                                     DataCell(
                                       const Icon(

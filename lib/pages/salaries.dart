@@ -5,7 +5,7 @@ import 'package:due_kasir/controller/store_controller.dart';
 import 'package:due_kasir/model/salary_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/pages/drawer.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/extension.dart';
 import 'package:due_kasir/widget/pdf_generator.dart';
@@ -64,27 +64,27 @@ class _SalariesState extends State<Salaries> {
             ),
             child: const Text('Refresh'),
           ),
-          PopupMenuButton<String>(
-            onSelected: (item) async {
-              if (item == 'sync') {
-                await Database().salariesSync();
-                await salaryController.salaries.refresh();
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'sync',
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.restore),
-                    SizedBox(width: 8),
-                    Text('Sync'),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          // PopupMenuButton<String>(
+          //   onSelected: (item) async {
+          //     if (item == 'sync') {
+          //       await Database().salariesSync();
+          //       await salaryController.salaries.refresh();
+          //     }
+          //   },
+          //   itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+          //     const PopupMenuItem<String>(
+          //       value: 'sync',
+          //       child: Row(
+          //         mainAxisSize: MainAxisSize.min,
+          //         children: [
+          //           Icon(Icons.restore),
+          //           SizedBox(width: 8),
+          //           Text('Sync'),
+          //         ],
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
       body: password == null
@@ -199,8 +199,8 @@ class _SalariesState extends State<Salaries> {
                       children: salary.map((item) {
                         final status = ['Draf', 'Paid'];
                         return ListTile(
-                          title: FutureBuilder<UserModel?>(
-                            future: Database().getUserById(item.userId),
+                          title: FutureBuilder<Users?>(
+                            future: SupabaseHelper().getUserById(item.userId!),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 return Text(
@@ -214,19 +214,19 @@ class _SalariesState extends State<Salaries> {
                             id: 'status',
                             initialValue: item.status,
                             onChanged: (v) async {
-                              SalaryModel salary = SalaryModel(
-                                id: item.id,
-                                userId: item.userId,
-                                status: v ?? 'Draf',
-                                periode: item.periode,
-                                items: item.items,
-                                deductions: item.deductions,
-                                note: item.note,
-                                management: item.management,
-                                total: item.total,
-                                createdAt: item.createdAt,
-                              );
-                              await Database().updateSalary(salary);
+                              Salary salary = Salary.fromJson({
+                                'id': item.id,
+                                'userId': item.userId,
+                                'status': v ?? 'Draf',
+                                'periode': item.periode,
+                                'items': item.items,
+                                'deductions': item.deductions,
+                                'note': item.note,
+                                'management': item.management,
+                                'total': item.total,
+                                'createdAt': item.createdAt,
+                              });
+                              await SupabaseHelper().updateSalary(salary);
                               Future.delayed(Durations.medium1).then(
                                   (_) => salaryController.salaries.refresh());
                             },
@@ -274,10 +274,11 @@ class _SalariesState extends State<Salaries> {
                                 ),
                               ),
                             ),
-                            DataCell(Text(item.status)),
+                            DataCell(Text(item.status ?? '')),
                             DataCell(
-                              FutureBuilder<UserModel?>(
-                                future: Database().getUserById(item.userId),
+                              FutureBuilder<Users?>(
+                                future:
+                                    SupabaseHelper().getUserById(item.userId!),
                                 builder: (context, snapshot) {
                                   if (snapshot.hasData) {
                                     return Text(snapshot.data?.nama ?? 'Admin');
@@ -286,7 +287,7 @@ class _SalariesState extends State<Salaries> {
                                 },
                               ),
                             ),
-                            DataCell(Text(item.periode)),
+                            DataCell(Text(item.periode ?? '')),
                             DataCell(Text(item.note ?? '')),
                             DataCell(Text(currency.format(item.total))),
                             DataCell(
@@ -299,19 +300,20 @@ class _SalariesState extends State<Salaries> {
                                       id: 'status',
                                       initialValue: item.status,
                                       onChanged: (v) async {
-                                        SalaryModel salary = SalaryModel(
-                                          id: item.id,
-                                          userId: item.userId,
-                                          status: v ?? 'Draf',
-                                          periode: item.periode,
-                                          items: item.items,
-                                          deductions: item.deductions,
-                                          note: item.note,
-                                          management: item.management,
-                                          total: item.total,
-                                          createdAt: item.createdAt,
-                                        );
-                                        await Database().updateSalary(salary);
+                                        Salary salary = Salary.fromJson({
+                                          'id': item.id,
+                                          'userId': item.userId,
+                                          'status': v ?? 'Draf',
+                                          'periode': item.periode,
+                                          'items': item.items,
+                                          'deductions': item.deductions,
+                                          'note': item.note,
+                                          'management': item.management,
+                                          'total': item.total,
+                                          'createdAt': item.createdAt,
+                                        });
+                                        await SupabaseHelper()
+                                            .updateSalary(salary);
                                         Future.delayed(Durations.medium1).then(
                                             (_) => salaryController.salaries
                                                 .refresh());
@@ -334,10 +336,10 @@ class _SalariesState extends State<Salaries> {
                                   ShadButton(
                                     child: const Text('PDF'),
                                     onPressed: () async {
-                                      var user = await Database()
-                                          .getUserById(item.userId);
+                                      var user = await SupabaseHelper()
+                                          .getUserById(item.userId!);
                                       if (user != null) {
-                                        log('hello ${item.items.first.toJson()}');
+                                        log('hello ${item.items?.first.toJson()}');
                                         pdfGenerator(
                                           user: user,
                                           store: store.value!,
@@ -349,7 +351,8 @@ class _SalariesState extends State<Salaries> {
                                   ShadButton.destructive(
                                     icon: const Icon(Icons.delete),
                                     onPressed: () async {
-                                      await Database().deleteSalary(item.id!);
+                                      await SupabaseHelper()
+                                          .removeSalary(item.id);
                                       Future.delayed(Durations.medium1).then(
                                           (_) => salaryController.salaries
                                               .refresh());

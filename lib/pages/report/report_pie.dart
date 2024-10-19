@@ -44,7 +44,7 @@ class ReportPie extends StatelessWidget {
               children: users.value
                       ?.map(
                         (u) => Indicator(
-                          color: converColor(u.id!),
+                          color: converColor(u.id),
                           text: u.nama,
                           isSquare: false,
                         ),
@@ -59,7 +59,7 @@ class ReportPie extends StatelessWidget {
   }
 
   List<PieChartSectionData> showingSections(
-      Map<int, List<PenjualanModel>> user, int total) {
+      Map<int, List<Report>> user, int total) {
     List<PieChartSectionData> listUser = [];
     for (var key in user.entries) {
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];

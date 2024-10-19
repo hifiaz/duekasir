@@ -22,11 +22,11 @@ ButtonStyle nonActive = ElevatedButton.styleFrom(
   ),
 );
 
-double sumReport(List<PenjualanModel> numbers) {
+double sumReport(List<Report> numbers) {
   double sum = 0;
 
   for (var i in numbers) {
-    sum = sum + i.totalHarga;
+    sum = sum + i.totalHarga!;
   }
   return sum;
 }

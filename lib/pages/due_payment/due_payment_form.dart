@@ -2,7 +2,7 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:due_kasir/controller/due_payment_controller.dart';
 import 'package:due_kasir/main.dart';
 import 'package:due_kasir/model/due_payment_model.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -31,9 +31,9 @@ class DuePaymentForm extends HookWidget {
     final hargaJual = useState(0.0);
     final hargaJualDiscount = useState(0.0);
     final status = useState(item?.status ?? 'dept');
-    final dateIn = useState(item?.dateIn ?? DateTime.now());
-    final dueDate =
-        useState(item?.dueDate ?? DateTime.now().add(const Duration(days: 3)));
+    final dateIn = useState(DateTime.tryParse(item?.dateIn ?? '') ?? DateTime.now());
+    final dueDate = useState(DateTime.tryParse(item?.dueDate ?? '') ??
+        DateTime.now().add(const Duration(days: 3)));
 
     useListenable(hargaJual);
     useListenable(editingName);
@@ -206,12 +206,12 @@ class DuePaymentForm extends HookWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (item != null)
+                      if (item != null) ...[
                         ShadButton.destructive(
                           child: const Text('Delete'),
                           onPressed: () {
-                            Database()
-                                .deleteInventory(item.id!)
+                            SupabaseHelper()
+                                .removeInventory(item.id)
                                 .whenComplete(() {
                               duePaymentController.payments.refresh();
                               if (context.mounted) Navigator.pop(context);
@@ -231,6 +231,7 @@ class DuePaymentForm extends HookWidget {
                             });
                           },
                         ),
+                      ],
                       ShadButton(
                         child: const Text('Save changes'),
                         onPressed: () {
@@ -238,22 +239,23 @@ class DuePaymentForm extends HookWidget {
                             return;
                           } else {
                             if (item != null) {
-                              final updateitem = DuePaymentModel(
-                                id: item.id,
-                                name: editingName.text.replaceAll(',', ' '),
-                                invoice: editingInvoice.text,
-                                itemName: editingItemName.text,
-                                itemAmount: stock.value,
-                                amount: int.parse(editingAmount.text),
-                                status: status.value,
-                                dateIn: dateIn.value,
-                                dueDate: dueDate.value,
-                                note: editingNote.text,
-                                createdAt: item.createdAt,
-                              );
+                              final updateitem = {
+                                'id': item.id,
+                                'name': editingName.text.replaceAll(',', ' '),
+                                'invoice': editingInvoice.text,
+                                'itemName': editingItemName.text,
+                                'itemAmount': stock.value,
+                                'amount': int.parse(editingAmount.text),
+                                'status': status.value,
+                                'dateIn': dateIn.value,
+                                'dueDate': dueDate.value,
+                                'note': editingNote.text,
+                                'createdAt': item.createdAt,
+                              };
 
-                              Database()
-                                  .updateDuePayment(updateitem)
+                              SupabaseHelper()
+                                  .updateDuePayment(
+                                      DuePayment.fromJson(updateitem))
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
                                   if (context.mounted) context.pop();
@@ -263,21 +265,21 @@ class DuePaymentForm extends HookWidget {
                                 });
                               });
                             } else {
-                              final newItem = DuePaymentModel(
-                                id: DateTime.now().microsecondsSinceEpoch,
-                                name: editingName.text.replaceAll(',', ' '),
-                                invoice: editingInvoice.text,
-                                itemName: editingItemName.text,
-                                itemAmount: stock.value,
-                                amount: int.parse(editingAmount.text),
-                                status: status.value,
-                                dateIn: dateIn.value,
-                                dueDate: dueDate.value,
-                                note: editingNote.text,
-                                createdAt: DateTime.now(),
-                              );
+                              final newItem = {
+                                'id': DateTime.now().microsecondsSinceEpoch,
+                                'name': editingName.text.replaceAll(',', ' '),
+                                'invoice': editingInvoice.text,
+                                'itemName': editingItemName.text,
+                                'itemAmount': stock.value,
+                                'amount': int.parse(editingAmount.text),
+                                'status': status.value,
+                                'dateIn': dateIn.value,
+                                'dueDate': dueDate.value,
+                                'note': editingNote.text,
+                                'createdAt': DateTime.now(),
+                              };
 
-                              Database()
+                              SupabaseHelper()
                                   .addDuePayment(newItem)
                                   .whenComplete(() {
                                 duePaymentController.payments.refresh();

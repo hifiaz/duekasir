@@ -17,8 +17,7 @@ class ReportBestSeller extends HookWidget {
   Widget build(BuildContext context) {
     final items = reportController.bestSeller.watch(context);
     reportController.report.listen(context, () {
-      final List<PenjualanModel>? listValue =
-          reportController.report.value.value;
+      final List<Report>? listValue = reportController.report.value.value;
       if (listValue != null) {
         if (totalItem.value != listValue.length) {
           totalItem.value = listValue.length;

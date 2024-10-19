@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class ReportVisitorAll extends StatelessWidget {
-  final Map<DateTime, List<PenjualanModel>> items;
+  final Map<DateTime, List<Report>> items;
   const ReportVisitorAll({super.key, required this.items});
 
   @override
@@ -29,7 +29,7 @@ class ReportVisitorAll extends StatelessWidget {
                       title: Text(dateWithoutTime.format(i.key)),
                       subtitle: Text(
                         currency.format(i.value
-                            .fold(0, (p, c) => p + c.totalHarga.toInt())),
+                            .fold(0, (p, c) => p + c.totalHarga!.toInt())),
                       ),
                       trailing: Text('${i.value.length} People',
                           style: ShadTheme.of(context).textTheme.muted),

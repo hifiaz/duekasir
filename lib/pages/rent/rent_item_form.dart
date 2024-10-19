@@ -2,7 +2,7 @@ import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/controller/rent_controller.dart';
 import 'package:due_kasir/main.dart';
 import 'package:due_kasir/model/rent_item_model.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -173,8 +173,8 @@ class RentItemForm extends HookWidget {
                         ShadButton.destructive(
                           child: const Text('Delete'),
                           onPressed: () {
-                            Database()
-                                .deleteRentItem(item.id!)
+                            SupabaseHelper()
+                                .removeRentItem(item.id)
                                 .whenComplete(() {
                               rentController.rentItems.refresh();
                               if (context.mounted) Navigator.pop(context);
@@ -201,19 +201,19 @@ class RentItemForm extends HookWidget {
                             return;
                           } else {
                             if (item != null) {
-                              final updateitem = RentItemModel(
-                                id: item.id,
-                                name: editingName.text.replaceAll(',', ' '),
-                                code: editingCode.text,
-                                rentThreeDay: int.parse(rentThreeDay.text),
-                                rentOneWeek: int.parse(rentOneWeek.text),
-                                rentOneMonth: int.parse(rentOneMonth.text),
-                                jumlahBarang: stock.value,
-                                note: note.text,
-                                createdAt: item.createdAt ?? DateTime.now(),
-                              );
+                              final updateitem = RentItems.fromJson({
+                                'id': item.id,
+                                'name': editingName.text.replaceAll(',', ' '),
+                                'code': editingCode.text,
+                                'rentThreeDay': int.parse(rentThreeDay.text),
+                                'rentOneWeek': int.parse(rentOneWeek.text),
+                                'rentOneMonth': int.parse(rentOneMonth.text),
+                                'jumlahBarang': stock.value,
+                                'note': note.text,
+                                'createdAt': item.createdAt ?? DateTime.now(),
+                              });
 
-                              Database()
+                              SupabaseHelper()
                                   .updateRentItem(updateitem)
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
@@ -223,19 +223,21 @@ class RentItemForm extends HookWidget {
                                 });
                               });
                             } else {
-                              final newItem = RentItemModel(
-                                id: DateTime.now().microsecondsSinceEpoch,
-                                name: editingName.text.replaceAll(',', ' '),
-                                code: editingCode.text,
-                                rentThreeDay: int.parse(rentThreeDay.text),
-                                rentOneWeek: int.parse(rentOneWeek.text),
-                                rentOneMonth: int.parse(rentOneMonth.text),
-                                jumlahBarang: stock.value,
-                                createdAt: DateTime.now(),
-                                note: note.text,
-                              );
+                              final newItem = {
+                                'id': DateTime.now().microsecondsSinceEpoch,
+                                'name': editingName.text.replaceAll(',', ' '),
+                                'code': editingCode.text,
+                                'rentThreeDay': int.parse(rentThreeDay.text),
+                                'rentOneWeek': int.parse(rentOneWeek.text),
+                                'rentOneMonth': int.parse(rentOneMonth.text),
+                                'jumlahBarang': stock.value,
+                                'createdAt': DateTime.now(),
+                                'note': note.text,
+                              };
 
-                              Database().addRentItem(newItem).whenComplete(() {
+                              SupabaseHelper()
+                                  .addRentItem(newItem)
+                                  .whenComplete(() {
                                 rentController.rentItems.refresh();
                                 if (context.mounted) context.pop();
                               });

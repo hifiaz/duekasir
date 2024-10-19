@@ -20,7 +20,7 @@ class ReportRevenue extends StatelessWidget {
     return const SizedBox();
   }
 
-  LineChartData mainData(Map<DateTime, List<PenjualanModel>> data) {
+  LineChartData mainData(Map<DateTime, List<Report>> data) {
     return LineChartData(
       gridData: const FlGridData(show: false),
       titlesData: const FlTitlesData(
@@ -64,7 +64,7 @@ class ReportRevenue extends StatelessWidget {
             for (var i in data.entries)
               FlSpot(
                 i.key.day.toDouble(),
-                i.value.fold(0, (p, c) => p + c.totalHarga),
+                i.value.fold(0, (p, c) => p + c.totalHarga!),
               ),
           ],
           isCurved: true,

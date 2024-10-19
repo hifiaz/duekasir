@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:csv/csv.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
-import 'package:due_kasir/model/item_model.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/model/inventory_model.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -19,7 +19,7 @@ class CsvPreview extends StatefulWidget {
 }
 
 class _CsvPreviewState extends State<CsvPreview> {
-  Future<List<ItemModel>> data() async {
+  Future<List<Inventory>> data() async {
     final csv = inventoryController.csvFile.watch(context);
     final input = File(csv!.path).openRead();
     return await input
@@ -27,19 +27,21 @@ class _CsvPreviewState extends State<CsvPreview> {
         .transform(const CsvToListConverter())
         .skip(1)
         .map((val) {
-      return ItemModel(
-          nama: val[1],
-          code: val[2].toString(),
-          deskripsi: val[3] == 'null' ? null : val[3],
-          jumlahBarang: val[4],
-          quantity: 1,
-          ukuran: val[6].toString(),
-          hargaDasar: val[7],
-          hargaJual: val[8],
-          hargaJualPersen: double.parse(val[9].toString()),
-          diskonPersen: double.tryParse(val[10].toString()),
-          isHargaJualPersen: val[11] == 'TRUE' ? true : false,
-          isSynced: false);
+      final data = {
+        'nama': val[1],
+        'code': val[2].toString(),
+        'deskripsi': val[3] == 'null' ? null : val[3],
+        'jumlahBarang': val[4],
+        'quantity': 1,
+        'ukuran': val[6].toString(),
+        'hargaDasar': val[7],
+        'hargaJual': val[8],
+        'hargaJualPersen': double.parse(val[9].toString()),
+        'diskonPersen': double.tryParse(val[10].toString()),
+        'isHargaJualPersen': val[11] == 'TRUE' ? true : false,
+        'isSynced': false
+      };
+      return Inventory.fromJson(data);
     }).toList();
   }
 
@@ -52,7 +54,7 @@ class _CsvPreviewState extends State<CsvPreview> {
         actions: [
           ShadButton(
             onPressed: () => d.isNotEmpty
-                ? Database().addAllInventory(d).whenComplete(() {
+                ? SupabaseHelper().addAllInventory(d).whenComplete(() {
                     inventoryController.listItemFromCsv.clear();
                     inventoryController.inventorys.refresh();
                     if (context.mounted) context.pop();

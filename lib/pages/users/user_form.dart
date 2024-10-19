@@ -1,6 +1,6 @@
 import 'package:due_kasir/controller/user_controller.dart';
 import 'package:due_kasir/model/user_model.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -24,8 +24,11 @@ class UserForm extends HookWidget {
     final user = userController.userSelected.watch(context);
     final editingName = useTextEditingController(text: user?.nama ?? '');
     final lahirTemp = useTextEditingController(
-        text: user?.dob != null ? dateWithoutTime.format(user!.dob!) : '');
-    final lahir = useState(user?.dob ?? DateTime.now());
+        text: user?.dob != null
+            ? dateWithoutTime.format(DateTime.parse(user?.dob ?? ''))
+            : '');
+    final lahir =
+        useState(DateTime.tryParse(user?.dob ?? '') ?? DateTime.now());
     final status = useState(user?.status ?? true);
     final role = useState(user?.keterangan ?? 'User');
     return Scaffold(
@@ -63,7 +66,8 @@ class UserForm extends HookWidget {
                         onTap: () async {
                           DateTime? pickedDate = await showDatePicker(
                               context: context,
-                              initialDate: user?.dob ?? DateTime.now(),
+                              initialDate: DateTime.tryParse(user?.dob ?? '') ??
+                                  DateTime.now(),
                               firstDate: DateTime(1950),
                               //DateTime.now() - not to allow to choose before today.
                               lastDate: DateTime(2100));
@@ -134,7 +138,9 @@ class UserForm extends HookWidget {
                         ShadButton.destructive(
                           child: const Text('Delete'),
                           onPressed: () {
-                            Database().deleteUser(user.id!).whenComplete(() {
+                            SupabaseHelper()
+                                .removeUsers(user.id)
+                                .whenComplete(() {
                               userController.users.refresh();
                               Navigator.pop(context);
                             });
@@ -147,37 +153,41 @@ class UserForm extends HookWidget {
                             return;
                           } else {
                             if (user != null) {
-                              final updateUser = UserModel(
-                                id: user.id,
-                                nama: editingName.text,
-                                dob: lahir.value,
-                                status: status.value,
-                                keterangan: role.value,
-                                masuk: DateTime.now(),
-                                createdAt: user.createdAt,
-                              );
-                              Database()
-                                  .updateUser(updateUser)
+                              final updateUser = Users.fromJson({
+                                'id': user.id,
+                                'nama': editingName.text,
+                                'dob': lahir.value.toString(),
+                                'status': status.value,
+                                'keterangan': role.value,
+                                'masuk': DateTime.now(),
+                                'createdAt': user.createdAt,
+                              });
+                              SupabaseHelper()
+                                  .updateUsers(updateUser)
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
                                   userController.users.refresh();
-                                  context.pop();
+                                  if (context.mounted) context.pop();
                                 });
                               });
                             } else {
-                              final newUser = UserModel(
-                                id: DateTime.now().microsecondsSinceEpoch,
-                                nama: editingName.text,
-                                dob: lahir.value,
-                                status: status.value,
-                                keterangan: role.value,
-                                masuk: DateTime.now(),
-                                createdAt: DateTime.now(),
-                              );
+                              final newUser = {
+                                'id': DateTime.now().microsecondsSinceEpoch,
+                                'nama': editingName.text,
+                                'dob': lahir.value.toString(),
+                                'status': status.value,
+                                'keterangan': role.value,
+                                'masuk': DateTime.now(),
+                                'createdAt': DateTime.now(),
+                              };
 
-                              Database().addNewUser(newUser).whenComplete(() {
+                              SupabaseHelper()
+                                  .addUsers(newUser)
+                                  .whenComplete(() {
                                 userController.users.refresh();
-                                context.pop();
+                                if (context.mounted) {
+                                  context.pop();
+                                }
                               });
                             }
                           }

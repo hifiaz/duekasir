@@ -1,27 +1,38 @@
-import 'package:due_kasir/model/penjualan_model.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/model/inventory_model.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:signals/signals_flutter.dart';
 
 class ReportController {
   final dateRange = listSignal(
       [DateTime.now().subtract(const Duration(days: 31)), DateTime.now()]);
   final report = futureSignal(
-    () async => Database().getReport(
+    () async => SupabaseHelper().getRepots(
         start: reportController.dateRange.first,
         end: reportController.dateRange.last),
   );
-  final reportToday = futureSignal(() async => Database().getReportToday());
-  final reportYesterday =
-      futureSignal(() async => Database().getReportYesterday());
-  final reportUser = futureSignal(() async => Database().getSalesByUser());
+  final reportToday = futureSignal(() async => SupabaseHelper().getRepots(
+      start: DateTime.now().copyWith(hour: 0, minute: 0, second: 0),
+      end: DateTime.now().copyWith(hour: 23, minute: 59, second: 59)));
+
+  final reportYesterday = futureSignal(() async => SupabaseHelper().getRepots(
+      start: DateTime.now()
+          .subtract(const Duration(days: 1))
+          .copyWith(hour: 0, minute: 0, second: 0),
+      end: DateTime.now()
+          .subtract(const Duration(days: 1))
+          .copyWith(hour: 23, minute: 59, second: 59)));
+  final reportUser =
+      futureSignal(() async => SupabaseHelper().getReportsByUser());
   final reportIncome = futureSignal(
-    () async => Database().getSalesByDate(
+    () async => SupabaseHelper().getSalesByDate(
         start: reportController.dateRange.first,
         end: reportController.dateRange.last),
   );
-  final reportOutOfStcok = futureSignal(() async => Database().getOutStock());
-  final bestSeller = listSignal<ProductItemModel>([], autoDispose: true);
-  final rentRevenue = futureSignal(() async => Database().getRentRevenue());
+  final reportOutOfStcok =
+      futureSignal(() async => SupabaseHelper().getOutStock());
+  final bestSeller = listSignal<Inventory>([], autoDispose: true);
+  final rentRevenue =
+      futureSignal(() async => SupabaseHelper().getRentRevenue());
 }
 
 final reportController = ReportController();

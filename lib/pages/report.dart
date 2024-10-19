@@ -2,7 +2,6 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:due_kasir/controller/expenses_controller.dart';
 import 'package:due_kasir/controller/inventory_controller.dart';
 import 'package:due_kasir/controller/report_controller.dart';
-import 'package:due_kasir/model/penjualan_model.dart';
 import 'package:due_kasir/model/user_model.dart';
 import 'package:due_kasir/pages/drawer.dart';
 import 'package:due_kasir/pages/report/report_bestseller.dart';
@@ -12,7 +11,7 @@ import 'package:due_kasir/pages/report/report_revenue.dart';
 import 'package:due_kasir/pages/report/report_sync_dialog.dart';
 import 'package:due_kasir/pages/report/report_visitor_weekly.dart';
 import 'package:due_kasir/pages/report/report_visitors.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:due_kasir/utils/extension.dart';
@@ -71,29 +70,29 @@ class _ReportState extends State<Report> {
             ),
             child: Text(isLoading ? 'Loading...' : 'Refresh'),
           ),
-          PopupMenuButton<String>(
-            onSelected: (item) async {
-              if (item == 'sync') {
-                await Database().checkIsReportSynced();
-                reportController.report.refresh();
-                reportController.reportToday.refresh();
-                reportController.reportYesterday.refresh();
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'sync',
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.restore),
-                    SizedBox(width: 8),
-                    Text('Sync'),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          // PopupMenuButton<String>(
+          //   onSelected: (item) async {
+          //     if (item == 'sync') {
+          //       await SupabaseHelper().checkIsReportSynced();
+          //       reportController.report.refresh();
+          //       reportController.reportToday.refresh();
+          //       reportController.reportYesterday.refresh();
+          //     }
+          //   },
+          //   itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+          //     const PopupMenuItem<String>(
+          //       value: 'sync',
+          //       child: Row(
+          //         mainAxisSize: MainAxisSize.min,
+          //         children: [
+          //           Icon(Icons.restore),
+          //           SizedBox(width: 8),
+          //           Text('Sync'),
+          //         ],
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
       body: SingleChildScrollView(
@@ -176,7 +175,7 @@ class _ReportState extends State<Report> {
                         width: screen,
                         title: Text(
                             currency.format(report.value!.fold(
-                                    0, (p, c) => p + c.totalHarga.toInt()) -
+                                    0, (p, c) => p + c.totalHarga!.toInt()) -
                                 report.value!.fold(
                                     0,
                                     (p, c) =>
@@ -197,7 +196,7 @@ class _ReportState extends State<Report> {
                       width: screen,
                       title: Text(
                           currency.format((rentRevenue.value ?? [])
-                              .fold(0, (p, c) => p + c.amount)),
+                              .fold(0, (p, c) => p + c.amount!)),
                           style: theme.textTheme.h4),
                       description: const Text('Rent Revenue'),
                     ),
@@ -209,7 +208,7 @@ class _ReportState extends State<Report> {
                         width: screen,
                         title: Text(
                             currency.format(expenses.value!
-                                .fold(0, (p, c) => p + c.amount)),
+                                .fold(0, (p, c) => p + c.amount!)),
                             style:
                                 theme.textTheme.h4.copyWith(color: Colors.red)),
                         description: const Text('Expenses'),
@@ -258,7 +257,7 @@ class _ReportState extends State<Report> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                  '${n.nama} - ${n.jumlahBarang} Item Left',
+                                                  '${n.nama ?? ''} - ${n.jumlahBarang} Item Left',
                                                   style: theme.textTheme.small),
                                               const SizedBox(height: 4),
                                               Text(
@@ -317,7 +316,7 @@ class _ReportState extends State<Report> {
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Column(
                   children: [
-                    ShadAccordion<PenjualanModel>.multiple(
+                    ShadAccordion<Report>.multiple(
                       children: (report.value ?? []).reversed.map(
                             (detail) => ShadAccordionItem(
                               value: detail,
@@ -336,9 +335,9 @@ class _ReportState extends State<Report> {
                                             .textTheme
                                             .small,
                                       ),
-                                      FutureBuilder<UserModel?>(
-                                        future: Database()
-                                            .getUserById(detail.kasir),
+                                      FutureBuilder<Users?>(
+                                        future: SupabaseHelper()
+                                            .getUserById(detail.kasir!),
                                         builder: (context, snapshot) {
                                           if (snapshot.hasData) {
                                             return Text(
@@ -362,8 +361,8 @@ class _ReportState extends State<Report> {
                                             .small,
                                       ),
                                       Text(
-                                          dateDayWithTime
-                                              .format(detail.createdAt),
+                                          dateDayWithTime.format(
+                                              DateTime.parse(detail.createdAt)),
                                           style: ShadTheme.of(context)
                                               .textTheme
                                               .muted),
@@ -409,7 +408,7 @@ class _ReportState extends State<Report> {
                                             context: context,
                                             builder: (context) =>
                                                 ReportSyncDialog(
-                                              id: detail.id!,
+                                              id: detail.id,
                                               detail: detail,
                                             ),
                                           );
@@ -429,7 +428,7 @@ class _ReportState extends State<Report> {
                                               context: context,
                                               builder: (context) =>
                                                   ReportDeleteDialog(
-                                                      id: detail.id!));
+                                                      id: detail.id));
                                         },
                                         icon: const Padding(
                                           padding: EdgeInsets.only(right: 8),

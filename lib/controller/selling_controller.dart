@@ -4,10 +4,10 @@ import 'package:due_kasir/controller/selling/events.dart';
 import 'package:due_kasir/controller/selling/service.dart';
 import 'package:due_kasir/enum/payment_enum.dart';
 import 'package:due_kasir/model/card_model.dart';
-import 'package:due_kasir/model/item_model.dart';
 import 'package:due_kasir/model/customer_model.dart';
+import 'package:due_kasir/model/inventory_model.dart';
 import 'package:due_kasir/model/user_model.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -16,8 +16,8 @@ class SellingController {
   final CartService _cartService;
   final isSearch = Signal(false);
   final tipeBayar = Signal(TypePayment.qris);
-  final pelanggan = Signal<CustomerModel?>(null);
-  final kasir = Signal<UserModel?>(null);
+  final pelanggan = Signal<Customer?>(null);
+  final kasir = Signal<Users?>(null);
   final selectedPrint = Signal<String>("Xprinter XP-T371U");
 
   late final _cart = signal<AsyncState<Cart>>(const AsyncLoading());
@@ -75,12 +75,12 @@ class SellingController {
     }
   }
 
-  Future<void> updateBatch(List<ItemModel> items) async {
-    await Future.forEach<ItemModel>(items, (i) async {
+  Future<void> updateBatch(List<Inventory> items) async {
+    await Future.forEach<Inventory>(items, (i) async {
       final item = i
-        ..jumlahBarang = i.jumlahBarang - i.quantity
+        ..jumlahBarang = i.jumlahBarang! - i.quantity!
         ..quantity = 1;
-      await Database().updateInventory(item);
+      await SupabaseHelper().updateInventory(item);
     });
     Future.delayed(Durations.short1).then((_) {
       inventoryController.inventorys.refresh();

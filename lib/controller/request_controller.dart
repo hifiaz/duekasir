@@ -4,7 +4,7 @@ import 'package:signals/signals_flutter.dart';
 
 class RequestController {
   final requests = futureSignal(() async => SupabaseHelper().getRequests());
-  final requestItemSelected = signal<RequestModel?>(null);
+  final requestItemSelected = signal<Request?>(null);
 }
 
 final requestController = RequestController();

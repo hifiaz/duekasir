@@ -1,8 +1,8 @@
 import 'package:due_kasir/controller/selling/events.dart';
 import 'package:due_kasir/controller/selling_controller.dart';
-import 'package:due_kasir/model/item_model.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/model/inventory_model.dart';
 import 'package:due_kasir/service/get_it.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/extension.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +37,7 @@ class SellingLeft extends HookWidget {
                             builder: (context) =>
                                 const SimpleBarcodeScannerPage(),
                           ));
-                      final data = await Database().searchByBarcode(res);
+                      final data = await SupabaseHelper().searchByBarcode(res);
                       if (data != null) {
                         editingBarcode.text = res;
                         getIt
@@ -69,17 +69,17 @@ class SellingLeft extends HookWidget {
                 ),
                 if (isSearch)
                   Expanded(
-                    child: Autocomplete<ItemModel>(
+                    child: Autocomplete<Inventory>(
                       optionsBuilder:
                           (TextEditingValue textEditingValue) async {
                         if (textEditingValue.text == '') {
-                          return const Iterable<ItemModel>.empty();
+                          return const Iterable<Inventory>.empty();
                         }
-                        final data = await Database()
+                        final data = await SupabaseHelper()
                             .searchInventorys(value: textEditingValue.text);
                         return data;
                       },
-                      onSelected: (ItemModel value) {
+                      onSelected: (Inventory value) {
                         getIt
                             .get<SellingController>()
                             .dispatch(CartItemAdded(value));
@@ -105,7 +105,7 @@ class SellingLeft extends HookWidget {
                                           option.jumlahBarang.toString(),
                                         ),
                                       ),
-                                      title: Text(option.nama),
+                                      title: Text(option.nama ?? ''),
                                       subtitle: Row(
                                         children: [
                                           Text(
@@ -127,7 +127,7 @@ class SellingLeft extends HookWidget {
                                           if (option.diskonPersen != null &&
                                               option.diskonPersen != 0)
                                             Text(
-                                              ' >> ${currency.format(option.hargaJual - option.hargaJual * (option.diskonPersen! / 100))}',
+                                              ' >> ${currency.format(option.hargaJual! - option.hargaJual! * (option.diskonPersen! / 100))}',
                                               style: const TextStyle(
                                                   color: Colors.green),
                                             ),
@@ -163,7 +163,7 @@ class SellingLeft extends HookWidget {
                   BarcodeKeyboardListener(
                     bufferDuration: const Duration(milliseconds: 200),
                     onBarcodeScanned: (barcode) async {
-                      final data = await Database()
+                      final data = await SupabaseHelper()
                           .searchByBarcode(barcode.replaceAll('½', '-'));
                       if (data != null) {
                         editingBarcode.text = barcode.replaceAll('½', '-');
@@ -206,7 +206,7 @@ class SellingLeft extends HookWidget {
                 children: item.items
                     .map(
                       (val) => Container(
-                        decoration: val.quantity > val.jumlahBarang
+                        decoration: val.quantity! > val.jumlahBarang!
                             ? BoxDecoration(
                                 border: Border.all(
                                   color: Colors.red,
@@ -220,7 +220,7 @@ class SellingLeft extends HookWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (val.quantity > val.jumlahBarang)
+                            if (val.quantity! > val.jumlahBarang!)
                               Padding(
                                 padding:
                                     const EdgeInsets.only(left: 8.0, top: 8.0),
@@ -233,7 +233,7 @@ class SellingLeft extends HookWidget {
                                 ),
                               ),
                             ListTile(
-                              title: Text(val.nama),
+                              title: Text(val.nama ?? ''),
                               subtitle: Row(
                                 children: [
                                   Text(
@@ -251,7 +251,7 @@ class SellingLeft extends HookWidget {
                                   if (val.diskonPersen != null &&
                                       val.diskonPersen != 0)
                                     Text(
-                                        ' >> ${currency.format(val.hargaJual - val.hargaJual * (val.diskonPersen! / 100))}'),
+                                        ' >> ${currency.format(val.hargaJual! - val.hargaJual! * (val.diskonPersen! / 100))}'),
                                 ],
                               ),
                               trailing: Text(val.quantity.toString()),

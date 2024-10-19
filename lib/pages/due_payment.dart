@@ -1,6 +1,5 @@
 import 'package:due_kasir/controller/due_payment_controller.dart';
 import 'package:due_kasir/pages/drawer.dart';
-import 'package:due_kasir/service/database.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:due_kasir/utils/extension.dart';
@@ -39,27 +38,27 @@ class _DuePaymentState extends State<DuePayment> with SignalsMixin {
             ),
             child: const Text('Refresh'),
           ),
-          PopupMenuButton<String>(
-            onSelected: (item) async {
-              if (item == 'sync') {
-                await Database().duePaymentSync();
-                await duePaymentController.payments.refresh();
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'sync',
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.restore),
-                    SizedBox(width: 8),
-                    Text('Sync'),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          // PopupMenuButton<String>(
+          //   onSelected: (item) async {
+          //     if (item == 'sync') {
+          //       await Database().duePaymentSync();
+          //       await duePaymentController.payments.refresh();
+          //     }
+          //   },
+          //   itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+          //     const PopupMenuItem<String>(
+          //       value: 'sync',
+          //       child: Row(
+          //         mainAxisSize: MainAxisSize.min,
+          //         children: [
+          //           Icon(Icons.restore),
+          //           SizedBox(width: 8),
+          //           Text('Sync'),
+          //         ],
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
       body: SingleChildScrollView(
@@ -81,14 +80,16 @@ class _DuePaymentState extends State<DuePayment> with SignalsMixin {
                               i.status == 'paid'
                                   ? ShadBadge(
                                       backgroundColor: Colors.green,
-                                      child: Text(i.status.toUpperCase()),
+                                      child: Text(i.status!.toUpperCase()),
                                     )
                                   : ShadBadge.destructive(
-                                      child: Text(i.status.toUpperCase()),
+                                      child: Text(i.status!.toUpperCase()),
                                     ),
                               Text(currency.format(i.amount)),
                               Text(
-                                dateWithoutTime.format(i.dueDate),
+                                dateWithoutTime.format(
+                                    DateTime.tryParse(i.dueDate!) ??
+                                        DateTime.now()),
                                 style: TextStyle(
                                     color: i.status == 'paid'
                                         ? Colors.green
@@ -127,7 +128,7 @@ class _DuePaymentState extends State<DuePayment> with SignalsMixin {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(item.name),
+                              Text(item.name ?? ''),
                               Text(item.invoice ?? ''),
                             ],
                           ),
@@ -145,15 +146,19 @@ class _DuePaymentState extends State<DuePayment> with SignalsMixin {
                           item.status == 'paid'
                               ? ShadBadge(
                                   backgroundColor: Colors.green,
-                                  child: Text(item.status.toUpperCase()),
+                                  child: Text(item.status!.toUpperCase()),
                                 )
                               : ShadBadge.destructive(
-                                  child: Text(item.status.toUpperCase()),
+                                  child: Text(item.status!.toUpperCase()),
                                 ),
                         ),
                         DataCell(Text(item.note ?? '')),
-                        DataCell(Text(dateWithoutTime.format(item.dateIn))),
-                        DataCell(Text(dateWithoutTime.format(item.dueDate))),
+                        DataCell(Text(dateWithoutTime.format(
+                            DateTime.tryParse(item.dateIn!) ??
+                                DateTime.now()))),
+                        DataCell(Text(dateWithoutTime.format(
+                            DateTime.tryParse(item.dueDate!) ??
+                                DateTime.now()))),
                         DataCell(
                           const Icon(Icons.more_horiz),
                           onTap: () {

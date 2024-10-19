@@ -1,13 +1,13 @@
-import 'package:due_kasir/model/item_model.dart';
+import 'package:due_kasir/model/inventory_model.dart';
 import 'package:equatable/equatable.dart';
 
 class Cart extends Equatable {
-  const Cart({this.items = const <ItemModel>[]});
+  const Cart({this.items = const <Inventory>[]});
 
-  final List<ItemModel> items;
+  final List<Inventory> items;
 
   int get totalItem {
-    return items.fold(0, (total, current) => total + current.quantity);
+    return items.fold(0, (total, current) => total + current.quantity!.toInt());
   }
 
   double get totalPrice {
@@ -16,10 +16,11 @@ class Cart extends Equatable {
         (total, current) =>
             total +
             (current.diskonPersen == null
-                ? (current.quantity * current.hargaJual)
-                : (current.quantity *
-                    (current.hargaJual -
-                        current.hargaJual * (current.diskonPersen! / 100)))));
+                ? (current.quantity!.toInt() * current.hargaJual!.toDouble())
+                : (current.quantity!.toInt() *
+                    (current.hargaJual!.toDouble() -
+                        current.hargaJual!.toDouble() *
+                            (current.diskonPersen! / 100)))));
   }
 
   @override

@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class RequestCard extends StatefulWidget {
-  final RequestModel val;
+  final Request val;
   const RequestCard({super.key, required this.val});
 
   @override
@@ -66,12 +66,13 @@ class _RequestCardState extends State<RequestCard> {
                           child: const Text('Save'),
                           onPressed: () async {
                             if (title.text.isNotEmpty) {
-                              RequestModel request = RequestModel(
-                                  id: widget.val.id,
-                                  title: title.text,
-                                  note: widget.val.note,
-                                  status: widget.val.status,
-                                  createdAt: widget.val.createdAt);
+                              Request request = Request.fromJson({
+                                'id': widget.val.id,
+                                'title': title.text,
+                                'note': widget.val.note,
+                                'status': widget.val.status,
+                                'createdAt': widget.val.createdAt
+                              });
                               await SupabaseHelper().updateRequest(request);
                               requestController.requests.refresh();
                               popoverController.toggle();
@@ -94,7 +95,8 @@ class _RequestCardState extends State<RequestCard> {
           ),
         ],
       ),
-      description: Text(dateWithTime.format(widget.val.createdAt!)),
+      description:
+          Text(dateWithTime.format(DateTime.parse(widget.val.createdAt))),
       footer: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

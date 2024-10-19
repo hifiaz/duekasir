@@ -73,7 +73,7 @@ class CustomerSheet extends HookWidget {
                           rows: customer.map((user) {
                             return DataRow(cells: [
                               DataCell(Text(user.id.toString())),
-                              DataCell(Text(user.nama)),
+                              DataCell(Text(user.nama ?? '')),
                               DataCell(Text((user.phone ?? '').toString())),
                               DataCell(Text(user.status == true
                                   ? 'Active'

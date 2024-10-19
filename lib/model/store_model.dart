@@ -1,44 +1,12 @@
-import 'package:isar/isar.dart';
+import 'package:json/json.dart';
 
-part 'store_model.g.dart';
-
-@collection
+@JsonCodable()
 class StoreModel {
-  Id? id = Isar.autoIncrement;
-  late String title;
-  late String description;
-  late String phone;
-  String? footer;
-  String? subFooter;
-
-  StoreModel({
-    this.id,
-    required this.title,
-    required this.description,
-    required this.phone,
-    this.footer,
-    this.subFooter,
-  });
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'id': id,
-      'title': title,
-      'description': description,
-      'phone': phone,
-      'footer': footer,
-      'subFooter': subFooter,
-    };
-  }
-
-  factory StoreModel.fromJson(json) {
-    return StoreModel(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      phone: json['phone'],
-      footer: json['footer'],
-      subFooter: json['subFooter'],
-    );
-  }
+  final int id;
+  final String title;
+  final String? description;
+  final String? phone;
+  final String? footer;
+  final String? subFooter;
+  final String? user;
 }

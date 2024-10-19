@@ -1,6 +1,5 @@
 import 'package:due_kasir/controller/expenses_controller.dart';
-import 'package:due_kasir/model/expenses_model.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,13 +26,14 @@ class ExpensesForm extends HookWidget {
           ShadButton(
               onPressed: () async {
                 if (expensesFormKey.currentState!.validate()) {
-                  final newItem = ExpensesModel(
-                      id: DateTime.now().microsecondsSinceEpoch,
-                      title: title.text,
-                      amount: int.parse(amount.text),
-                      note: note.text,
-                      createdAt: date.value);
-                  await Database().addExpenses(newItem).whenComplete(() {
+                  final newItem = {
+                    'id': DateTime.now().microsecondsSinceEpoch,
+                    'title': title.text,
+                    'amount': int.parse(amount.text),
+                    'note': note.text,
+                    'createdAt': date.value
+                  };
+                  await SupabaseHelper().addExpenses(newItem).whenComplete(() {
                     expensesController.expenses.refresh();
                     if (context.mounted) context.pop();
                   });

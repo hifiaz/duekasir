@@ -1,14 +1,4 @@
-import 'package:due_kasir/controller/customer_controller.dart';
-import 'package:due_kasir/controller/due_payment_controller.dart';
-import 'package:due_kasir/controller/expenses_controller.dart';
-import 'package:due_kasir/controller/inventory_controller.dart';
-import 'package:due_kasir/controller/presence_controller.dart';
-import 'package:due_kasir/controller/rent_controller.dart';
-import 'package:due_kasir/controller/report_controller.dart';
-import 'package:due_kasir/controller/store_controller.dart';
-import 'package:due_kasir/controller/user_controller.dart';
 import 'package:due_kasir/pages/drawer.dart';
-import 'package:due_kasir/service/database.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:signals/signals_flutter.dart';
@@ -23,7 +13,7 @@ class Sync extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
     User? user = Supabase.instance.client.auth.currentUser;
-    final sync = isSync.watch(context);
+    // final sync = isSync.watch(context);
     return Scaffold(
       drawer: const NavDrawer(),
       appBar: AppBar(
@@ -36,54 +26,54 @@ class Sync extends StatelessWidget {
           title: Text('Sync', style: theme.textTheme.h4),
           description: const Text(
               'Do you have data on cloud before? if not you can ignore this page and move to other menu'),
-          footer: ShadButton(
-            width: double.infinity,
-            child: Text(sync ? 'Loading...' : 'Sync Data'),
-            onPressed: () async {
-              if (user == null) return;
-              isSync.value = true;
-              // store
-              await Database().syncStore();
-              await storeController.store.refresh();
-              // users
-              await Database().syncUsers();
-              await userController.users.refresh();
-              // rent
-              await Database().rentSync();
-              await rentController.rents.refresh();
-              await Database().rentItemSync();
-              await rentController.rentItems.refresh();
-              // expenses
-              await Database().expensesSync();
-              await expensesController.expenses.refresh();
-              // presense
-              await Database().presenseSync();
-              await presenceController.presence.refresh();
-              // report
-              await Database().checkIsReportSynced();
-              await reportController.report.refresh();
-              await reportController.reportToday.refresh();
-              await reportController.reportYesterday.refresh();
-              // inventory
-              await Database().checkIsInventorySynced();
-              await Database().getInventorys();
-              await inventoryController.inventorys.refresh();
-              // customer
-              await Database().syncCustomers();
-              await customerController.customer.refresh();
-              //due payment
-              await Database().duePaymentSync();
-              await duePaymentController.payments.refresh();
-              isSync.value = false;
-              if (context.mounted) {
-                ShadToaster.of(context).show(
-                  const ShadToast(
-                    description: Text('Sync Done, Enjoy Due Kasir!'),
-                  ),
-                );
-              }
-            },
-          ),
+          // footer: ShadButton(
+          //   width: double.infinity,
+          //   child: Text(sync ? 'Loading...' : 'Sync Data'),
+          //   onPressed: () async {
+          //     if (user == null) return;
+          //     isSync.value = true;
+          //     // store
+          //     await Database().syncStore();
+          //     await storeController.store.refresh();
+          //     // users
+          //     await Database().syncUsers();
+          //     await userController.users.refresh();
+          //     // rent
+          //     await Database().rentSync();
+          //     await rentController.rents.refresh();
+          //     await Database().rentItemSync();
+          //     await rentController.rentItems.refresh();
+          //     // expenses
+          //     await Database().expensesSync();
+          //     await expensesController.expenses.refresh();
+          //     // presense
+          //     await Database().presenseSync();
+          //     await presenceController.presence.refresh();
+          //     // report
+          //     await Database().checkIsReportSynced();
+          //     await reportController.report.refresh();
+          //     await reportController.reportToday.refresh();
+          //     await reportController.reportYesterday.refresh();
+          //     // inventory
+          //     await Database().checkIsInventorySynced();
+          //     await Database().getInventorys();
+          //     await inventoryController.inventorys.refresh();
+          //     // customer
+          //     await Database().syncCustomers();
+          //     await customerController.customer.refresh();
+          //     //due payment
+          //     await Database().duePaymentSync();
+          //     await duePaymentController.payments.refresh();
+          //     isSync.value = false;
+          //     if (context.mounted) {
+          //       ShadToaster.of(context).show(
+          //         const ShadToast(
+          //           description: Text('Sync Done, Enjoy Due Kasir!'),
+          //         ),
+          //       );
+          //     }
+          //   },
+          // ),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Column(

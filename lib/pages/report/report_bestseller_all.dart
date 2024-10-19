@@ -1,10 +1,10 @@
 import 'package:collection/collection.dart';
-import 'package:due_kasir/model/penjualan_model.dart';
+import 'package:due_kasir/model/inventory_model.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:flutter/material.dart';
 
 class ReportBestSellerAll extends StatelessWidget {
-  final List<ProductItemModel> items;
+  final List<Inventory> items;
   const ReportBestSellerAll({super.key, required this.items});
 
   @override

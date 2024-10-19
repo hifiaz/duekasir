@@ -4,7 +4,7 @@ import 'package:due_kasir/controller/salary_controller.dart';
 import 'package:due_kasir/controller/user_controller.dart';
 import 'package:due_kasir/model/salary_model.dart';
 import 'package:due_kasir/model/user_model.dart';
-import 'package:due_kasir/service/database.dart';
+import 'package:due_kasir/service/supabase_service.dart';
 import 'package:due_kasir/utils/constant.dart';
 import 'package:due_kasir/utils/date_utils.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +16,8 @@ final itemSalary = listSignal<ItemSalary>([], autoDispose: true);
 final itemDeductions = listSignal<ItemSalary>([], autoDispose: true);
 
 class SalariesForm extends StatefulWidget {
-  final UserModel? selectedUser;
-  final SalaryModel? salary;
+  final Users? selectedUser;
+  final Salary? salary;
   const SalariesForm({super.key, this.selectedUser, this.salary});
 
   @override
@@ -36,7 +36,7 @@ class _SalariesFormState extends State<SalariesForm> {
   int? tempTotal;
   final salariesFormKey = GlobalKey<ShadFormState>();
   final status = ['Draf', 'Paid'];
-  UserModel? user;
+  Users? user;
 
   @override
   void initState() {
@@ -67,7 +67,7 @@ class _SalariesFormState extends State<SalariesForm> {
     itemSalary.value = widget.salary?.items ?? [];
     if (widget.salary?.items != null) {
       itemsCount = (widget.salary?.items ?? []).length;
-      await Future.forEach(widget.salary!.items, (item) async {
+      await Future.forEach(widget.salary!.items!, (item) async {
         formItems.add(buildItemField(item.id!, item: item));
       });
     }
@@ -107,7 +107,7 @@ class _SalariesFormState extends State<SalariesForm> {
                   Wrap(
                     children: [
                       if (users.hasValue && users.value?.isNotEmpty == true)
-                        ShadSelectFormField<UserModel>(
+                        ShadSelectFormField<Users>(
                           id: 'user',
                           initialValue: widget.selectedUser,
                           label: const Text('User'),
@@ -189,7 +189,7 @@ class _SalariesFormState extends State<SalariesForm> {
                       reportBonus.map(
                         data: (data) {
                           return Text(
-                              'Hitungan ${currency.format(data.fold(0, (p, c) => p + c.totalHarga.toInt()))} >> Bonus : ${currency.format(data.fold(0, (p, c) => p + c.totalHarga.toInt()) * 1 / 100)}');
+                              'Hitungan ${currency.format(data.fold(0, (p, c) => p + c.totalHarga!.toInt()))} >> Bonus : ${currency.format(data.fold(0, (p, c) => p + c.totalHarga!.toInt()) * 1 / 100)}');
                         },
                         error: (error, __) => const Text('Error'),
                         loading: () => const CircularProgressIndicator(),
@@ -300,24 +300,26 @@ class _SalariesFormState extends State<SalariesForm> {
                       child: const Text('Save'),
                       onPressed: () {
                         if (salariesFormKey.currentState!.saveAndValidate()) {
-                          SalaryModel salary = SalaryModel(
-                            id: DateTime.now().microsecondsSinceEpoch,
-                            userId: user!.id!,
-                            status:
+                          var salary = {
+                            'id': DateTime.now().microsecondsSinceEpoch,
+                            'userId': user!.id,
+                            'status':
                                 salariesFormKey.currentState!.value['status'],
-                            periode:
+                            'periode':
                                 salariesFormKey.currentState!.value['periode'],
-                            items: items,
-                            deductions: deductions,
-                            note: note.text,
-                            management: management.text,
-                            total: int.parse(total.text),
-                            createdAt: DateTime.now(),
-                          );
+                            'items': items,
+                            'deductions': deductions,
+                            'note': note.text,
+                            'management': management.text,
+                            'total': int.parse(total.text),
+                            'createdAt': DateTime.now(),
+                          };
 
-                          Database().addSalary(salary).whenComplete(() {
+                          SupabaseHelper().addSalary(salary).whenComplete(() {
                             salaryController.salaries.refresh();
-                            Navigator.of(context).pop(false);
+                            if (context.mounted) {
+                              Navigator.of(context).pop(false);
+                            }
                           });
                         }
                       },
@@ -438,14 +440,16 @@ class _SalariesFormState extends State<SalariesForm> {
     if (amount != null || amount?.isEmpty == true) {
       final ItemSalary? item =
           itemSalary.lastWhereOrNull((item) => item.id == i);
-      var temp = ItemSalary(id: i, description: item!.description);
+      var temp =
+          ItemSalary.fromJson({'id': i, 'description': item!.description});
       if (item.id == i) {
         itemSalary.removeWhere((e) => e.id == i);
       }
-      itemSalary.add(
-          ItemSalary(id: i, description: temp.description, amount: amount));
+      itemSalary.add(ItemSalary.fromJson(
+          {'id': i, 'description': temp.description, 'amount': amount}));
     } else {
-      itemSalary.add(ItemSalary(id: i, description: description));
+      itemSalary
+          .add(ItemSalary.fromJson({'id': i, 'description': description}));
     }
   }
 
@@ -453,14 +457,16 @@ class _SalariesFormState extends State<SalariesForm> {
     if (amount != null || amount?.isEmpty == true) {
       final ItemSalary? item =
           itemDeductions.value.lastWhereOrNull((item) => item.id == i);
-      var temp = ItemSalary(id: i, description: item!.description);
+      var temp =
+          ItemSalary.fromJson({'id': i, 'description': item!.description});
       if (item.id == i) {
         itemDeductions.value.removeWhere((e) => e.id == i);
       }
-      itemDeductions.value.add(
-          ItemSalary(id: i, description: temp.description, amount: amount));
+      itemDeductions.value.add(ItemSalary.fromJson(
+          {'id': i, 'description': temp.description, 'amount': amount}));
     } else {
-      itemDeductions.value.add(ItemSalary(id: i, description: description));
+      itemDeductions.value
+          .add(ItemSalary.fromJson({'id': i, 'description': description}));
     }
   }
 }

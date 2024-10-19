@@ -8,6 +8,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   file_saver
   permission_handler_windows
   powersync_flutter_libs
+  print_bluetooth_thermal
   share_plus
   sqlite3_flutter_libs
   url_launcher_windows

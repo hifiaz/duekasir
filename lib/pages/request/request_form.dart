@@ -85,22 +85,21 @@ class _RequestFormState extends State<RequestForm> {
                 ? null
                 : () async {
                     if (widget.request != null) {
-                      Request request = Request.fromJson({
-                        'id': widget.request!.id,
-                        'title': widget.request?.title,
-                        'note': jsonEncode(editorState?.document.toJson()),
-                        'status': selectedStatus,
-                        'createdAt': widget.request?.createdAt
-                      });
+                      Request request = Request(
+                          id: widget.request!.id,
+                          title: widget.request?.title,
+                          note: jsonEncode(editorState?.document.toJson()),
+                          status: selectedStatus,
+                          createdAt:
+                              widget.request?.createdAt ?? DateTime.now());
                       await SupabaseHelper().updateRequest(request);
                     } else {
-                      Request request = Request.fromJson({
-                        'id': DateTime.now().millisecondsSinceEpoch,
-                        'note': jsonEncode(editorState?.document.toJson()),
-                        'status': selectedStatus,
-                        'createdAt': DateTime.now()
-                      });
-                      await SupabaseHelper().addRequest(request.toJson());
+                      Request request = Request(
+                          id: DateTime.now().millisecondsSinceEpoch,
+                          note: jsonEncode(editorState?.document.toJson()),
+                          status: selectedStatus,
+                          createdAt: DateTime.now());
+                      await SupabaseHelper().addRequest(request.toMap());
                     }
                     requestController.requests.refresh();
                     if (context.mounted) Navigator.pop(context);

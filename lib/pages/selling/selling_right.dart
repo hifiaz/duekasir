@@ -98,20 +98,20 @@ class SellingRightState extends State<SellingRight> {
                       store.hasValue) {
                     List<Inventory> products = [];
                     for (Inventory p in list.value!.items) {
-                      products.add(Inventory.fromJson({
-                        'id': p.id,
-                        'nama': p.nama,
-                        'code': p.code,
-                        'quantity': p.quantity,
-                        'hargaJual': p.hargaJual,
-                        'ukuran': p.ukuran,
-                        'isHargaJualPersen': p.isHargaJualPersen,
-                        'hargaJualPersen': p.hargaJualPersen,
-                        'hargaDasar': p.hargaDasar,
-                        'diskonPersen': p.diskonPersen,
-                        'deskripsi': p.deskripsi,
-                        'jumlahBarang': p.jumlahBarang,
-                      }));
+                      products.add(Inventory(
+                        id: p.id,
+                        nama: p.nama,
+                        code: p.code,
+                        quantity: p.quantity,
+                        hargaJual: p.hargaJual,
+                        ukuran: p.ukuran,
+                        isHargaJualPersen: p.isHargaJualPersen,
+                        hargaJualPersen: p.hargaJualPersen,
+                        hargaDasar: p.hargaDasar,
+                        diskonPersen: p.diskonPersen,
+                        deskripsi: p.deskripsi,
+                        jumlahBarang: p.jumlahBarang,
+                      ));
                     }
                     final newItem = {
                       'id': DateTime.now().microsecondsSinceEpoch,
@@ -155,37 +155,39 @@ class SellingRightState extends State<SellingRight> {
                       store.hasValue) {
                     List<Inventory> products = [];
                     for (Inventory p in list.value!.items) {
-                      products.add(Inventory.fromJson({
-                        'id': p.id,
-                        'nama': p.nama,
-                        'code': p.code,
-                        'quantity': p.quantity,
-                        'hargaJual': p.hargaJual,
-                        'ukuran': p.ukuran,
-                        'isHargaJualPersen': p.isHargaJualPersen,
-                        'hargaJualPersen': p.hargaJualPersen,
-                        'hargaDasar': p.hargaDasar,
-                        'diskonPersen': p.diskonPersen,
-                        'deskripsi': p.deskripsi,
-                        'jumlahBarang': p.jumlahBarang,
-                      }));
+                      products.add(Inventory(
+                        id: p.id,
+                        nama: p.nama,
+                        code: p.code,
+                        quantity: p.quantity,
+                        hargaJual: p.hargaJual,
+                        ukuran: p.ukuran,
+                        isHargaJualPersen: p.isHargaJualPersen,
+                        hargaJualPersen: p.hargaJualPersen,
+                        hargaDasar: p.hargaDasar,
+                        diskonPersen: p.diskonPersen,
+                        deskripsi: p.deskripsi,
+                        jumlahBarang: p.jumlahBarang,
+                      ));
                     }
-                    final newItem = {
-                      'id': DateTime.now().microsecondsSinceEpoch,
-                      'items': products,
-                      'kasir': kasir?.id ?? 1,
-                      'keterangan': note.text,
-                      'diskon': 0,
-                      'totalHarga': list.value?.totalPrice ?? 0.0,
-                      'totalItem': list.value?.totalItem ?? 0,
-                      'pembeli': pelanggan?.id,
-                      'createdAt': DateTime.now(),
-                    };
+                    final newItem = Report(
+                      id: DateTime.now().microsecondsSinceEpoch,
+                      items: products,
+                      kasir: kasir?.id ?? 1,
+                      keterangan: note.text,
+                      diskon: 0,
+                      totalHarga: list.value?.totalPrice ?? 0.0,
+                      totalItem: list.value?.totalItem ?? 0,
+                      pembeli: pelanggan?.id,
+                      createdAt: DateTime.now(),
+                    );
                     if (products.isEmpty) return;
-                    SupabaseHelper().addReport(newItem).whenComplete(() {
+                    SupabaseHelper()
+                        .addReport(newItem.toMap())
+                        .whenComplete(() {
                       letsPrint(
                               store: store.value!,
-                              model: Report.fromJson(newItem),
+                              model: newItem,
                               kasir: kasir?.nama ?? 'Umum',
                               tipe: tipeBayar,
                               total: cashEditing.text,

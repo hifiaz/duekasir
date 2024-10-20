@@ -31,9 +31,9 @@ class DuePaymentForm extends HookWidget {
     final hargaJual = useState(0.0);
     final hargaJualDiscount = useState(0.0);
     final status = useState(item?.status ?? 'dept');
-    final dateIn = useState(DateTime.tryParse(item?.dateIn ?? '') ?? DateTime.now());
-    final dueDate = useState(DateTime.tryParse(item?.dueDate ?? '') ??
-        DateTime.now().add(const Duration(days: 3)));
+    final dateIn = useState(item?.dateIn ?? DateTime.now());
+    final dueDate =
+        useState(item?.dueDate ?? DateTime.now().add(const Duration(days: 3)));
 
     useListenable(hargaJual);
     useListenable(editingName);
@@ -239,23 +239,22 @@ class DuePaymentForm extends HookWidget {
                             return;
                           } else {
                             if (item != null) {
-                              final updateitem = {
-                                'id': item.id,
-                                'name': editingName.text.replaceAll(',', ' '),
-                                'invoice': editingInvoice.text,
-                                'itemName': editingItemName.text,
-                                'itemAmount': stock.value,
-                                'amount': int.parse(editingAmount.text),
-                                'status': status.value,
-                                'dateIn': dateIn.value,
-                                'dueDate': dueDate.value,
-                                'note': editingNote.text,
-                                'createdAt': item.createdAt,
-                              };
+                              final updateitem = DuePayment(
+                                id: item.id,
+                                name: editingName.text.replaceAll(',', ' '),
+                                invoice: editingInvoice.text,
+                                itemName: editingItemName.text,
+                                itemAmount: stock.value,
+                                amount: int.parse(editingAmount.text),
+                                status: status.value,
+                                dateIn: dateIn.value,
+                                dueDate: dueDate.value,
+                                note: editingNote.text,
+                                createdAt: item.createdAt,
+                              );
 
                               SupabaseHelper()
-                                  .updateDuePayment(
-                                      DuePayment.fromJson(updateitem))
+                                  .updateDuePayment(updateitem)
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
                                   if (context.mounted) context.pop();

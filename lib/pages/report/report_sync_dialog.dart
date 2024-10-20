@@ -33,7 +33,7 @@ class _ReportSyncDialogState extends State<ReportSyncDialog> {
               onPressed: () async {
                 if (reportFormKey.currentState!.validate()) {
                   if (_password.text == '111111') {
-                    await SupabaseHelper().addReport(widget.detail.toJson());
+                    await SupabaseHelper().addReport(widget.detail.toMap());
                     await reportController.report.refresh();
                     await reportController.reportToday.refresh();
                     await reportController.reportYesterday.refresh();

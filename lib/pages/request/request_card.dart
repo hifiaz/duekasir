@@ -66,13 +66,12 @@ class _RequestCardState extends State<RequestCard> {
                           child: const Text('Save'),
                           onPressed: () async {
                             if (title.text.isNotEmpty) {
-                              Request request = Request.fromJson({
-                                'id': widget.val.id,
-                                'title': title.text,
-                                'note': widget.val.note,
-                                'status': widget.val.status,
-                                'createdAt': widget.val.createdAt
-                              });
+                              Request request = Request(
+                                  id: widget.val.id,
+                                  title: title.text,
+                                  note: widget.val.note,
+                                  status: widget.val.status,
+                                  createdAt: widget.val.createdAt);
                               await SupabaseHelper().updateRequest(request);
                               requestController.requests.refresh();
                               popoverController.toggle();
@@ -95,8 +94,7 @@ class _RequestCardState extends State<RequestCard> {
           ),
         ],
       ),
-      description:
-          Text(dateWithTime.format(DateTime.parse(widget.val.createdAt))),
+      description: Text(dateWithTime.format(widget.val.createdAt)),
       footer: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

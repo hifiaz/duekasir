@@ -214,18 +214,18 @@ class _SalariesState extends State<Salaries> {
                             id: 'status',
                             initialValue: item.status,
                             onChanged: (v) async {
-                              Salary salary = Salary.fromJson({
-                                'id': item.id,
-                                'userId': item.userId,
-                                'status': v ?? 'Draf',
-                                'periode': item.periode,
-                                'items': item.items,
-                                'deductions': item.deductions,
-                                'note': item.note,
-                                'management': item.management,
-                                'total': item.total,
-                                'createdAt': item.createdAt,
-                              });
+                              Salary salary = Salary(
+                                id: item.id,
+                                userId: item.userId,
+                                status: v ?? 'Draf',
+                                periode: item.periode,
+                                items: item.items,
+                                deductions: item.deductions,
+                                note: item.note,
+                                management: item.management,
+                                total: item.total,
+                                createdAt: item.createdAt,
+                              );
                               await SupabaseHelper().updateSalary(salary);
                               Future.delayed(Durations.medium1).then(
                                   (_) => salaryController.salaries.refresh());
@@ -300,18 +300,18 @@ class _SalariesState extends State<Salaries> {
                                       id: 'status',
                                       initialValue: item.status,
                                       onChanged: (v) async {
-                                        Salary salary = Salary.fromJson({
-                                          'id': item.id,
-                                          'userId': item.userId,
-                                          'status': v ?? 'Draf',
-                                          'periode': item.periode,
-                                          'items': item.items,
-                                          'deductions': item.deductions,
-                                          'note': item.note,
-                                          'management': item.management,
-                                          'total': item.total,
-                                          'createdAt': item.createdAt,
-                                        });
+                                        Salary salary = Salary(
+                                          id: item.id,
+                                          userId: item.userId,
+                                          status: v ?? 'Draf',
+                                          periode: item.periode,
+                                          items: item.items,
+                                          deductions: item.deductions,
+                                          note: item.note,
+                                          management: item.management,
+                                          total: item.total,
+                                          createdAt: item.createdAt,
+                                        );
                                         await SupabaseHelper()
                                             .updateSalary(salary);
                                         Future.delayed(Durations.medium1).then(

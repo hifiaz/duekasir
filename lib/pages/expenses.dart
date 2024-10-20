@@ -109,9 +109,8 @@ class Expanses extends StatelessWidget {
                         .map((v) => ListTile(
                               title: Text(v.title ?? ''),
                               subtitle: Text(currency.format(v.amount)),
-                              trailing: Text(dateWithoutTime.format(
-                                  DateTime.tryParse(v.createdAt) ??
-                                      DateTime.now())),
+                              trailing:
+                                  Text(dateWithoutTime.format(v.createdAt)),
                             ))
                         .toList(),
                   );
@@ -134,9 +133,8 @@ class Expanses extends StatelessWidget {
                                   DataCell(Text(val.title ?? '')),
                                   DataCell(Text(currency.format(val.amount))),
                                   DataCell(Text(val.note ?? '')),
-                                  DataCell(Text(dateWithTime.format(
-                                      DateTime.tryParse(val.createdAt) ??
-                                          DateTime.now()))),
+                                  DataCell(
+                                      Text(dateWithTime.format(val.createdAt))),
                                   DataCell(
                                     ShadButton.destructive(
                                       onPressed: () {

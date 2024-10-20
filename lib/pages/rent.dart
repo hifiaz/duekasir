@@ -134,7 +134,7 @@ class _RentState extends State<Rent> {
                             subtitle: Text(
                               p.paid ?? false
                                   ? snapshot.data?.name ?? ''
-                                  : '${snapshot.data?.name} - Expired on ${(DateTime.now().difference(DateTime.parse(p.rentDate!)).inDays)} days - ${DateTime.parse(p.rentDate!).day}/${DateTime.parse(p.rentDate!).month}/${DateTime.parse(p.rentDate!).year}',
+                                  : '${snapshot.data?.name} - Expired on ${(DateTime.now().difference(p.rentDate!).inDays)} days - ${p.rentDate!.day}/${p.rentDate!.month}/${p.rentDate!.year}',
                               style: p.paid ?? false
                                   ? const TextStyle(
                                       decoration: TextDecoration.lineThrough)
@@ -143,7 +143,7 @@ class _RentState extends State<Rent> {
                             trailing: p.paid ?? false
                                 ? null
                                 : DateTime.now()
-                                        .difference(DateTime.parse(p.rentDate!))
+                                        .difference(p.rentDate!)
                                         .inDays
                                         .isNegative
                                     ? const Icon(Icons.check_circle,

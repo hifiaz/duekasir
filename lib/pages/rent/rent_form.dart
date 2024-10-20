@@ -31,13 +31,12 @@ class RentForm extends HookWidget {
     useState(() {
       if (rent != null) {
         if (!DateTime.now()
-            .difference(DateTime.tryParse(rent!.rentDate!) ?? DateTime.now())
+            .difference(rent?.rentDate ?? DateTime.now())
             .inDays
             .isNegative) {
           pinalty.value = 8000 *
               DateTime.now()
-                  .difference(
-                      DateTime.tryParse(rent!.rentDate!) ?? DateTime.now())
+                  .difference(rent?.rentDate ?? DateTime.now())
                   .inDays;
         }
       }
@@ -192,20 +191,20 @@ class RentForm extends HookWidget {
                               return;
                             } else {
                               if (rent != null) {
-                                final updateitem = Rent.fromJson({
-                                  'name': editingName.text,
-                                  'id': rent!.id,
-                                  'item': item.id,
-                                  'amount': amount.value,
-                                  'identity': identity.value,
-                                  'picture': people.value,
-                                  'paid': false,
-                                  'note': editingNote.text,
-                                  'rentDate': rent!.rentDate,
-                                  'howManyDay': rent!.howManyDay,
-                                  'updatedAt': DateTime.now(),
-                                  'createdAt': rent!.createdAt,
-                                });
+                                final updateitem = Rent(
+                                  name: editingName.text,
+                                  id: rent!.id,
+                                  item: item.id,
+                                  amount: amount.value,
+                                  identity: identity.value,
+                                  picture: people.value,
+                                  paid: false,
+                                  note: editingNote.text,
+                                  rentDate: rent!.rentDate,
+                                  howManyDay: rent!.howManyDay,
+                                  updatedAt: DateTime.now(),
+                                  createdAt: rent!.createdAt,
+                                );
 
                                 SupabaseHelper()
                                     .updateRent(updateitem)
@@ -227,20 +226,20 @@ class RentForm extends HookWidget {
                             return;
                           } else {
                             if (rent != null) {
-                              final updateitem = Rent.fromJson({
-                                'name': editingName.text,
-                                'id': rent!.id,
-                                'item': item.id,
-                                'amount': amount.value + pinalty.value,
-                                'identity': identity.value,
-                                'picture': people.value,
-                                'paid': true,
-                                'note': editingNote.text,
-                                'rentDate': rent!.rentDate,
-                                'howManyDay': rent!.howManyDay,
-                                'updatedAt': DateTime.now(),
-                                'createdAt': rent!.createdAt,
-                              });
+                              final updateitem = Rent(
+                                name: editingName.text,
+                                id: rent!.id,
+                                item: item.id,
+                                amount: amount.value + pinalty.value,
+                                identity: identity.value,
+                                picture: people.value,
+                                paid: true,
+                                note: editingNote.text,
+                                rentDate: rent!.rentDate,
+                                howManyDay: rent!.howManyDay,
+                                updatedAt: DateTime.now(),
+                                createdAt: rent!.createdAt,
+                              );
 
                               SupabaseHelper()
                                   .updateRent(updateitem)

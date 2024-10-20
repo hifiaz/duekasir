@@ -440,16 +440,14 @@ class _SalariesFormState extends State<SalariesForm> {
     if (amount != null || amount?.isEmpty == true) {
       final ItemSalary? item =
           itemSalary.lastWhereOrNull((item) => item.id == i);
-      var temp =
-          ItemSalary.fromJson({'id': i, 'description': item!.description});
+      var temp = ItemSalary(id: i, description: item!.description);
       if (item.id == i) {
         itemSalary.removeWhere((e) => e.id == i);
       }
-      itemSalary.add(ItemSalary.fromJson(
-          {'id': i, 'description': temp.description, 'amount': amount}));
+      itemSalary.add(
+          ItemSalary(id: i, description: temp.description, amount: amount));
     } else {
-      itemSalary
-          .add(ItemSalary.fromJson({'id': i, 'description': description}));
+      itemSalary.add(ItemSalary(id: i, description: description));
     }
   }
 
@@ -457,16 +455,14 @@ class _SalariesFormState extends State<SalariesForm> {
     if (amount != null || amount?.isEmpty == true) {
       final ItemSalary? item =
           itemDeductions.value.lastWhereOrNull((item) => item.id == i);
-      var temp =
-          ItemSalary.fromJson({'id': i, 'description': item!.description});
+      var temp = ItemSalary(id: i, description: item!.description);
       if (item.id == i) {
         itemDeductions.value.removeWhere((e) => e.id == i);
       }
-      itemDeductions.value.add(ItemSalary.fromJson(
-          {'id': i, 'description': temp.description, 'amount': amount}));
+      itemDeductions.value.add(
+          ItemSalary(id: i, description: temp.description, amount: amount));
     } else {
-      itemDeductions.value
-          .add(ItemSalary.fromJson({'id': i, 'description': description}));
+      itemDeductions.value.add(ItemSalary(id: i, description: description));
     }
   }
 }

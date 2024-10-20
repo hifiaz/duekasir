@@ -27,21 +27,21 @@ class _CsvPreviewState extends State<CsvPreview> {
         .transform(const CsvToListConverter())
         .skip(1)
         .map((val) {
-      final data = {
-        'nama': val[1],
-        'code': val[2].toString(),
-        'deskripsi': val[3] == 'null' ? null : val[3],
-        'jumlahBarang': val[4],
-        'quantity': 1,
-        'ukuran': val[6].toString(),
-        'hargaDasar': val[7],
-        'hargaJual': val[8],
-        'hargaJualPersen': double.parse(val[9].toString()),
-        'diskonPersen': double.tryParse(val[10].toString()),
-        'isHargaJualPersen': val[11] == 'TRUE' ? true : false,
-        'isSynced': false
-      };
-      return Inventory.fromJson(data);
+      final data = Inventory(
+        id: val[0],
+        nama: val[1],
+        code: val[2].toString(),
+        deskripsi: val[3] == 'null' ? null : val[3],
+        jumlahBarang: val[4],
+        quantity: 1,
+        ukuran: val[6].toString(),
+        hargaDasar: val[7],
+        hargaJual: val[8],
+        hargaJualPersen: double.parse(val[9].toString()),
+        diskonPersen: double.tryParse(val[10].toString()),
+        isHargaJualPersen: val[11] == 'TRUE' ? true : false,
+      );
+      return data;
     }).toList();
   }
 

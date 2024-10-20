@@ -361,8 +361,8 @@ class _ReportState extends State<Report> {
                                             .small,
                                       ),
                                       Text(
-                                          dateDayWithTime.format(
-                                              DateTime.parse(detail.createdAt)),
+                                          dateDayWithTime
+                                              .format(detail.createdAt),
                                           style: ShadTheme.of(context)
                                               .textTheme
                                               .muted),

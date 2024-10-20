@@ -264,26 +264,25 @@ class InventoryForm extends HookWidget {
                             return;
                           } else {
                             if (item != null) {
-                              final updateitem = {
-                                'id': item.id,
-                                'nama': editingName.text.replaceAll(',', ' '),
-                                'code': editingCode.text,
-                                'quantity': 1,
-                                'hargaJual': hargaJual.value.toInt(),
-                                'ukuran': editingUkuran.text,
-                                'isHargaJualPersen': true,
-                                'hargaJualPersen':
+                              final updateitem = Inventory(
+                                id: item.id,
+                                nama: editingName.text.replaceAll(',', ' '),
+                                code: editingCode.text,
+                                quantity: 1,
+                                hargaJual: hargaJual.value.toInt(),
+                                ukuran: editingUkuran.text,
+                                isHargaJualPersen: true,
+                                hargaJualPersen:
                                     double.parse(editingHargaJualPersen.text),
-                                'hargaDasar': int.parse(editingHargaDasar.text),
-                                'diskonPersen':
+                                hargaDasar: int.parse(editingHargaDasar.text),
+                                diskonPersen:
                                     double.tryParse(editingDiscount.text),
-                                'jumlahBarang': stock.value,
-                                'createdAt': item.createdAt,
-                              };
+                                jumlahBarang: stock.value,
+                                createdAt: item.createdAt,
+                              );
 
                               SupabaseHelper()
-                                  .updateInventory(
-                                      Inventory.fromJson(updateitem))
+                                  .updateInventory(updateitem)
                                   .whenComplete(() {
                                 Future.delayed(Durations.short1).then((_) {
                                   if (context.mounted) context.pop();

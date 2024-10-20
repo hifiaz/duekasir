@@ -141,8 +141,8 @@ class Presence extends StatelessWidget {
                                         }),
                                   ),
                                   DataCell(Text(val.note ?? '')),
-                                  DataCell(Text(dateWithTime
-                                      .format(DateTime.parse(val.createdAt)))),
+                                  DataCell(
+                                      Text(dateWithTime.format(val.createdAt))),
                                 ]))
                             .toList()),
                   ],

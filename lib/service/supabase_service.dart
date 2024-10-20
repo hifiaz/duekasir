@@ -43,7 +43,7 @@ class SupabaseHelper {
     final response =
         await supabase.from('users').select().eq('id', userId).single();
 
-    return Users.fromJson(response);
+    return Users.fromMap(response);
   }
 
   Future<List<Inventory>> getInventoryAll({String? value}) async {
@@ -68,7 +68,7 @@ class SupabaseHelper {
     final response =
         await supabase.from('inventory').select().lte('jumlah_barang', 1);
 
-    return response.map((e) => Inventory.fromJson(e)).toList();
+    return response.map((e) => Inventory.fromMap(e)).toList();
   }
 
   addInventory(Map data) async {
@@ -93,7 +93,7 @@ class SupabaseHelper {
         .ilike('code', '%$value%')
         .single();
 
-    return Inventory.fromJson(response);
+    return Inventory.fromMap(response);
   }
 
   Future<List<Inventory>> searchInventorys({String? value}) async {
@@ -104,7 +104,7 @@ class SupabaseHelper {
     }
 
     final response = await query;
-    return response.map((e) => Inventory.fromJson(e)).toList();
+    return response.map((e) => Inventory.fromMap(e)).toList();
   }
 
   updateInventory(Inventory item) async {
@@ -114,11 +114,11 @@ class SupabaseHelper {
         .eq("id", item.id)
         .then((value) async {
       if (value.isEmpty) {
-        addInventory(item.toJson());
+        addInventory(item.toMap());
       } else {
         await supabase
             .from('inventory')
-            .update(item.toJson())
+            .update(item.toMap())
             .match({'id': item.id});
       }
     });
@@ -148,7 +148,7 @@ class SupabaseHelper {
     }
 
     final response = await query;
-    return response.map((e) => Customer.fromJson(e)).toList();
+    return response.map((e) => Customer.fromMap(e)).toList();
   }
 
   addCustomer(Map data) async {
@@ -178,11 +178,11 @@ class SupabaseHelper {
         .eq("id", item.id)
         .then((value) async {
       if (value.isEmpty) {
-        addInventory(item.toJson());
+        addInventory(item.toMap());
       } else {
         await supabase
             .from('customer')
-            .update(item.toJson())
+            .update(item.toMap())
             .match({'id': item.id});
       }
     });
@@ -215,17 +215,17 @@ class SupabaseHelper {
         });
 
         allReport.add(
-          Report.fromJson({
-            'id': val['id'],
-            'pembeli': val['pembeli'],
-            'diskon': val['diskon'].toDouble(),
-            'kasir': val['kasir'],
-            'keterangan': val['keterangan'],
-            'totalItem': val['totalItem'],
-            'totalHarga': val['totalHarga'].toDouble(),
-            'createdAt': DateTime.parse(val['createdAt']),
-            'items': listProduct,
-          }),
+          Report(
+            id: val['id'],
+            pembeli: val['pembeli'],
+            diskon: val['diskon'].toDouble(),
+            kasir: val['kasir'],
+            keterangan: val['keterangan'],
+            totalItem: val['totalItem'],
+            totalHarga: val['totalHarga'].toDouble(),
+            createdAt: DateTime.parse(val['createdAt']),
+            items: listProduct,
+          ),
         );
       });
     }
@@ -244,11 +244,11 @@ class SupabaseHelper {
         .lte('createdAt', end.toIso8601String());
 
     final List<Report> reports =
-        response.map((e) => Report.fromJson(e)).toList();
+        response.map((e) => Report.fromMap(e)).toList();
 
     final Map<DateTime, List<Report>> listOfOrders =
         reports.groupListsBy((report) {
-      final dateTime = DateTime.parse(report.createdAt);
+      final dateTime = report.createdAt;
       return DateTime(dateTime.year, dateTime.month, dateTime.day);
     });
 
@@ -261,7 +261,7 @@ class SupabaseHelper {
         .select()
         .eq('user', supabase.auth.currentUser!.id);
 
-    final reports = response.map((e) => Report.fromJson(e)).toList();
+    final reports = response.map((e) => Report.fromMap(e)).toList();
 
     final Map<int, List<Report>> reportsByUser = {};
     for (var report in reports) {
@@ -299,7 +299,7 @@ class SupabaseHelper {
     }
 
     final res = await query;
-    return res.map((json) => Report.fromJson(json)).toList();
+    return res.map((json) => Report.fromMap(json)).toList();
   }
 
   removeReport(int id) async {
@@ -315,11 +315,11 @@ class SupabaseHelper {
         .eq("id", item.id)
         .then((value) async {
       if (value.isEmpty) {
-        addInventory(item.toJson());
+        addInventory(item.toMap());
       } else {
         await supabase
             .from('report')
-            .update(item.toJson())
+            .update(item.toMap())
             .match({'id': item.id});
       }
     });
@@ -363,7 +363,7 @@ class SupabaseHelper {
 
     if (result.isNotEmpty) {
       await Future.forEach(result, (val) async {
-        allPresense.add(PresenseModel.fromJson(val));
+        allPresense.add(PresenseModel.fromMap(val));
       });
     }
     return allPresense;
@@ -383,7 +383,7 @@ class SupabaseHelper {
     final response =
         await supabase.from('rent_items').select().eq('id', id).single();
 
-    return RentItems.fromJson(response);
+    return RentItems.fromMap(response);
   }
 
   Future<List<RentItems>> getRentItems() async {
@@ -396,7 +396,7 @@ class SupabaseHelper {
 
     if (result.isNotEmpty) {
       await Future.forEach(result, (val) async {
-        rentItems.add(RentItems.fromJson(val));
+        rentItems.add(RentItems.fromMap(val));
       });
     }
     return rentItems;
@@ -404,7 +404,7 @@ class SupabaseHelper {
 
   Future<List<Rent>> getRentRevenue() async {
     final response = await supabase.from('rent').select().eq('paid', true);
-    return response.map((e) => Rent.fromJson(e)).toList();
+    return response.map((e) => Rent.fromMap(e)).toList();
   }
 
   removeRentItem(int id) async {
@@ -420,11 +420,11 @@ class SupabaseHelper {
         .eq("id", item.id)
         .then((value) async {
       if (value.isEmpty) {
-        addRentItem(item.toJson());
+        addRentItem(item.toMap());
       } else {
         await supabase
             .from('rent_items')
-            .update(item.toJson())
+            .update(item.toMap())
             .match({'id': item.id});
       }
     });
@@ -450,7 +450,7 @@ class SupabaseHelper {
 
     if (result.isNotEmpty) {
       await Future.forEach(result, (val) async {
-        rentItems.add(Rent.fromJson(val));
+        rentItems.add(Rent.fromMap(val));
       });
     }
     return rentItems;
@@ -464,12 +464,9 @@ class SupabaseHelper {
   updateRent(Rent item) async {
     await supabase.from('rent').select().eq("id", item.id).then((value) async {
       if (value.isEmpty) {
-        addRent(item.toJson());
+        addRent(item.toMap());
       } else {
-        await supabase
-            .from('rent')
-            .update(item.toJson())
-            .match({'id': item.id});
+        await supabase.from('rent').update(item.toMap()).match({'id': item.id});
       }
     });
   }
@@ -515,7 +512,7 @@ class SupabaseHelper {
 
     if (result.isNotEmpty) {
       await Future.forEach(result, (val) async {
-        expensesItems.add(Expenses.fromJson(val));
+        expensesItems.add(Expenses.fromMap(val));
       });
     }
     return expensesItems;
@@ -541,17 +538,17 @@ class SupabaseHelper {
         .from('store')
         .select()
         .eq('user', supabase.auth.currentUser!.id);
-    return result.isEmpty ? null : StoreModel.fromJson(result.first);
+    return result.isEmpty ? null : StoreModel.fromMap(result.first);
   }
 
   updateStore(StoreModel item) async {
     await supabase.from('store').select().eq("id", item.id).then((value) async {
       if (value.isEmpty) {
-        addStore(item.toJson());
+        addStore(item.toMap());
       } else {
         await supabase
             .from('store')
-            .update(item.toJson())
+            .update(item.toMap())
             .match({'id': item.id});
       }
     });
@@ -570,7 +567,7 @@ class SupabaseHelper {
   Future<Users?> getUserById(int id) async {
     final res = await supabase.from('users').select().eq("id", id);
     if (res.isNotEmpty) {
-      return Users.fromJson(res.first);
+      return Users.fromMap(res.first);
     } else {
       throw Exception('User not found');
     }
@@ -592,7 +589,7 @@ class SupabaseHelper {
 
     if (result.isNotEmpty) {
       await Future.forEach(result, (val) async {
-        users.add(Users.fromJson(val));
+        users.add(Users.fromMap(val));
       });
     }
     return users;
@@ -607,11 +604,11 @@ class SupabaseHelper {
   updateUsers(Users item) async {
     await supabase.from('users').select().eq("id", item.id).then((value) async {
       if (value.isEmpty) {
-        addUsers(item.toJson());
+        addUsers(item.toMap());
       } else {
         await supabase
             .from('users')
-            .update(item.toJson())
+            .update(item.toMap())
             .match({'id': item.id});
       }
     });
@@ -650,30 +647,30 @@ class SupabaseHelper {
       await Future.forEach(result, (val) async {
         List<ItemSalary> items = [];
         await Future.forEach(val['items'], (p) async {
-          items.add(ItemSalary.fromJson(p as Map<String, dynamic>));
+          items.add(ItemSalary.fromMap(p as Map<String, dynamic>));
         });
 
         List<ItemSalary> deductions = [];
         if (val['deductions'] != null) {
           await Future.forEach(val['deductions'], (p) async {
-            deductions.add(ItemSalary.fromJson(p as Map<String, dynamic>));
+            deductions.add(ItemSalary.fromMap(p as Map<String, dynamic>));
           });
         }
 
         salaryItems.add(
-          Salary.fromJson({
-            'id': val['id'],
-            'periode': val['periode'],
-            'status': val['status'],
-            'total': val['total'].toInt(),
-            'userId': val['userId'].toInt(),
-            'note': val['note'],
-            'items': items,
-            'deductions': deductions,
-            'createdAt': val['createdAt'] != null
+          Salary(
+            id: val['id'],
+            periode: val['periode'],
+            status: val['status'],
+            total: val['total'].toInt(),
+            userId: val['userId'].toInt(),
+            note: val['note'],
+            items: items,
+            deductions: deductions,
+            createdAt: val['createdAt'] != null
                 ? DateTime.parse(val['createdAt'])
                 : null,
-          }),
+          ),
         );
       });
     }
@@ -687,11 +684,11 @@ class SupabaseHelper {
         .eq("id", item.id)
         .then((value) async {
       if (value.isEmpty) {
-        addRent(item.toJson());
+        addRent(item.toMap());
       } else {
         await supabase
             .from('salary')
-            .update(item.toJson())
+            .update(item.toMap())
             .match({'id': item.id});
       }
     });
@@ -747,11 +744,11 @@ class SupabaseHelper {
         .eq("id", item.id)
         .then((value) async {
       if (value.isEmpty) {
-        addDuePayment(item.toJson());
+        addDuePayment(item.toMap());
       } else {
         await supabase
             .from('due_payment')
-            .update(item.toJson())
+            .update(item.toMap())
             .match({'id': item.id});
       }
     });
@@ -787,7 +784,7 @@ class SupabaseHelper {
         .eq('user', supabase.auth.currentUser!.id);
 
     await Future.forEach(result, (val) async {
-      requestItems.add(Request.fromJson(val));
+      requestItems.add(Request.fromMap(val));
     });
 
     return requestItems;
@@ -800,11 +797,11 @@ class SupabaseHelper {
         .eq("id", item.id)
         .then((value) async {
       if (value.isEmpty) {
-        addRent(item.toJson());
+        addRent(item.toMap());
       } else {
         await supabase
             .from('request')
-            .update(item.toJson())
+            .update(item.toMap())
             .match({'id': item.id});
       }
     });

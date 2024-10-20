@@ -25,12 +25,9 @@ class CustomerForm extends HookWidget {
         useTextEditingController(text: customer?.keterangan ?? '');
     final lahirTemp = useTextEditingController(
         text: customer?.dob != null
-            ? dateWithoutTime
-                .format(DateTime.tryParse(customer!.dob!) ?? DateTime.now())
+            ? dateWithoutTime.format(customer?.dob ?? DateTime.now())
             : '');
-    final lahir = useState(
-        DateTime.tryParse(customer?.dob ?? DateTime.now().toString()) ??
-            DateTime.now());
+    final lahir = useState(customer?.dob ?? DateTime.now());
     final status = useState(customer?.status ?? true);
     return Scaffold(
       body: SafeArea(
@@ -80,9 +77,7 @@ class CustomerForm extends HookWidget {
                           onTap: () async {
                             DateTime? pickedDate = await showDatePicker(
                                 context: context,
-                                initialDate:
-                                    DateTime.tryParse(customer!.dob!) ??
-                                        DateTime.now(),
+                                initialDate: customer?.dob ?? DateTime.now(),
                                 firstDate: DateTime(1950),
                                 //DateTime.now() - not to allow to choose before today.
                                 lastDate: DateTime(2100));
@@ -151,19 +146,18 @@ class CustomerForm extends HookWidget {
                           onPressed: () {
                             if (customerFormKey.currentState!.validate()) {
                               if (customer != null) {
-                                final updateCustomer = {
-                                  'id': customer.id,
-                                  'nama': editingName.text,
-                                  'dob': lahir.value,
-                                  'ktp': editingKtp.text,
-                                  'status': status.value,
-                                  'phone': editingPhone.text,
-                                  'keterangan': editingKeterangan.text,
-                                  'createdAt': customer.createdAt,
-                                };
+                                final updateCustomer = Customer(
+                                  id: customer.id,
+                                  nama: editingName.text,
+                                  dob: lahir.value,
+                                  ktp: editingKtp.text,
+                                  status: status.value,
+                                  phone: editingPhone.text,
+                                  keterangan: editingKeterangan.text,
+                                  createdAt: customer.createdAt,
+                                );
                                 SupabaseHelper()
-                                    .updateCustomer(
-                                        Customer.fromJson(updateCustomer))
+                                    .updateCustomer(updateCustomer)
                                     .whenComplete(() {
                                   Future.delayed(Durations.short1).then((_) {
                                     customerController.customer.refresh();

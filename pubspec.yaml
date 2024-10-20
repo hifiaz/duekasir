@@ -74,7 +74,6 @@ dependencies:
   appflowy_editor: ^4.0.0
   universal_html: ^2.2.4
   powersync: ^1.8.7
-  json: ^0.20.2
 
 dependency_overrides:
   intl: ^0.19.0
@@ -92,7 +91,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
-  build_runner: ^2.4.12
+  build_runner: ^2.4.13
   go_router_builder: ^2.7.1
   # isar_generator: ^3.1.0
 

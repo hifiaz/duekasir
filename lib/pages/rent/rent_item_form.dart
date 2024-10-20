@@ -201,17 +201,17 @@ class RentItemForm extends HookWidget {
                             return;
                           } else {
                             if (item != null) {
-                              final updateitem = RentItems.fromJson({
-                                'id': item.id,
-                                'name': editingName.text.replaceAll(',', ' '),
-                                'code': editingCode.text,
-                                'rentThreeDay': int.parse(rentThreeDay.text),
-                                'rentOneWeek': int.parse(rentOneWeek.text),
-                                'rentOneMonth': int.parse(rentOneMonth.text),
-                                'jumlahBarang': stock.value,
-                                'note': note.text,
-                                'createdAt': item.createdAt ?? DateTime.now(),
-                              });
+                              final updateitem = RentItems(
+                                id: item.id,
+                                name: editingName.text.replaceAll(',', ' '),
+                                code: editingCode.text,
+                                rentThreeDay: int.parse(rentThreeDay.text),
+                                rentOneWeek: int.parse(rentOneWeek.text),
+                                rentOneMonth: int.parse(rentOneMonth.text),
+                                jumlahBarang: stock.value,
+                                note: note.text,
+                                createdAt: item.createdAt ?? DateTime.now(),
+                              );
 
                               SupabaseHelper()
                                   .updateRentItem(updateitem)

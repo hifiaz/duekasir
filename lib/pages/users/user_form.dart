@@ -25,10 +25,9 @@ class UserForm extends HookWidget {
     final editingName = useTextEditingController(text: user?.nama ?? '');
     final lahirTemp = useTextEditingController(
         text: user?.dob != null
-            ? dateWithoutTime.format(DateTime.parse(user?.dob ?? ''))
+            ? dateWithoutTime.format(user?.dob ?? DateTime.now())
             : '');
-    final lahir =
-        useState(DateTime.tryParse(user?.dob ?? '') ?? DateTime.now());
+    final lahir = useState(user?.dob ?? DateTime.now());
     final status = useState(user?.status ?? true);
     final role = useState(user?.keterangan ?? 'User');
     return Scaffold(
@@ -66,8 +65,7 @@ class UserForm extends HookWidget {
                         onTap: () async {
                           DateTime? pickedDate = await showDatePicker(
                               context: context,
-                              initialDate: DateTime.tryParse(user?.dob ?? '') ??
-                                  DateTime.now(),
+                              initialDate: user?.dob ?? DateTime.now(),
                               firstDate: DateTime(1950),
                               //DateTime.now() - not to allow to choose before today.
                               lastDate: DateTime(2100));
@@ -153,15 +151,15 @@ class UserForm extends HookWidget {
                             return;
                           } else {
                             if (user != null) {
-                              final updateUser = Users.fromJson({
-                                'id': user.id,
-                                'nama': editingName.text,
-                                'dob': lahir.value.toString(),
-                                'status': status.value,
-                                'keterangan': role.value,
-                                'masuk': DateTime.now(),
-                                'createdAt': user.createdAt,
-                              });
+                              final updateUser = Users(
+                                id: user.id,
+                                nama: editingName.text,
+                                dob: lahir.value,
+                                status: status.value,
+                                keterangan: role.value,
+                                masuk: DateTime.now(),
+                                createdAt: user.createdAt,
+                              );
                               SupabaseHelper()
                                   .updateUsers(updateUser)
                                   .whenComplete(() {

@@ -69,11 +69,11 @@ class UserList extends HookWidget {
                           DataCell(Text(user.id.toString())),
                           DataCell(Text(user.nama)),
                           DataCell(Text(dateWithoutTime
-                              .format(DateTime.tryParse(user.dob!)  ?? DateTime.now()))),
+                              .format(user.dob ?? DateTime.now()))),
                           DataCell(Text(
                               user.status == true ? 'Active' : 'Non Active')),
                           DataCell(Text(dateWithTime
-                              .format(DateTime.tryParse(user.masuk!) ?? DateTime.now()))),
+                              .format(user.masuk ?? DateTime.now()))),
                           DataCell(Text(user.keterangan ?? '')),
                           DataCell(
                             const Icon(Icons.keyboard_arrow_right_outlined),

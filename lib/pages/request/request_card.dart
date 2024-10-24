@@ -94,7 +94,7 @@ class _RequestCardState extends State<RequestCard> {
           ),
         ],
       ),
-      description: Text(dateWithTime.format(widget.val.createdAt)),
+      description: Text(dateWithTime.format(widget.val.createdAt ?? DateTime.now())),
       footer: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

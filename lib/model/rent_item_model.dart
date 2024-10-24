@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-
 class RentItems {
   final int id;
   final String? name;
@@ -12,7 +11,7 @@ class RentItems {
   final int? rentOneWeek;
   final int? rentOneMonth;
   final String? user;
-  final DateTime? createdAt;
+  final String? createdAt;
   RentItems({
     required this.id,
     this.name,
@@ -36,7 +35,7 @@ class RentItems {
     int? rentOneWeek,
     int? rentOneMonth,
     String? user,
-    DateTime? createdAt,
+    String? createdAt,
   }) {
     return RentItems(
       id: id ?? this.id,
@@ -63,7 +62,7 @@ class RentItems {
       'rentOneWeek': rentOneWeek,
       'rentOneMonth': rentOneMonth,
       'user': user,
-      'createdAt': createdAt?.millisecondsSinceEpoch,
+      'createdAt': createdAt,
     };
   }
 
@@ -73,18 +72,23 @@ class RentItems {
       name: map['name'] != null ? map['name'] as String : null,
       code: map['code'] != null ? map['code'] as String : null,
       note: map['note'] != null ? map['note'] as String : null,
-      jumlahBarang: map['jumlahBarang'] != null ? map['jumlahBarang'] as int : null,
-      rentThreeDay: map['rentThreeDay'] != null ? map['rentThreeDay'] as int : null,
-      rentOneWeek: map['rentOneWeek'] != null ? map['rentOneWeek'] as int : null,
-      rentOneMonth: map['rentOneMonth'] != null ? map['rentOneMonth'] as int : null,
+      jumlahBarang:
+          map['jumlahBarang'] != null ? map['jumlahBarang'] as int : null,
+      rentThreeDay:
+          map['rentThreeDay'] != null ? map['rentThreeDay'] as int : null,
+      rentOneWeek:
+          map['rentOneWeek'] != null ? map['rentOneWeek'] as int : null,
+      rentOneMonth:
+          map['rentOneMonth'] != null ? map['rentOneMonth'] as int : null,
       user: map['user'] != null ? map['user'] as String : null,
-      createdAt: map['createdAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int) : null,
+      createdAt: map['createdAt'] != null ? map['createdAt'] as String : null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory RentItems.fromJson(String source) => RentItems.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory RentItems.fromJson(String source) =>
+      RentItems.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -94,31 +98,30 @@ class RentItems {
   @override
   bool operator ==(covariant RentItems other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.id == id &&
-      other.name == name &&
-      other.code == code &&
-      other.note == note &&
-      other.jumlahBarang == jumlahBarang &&
-      other.rentThreeDay == rentThreeDay &&
-      other.rentOneWeek == rentOneWeek &&
-      other.rentOneMonth == rentOneMonth &&
-      other.user == user &&
-      other.createdAt == createdAt;
+
+    return other.id == id &&
+        other.name == name &&
+        other.code == code &&
+        other.note == note &&
+        other.jumlahBarang == jumlahBarang &&
+        other.rentThreeDay == rentThreeDay &&
+        other.rentOneWeek == rentOneWeek &&
+        other.rentOneMonth == rentOneMonth &&
+        other.user == user &&
+        other.createdAt == createdAt;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      name.hashCode ^
-      code.hashCode ^
-      note.hashCode ^
-      jumlahBarang.hashCode ^
-      rentThreeDay.hashCode ^
-      rentOneWeek.hashCode ^
-      rentOneMonth.hashCode ^
-      user.hashCode ^
-      createdAt.hashCode;
+        name.hashCode ^
+        code.hashCode ^
+        note.hashCode ^
+        jumlahBarang.hashCode ^
+        rentThreeDay.hashCode ^
+        rentOneWeek.hashCode ^
+        rentOneMonth.hashCode ^
+        user.hashCode ^
+        createdAt.hashCode;
   }
 }

@@ -61,7 +61,7 @@ class SupabaseHelper {
           .toList();
     }
 
-    return filteredResult.map((val) => Inventory.fromJson(val)).toList();
+    return filteredResult.map((val) => Inventory.fromMap(val)).toList();
   }
 
   Future<List<Inventory>> getOutStock() async {
@@ -707,7 +707,7 @@ class SupabaseHelper {
       await Future.forEach(result, (val) async => data.add(val));
     }
     await Future.forEach(data, (val) async {
-      duePayments.add(DuePayment.fromJson(val));
+      duePayments.add(DuePayment.fromMap(val));
     });
 
     return duePayments;

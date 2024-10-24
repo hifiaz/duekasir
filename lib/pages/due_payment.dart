@@ -87,8 +87,8 @@ class _DuePaymentState extends State<DuePayment> with SignalsMixin {
                                     ),
                               Text(currency.format(i.amount)),
                               Text(
-                                dateWithoutTime
-                                    .format(i.dueDate ?? DateTime.now()),
+                                dateWithoutTime.format(
+                                    i.dueDateDateTime ?? DateTime.now()),
                                 style: TextStyle(
                                     color: i.status == 'paid'
                                         ? Colors.green
@@ -153,9 +153,9 @@ class _DuePaymentState extends State<DuePayment> with SignalsMixin {
                         ),
                         DataCell(Text(item.note ?? '')),
                         DataCell(Text(dateWithoutTime
-                            .format(item.dateIn ?? DateTime.now()))),
+                            .format(item.dateInDateTime ?? DateTime.now()))),
                         DataCell(Text(dateWithoutTime
-                            .format(item.dueDate ?? DateTime.now()))),
+                            .format(item.dueDateDateTime ?? DateTime.now()))),
                         DataCell(
                           const Icon(Icons.more_horiz),
                           onTap: () {

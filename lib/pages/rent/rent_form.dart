@@ -31,12 +31,12 @@ class RentForm extends HookWidget {
     useState(() {
       if (rent != null) {
         if (!DateTime.now()
-            .difference(rent?.rentDate ?? DateTime.now())
+            .difference(rent?.rentDateAsDateTime ?? DateTime.now())
             .inDays
             .isNegative) {
           pinalty.value = 8000 *
               DateTime.now()
-                  .difference(rent?.rentDate ?? DateTime.now())
+                  .difference(rent?.rentDateAsDateTime ?? DateTime.now())
                   .inDays;
         }
       }
@@ -202,7 +202,7 @@ class RentForm extends HookWidget {
                                   note: editingNote.text,
                                   rentDate: rent!.rentDate,
                                   howManyDay: rent!.howManyDay,
-                                  updatedAt: DateTime.now(),
+                                  updatedAt: DateTime.now().toIso8601String(),
                                   createdAt: rent!.createdAt,
                                 );
 
@@ -237,7 +237,7 @@ class RentForm extends HookWidget {
                                 note: editingNote.text,
                                 rentDate: rent!.rentDate,
                                 howManyDay: rent!.howManyDay,
-                                updatedAt: DateTime.now(),
+                                updatedAt: DateTime.now().toIso8601String(),
                                 createdAt: rent!.createdAt,
                               );
 

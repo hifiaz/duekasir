@@ -150,7 +150,7 @@ class InventoryForm extends HookWidget {
                         margin: const EdgeInsets.only(top: 25),
                         child: ShadSelect<int>(
                           placeholder: const Text('Select a Stock'),
-                          initialValue: item?.jumlahBarang,
+                          initialValue: item?.jumlahBarang?.toInt(),
                           options: List.generate(
                               200,
                               (val) =>
@@ -273,10 +273,10 @@ class InventoryForm extends HookWidget {
                                 ukuran: editingUkuran.text,
                                 isHargaJualPersen: true,
                                 hargaJualPersen:
-                                    double.parse(editingHargaJualPersen.text),
+                                    int.parse(editingHargaJualPersen.text),
                                 hargaDasar: int.parse(editingHargaDasar.text),
                                 diskonPersen:
-                                    double.tryParse(editingDiscount.text),
+                                    int.tryParse(editingDiscount.text),
                                 jumlahBarang: stock.value,
                                 createdAt: item.createdAt,
                               );

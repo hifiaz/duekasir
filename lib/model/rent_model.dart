@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-
 class Rent {
   final int id;
   final String? name;
@@ -11,11 +10,11 @@ class Rent {
   final int? pinalty;
   final bool? identity;
   final bool? picture;
-  final DateTime? rentDate;
+  final String? rentDate;
   final bool? paid;
   final String? user;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
+  final String createdAt;
+  final String? updatedAt;
   final int? howManyDay;
   Rent({
     required this.id,
@@ -34,6 +33,12 @@ class Rent {
     this.howManyDay,
   });
 
+  DateTime? get rentDateAsDateTime {
+    if (rentDate == null) return null;
+    return DateTime.parse(rentDate!);
+  }
+
+
   Rent copyWith({
     int? id,
     String? name,
@@ -43,11 +48,11 @@ class Rent {
     int? pinalty,
     bool? identity,
     bool? picture,
-    DateTime? rentDate,
+    String? rentDate,
     bool? paid,
     String? user,
-    DateTime? createdAt,
-    DateTime? updatedAt,
+    String? createdAt,
+    String? updatedAt,
     int? howManyDay,
   }) {
     return Rent(
@@ -78,11 +83,11 @@ class Rent {
       'pinalty': pinalty,
       'identity': identity,
       'picture': picture,
-      'rentDate': rentDate?.millisecondsSinceEpoch,
+      'rentDate': rentDate,
       'paid': paid,
       'user': user,
-      'createdAt': createdAt.millisecondsSinceEpoch,
-      'updatedAt': updatedAt?.millisecondsSinceEpoch,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
       'howManyDay': howManyDay,
     };
   }
@@ -97,11 +102,11 @@ class Rent {
       pinalty: map['pinalty'] != null ? map['pinalty'] as int : null,
       identity: map['identity'] != null ? map['identity'] as bool : null,
       picture: map['picture'] != null ? map['picture'] as bool : null,
-      rentDate: map['rentDate'] != null ? DateTime.fromMillisecondsSinceEpoch(map['rentDate'] as int) : null,
+      rentDate: map['rentDate'] != null ? map['rentDate'] as String : null,
       paid: map['paid'] != null ? map['paid'] as bool : null,
       user: map['user'] != null ? map['user'] as String : null,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
-      updatedAt: map['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] as int) : null,
+      createdAt: map['createdAt'] as String,
+      updatedAt: map['updatedAt'] != null ? map['updatedAt'] as String : null,
       howManyDay: map['howManyDay'] != null ? map['howManyDay'] as int : null,
     );
   }

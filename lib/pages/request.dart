@@ -37,7 +37,7 @@ class _RequestState extends State<Request> {
               ),
             );
           },
-          error: (e) => Center(child: Text('$e')),
+          error: (e, __) => Center(child: Text('$e $__')),
           loading: () => const Center(
             child: CircularProgressIndicator(),
           ),

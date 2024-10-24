@@ -31,9 +31,9 @@ class DuePaymentForm extends HookWidget {
     final hargaJual = useState(0.0);
     final hargaJualDiscount = useState(0.0);
     final status = useState(item?.status ?? 'dept');
-    final dateIn = useState(item?.dateIn ?? DateTime.now());
+    final dateIn = useState(item?.dateInDateTime ?? DateTime.now());
     final dueDate =
-        useState(item?.dueDate ?? DateTime.now().add(const Duration(days: 3)));
+        useState(item?.dueDateDateTime ?? DateTime.now().add(const Duration(days: 3)));
 
     useListenable(hargaJual);
     useListenable(editingName);
@@ -247,8 +247,8 @@ class DuePaymentForm extends HookWidget {
                                 itemAmount: stock.value,
                                 amount: int.parse(editingAmount.text),
                                 status: status.value,
-                                dateIn: dateIn.value,
-                                dueDate: dueDate.value,
+                                dateIn: dateIn.value.toIso8601String(),
+                                dueDate: dueDate.value.toIso8601String(),
                                 note: editingNote.text,
                                 createdAt: item.createdAt,
                               );

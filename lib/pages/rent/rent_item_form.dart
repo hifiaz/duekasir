@@ -210,7 +210,7 @@ class RentItemForm extends HookWidget {
                                 rentOneMonth: int.parse(rentOneMonth.text),
                                 jumlahBarang: stock.value,
                                 note: note.text,
-                                createdAt: item.createdAt ?? DateTime.now(),
+                                createdAt: item.createdAt,
                               );
 
                               SupabaseHelper()

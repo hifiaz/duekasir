@@ -10,9 +10,9 @@ class DuePayment {
   final int? amount;
   final String? status;
   final String? note;
-  final DateTime? dateIn;
-  final DateTime? dueDate;
-  final DateTime? createdAt;
+  final String? dateIn;
+  final String? dueDate;
+  final String? createdAt;
   final String? user;
   DuePayment({
     required this.id,
@@ -29,6 +29,16 @@ class DuePayment {
     this.user,
   });
 
+  DateTime? get dateInDateTime {
+    if (dateIn == null) return null;
+    return DateTime.parse(dateIn!);
+  }
+
+  DateTime? get dueDateDateTime {
+    if (dueDate == null) return null;
+    return DateTime.parse(dueDate!);
+  }
+
   DuePayment copyWith({
     int? id,
     String? name,
@@ -38,9 +48,9 @@ class DuePayment {
     int? amount,
     String? status,
     String? note,
-    DateTime? dateIn,
-    DateTime? dueDate,
-    DateTime? createdAt,
+    String? dateIn,
+    String? dueDate,
+    String? createdAt,
     String? user,
   }) {
     return DuePayment(
@@ -69,9 +79,9 @@ class DuePayment {
       'amount': amount,
       'status': status,
       'note': note,
-      'dateIn': dateIn?.millisecondsSinceEpoch,
-      'dueDate': dueDate?.millisecondsSinceEpoch,
-      'createdAt': createdAt?.millisecondsSinceEpoch,
+      'dateIn': dateIn,
+      'dueDate': dueDate,
+      'createdAt': createdAt,
       'user': user,
     };
   }
@@ -86,16 +96,17 @@ class DuePayment {
       amount: map['amount'] != null ? map['amount'] as int : null,
       status: map['status'] != null ? map['status'] as String : null,
       note: map['note'] != null ? map['note'] as String : null,
-      dateIn: map['dateIn'] != null ? DateTime.fromMillisecondsSinceEpoch(map['dateIn'] as int) : null,
-      dueDate: map['dueDate'] != null ? DateTime.fromMillisecondsSinceEpoch(map['dueDate'] as int) : null,
-      createdAt: map['createdAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int) : null,
+      dateIn: map['dateIn'] != null ? map['dateIn'] as String : null,
+      dueDate: map['dueDate'] != null ? map['dueDate'] as String : null,
+      createdAt: map['createdAt'] != null ? map['createdAt'] as String : null,
       user: map['user'] != null ? map['user'] as String : null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory DuePayment.fromJson(String source) => DuePayment.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory DuePayment.fromJson(String source) =>
+      DuePayment.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -105,35 +116,34 @@ class DuePayment {
   @override
   bool operator ==(covariant DuePayment other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.id == id &&
-      other.name == name &&
-      other.invoice == invoice &&
-      other.itemName == itemName &&
-      other.itemAmount == itemAmount &&
-      other.amount == amount &&
-      other.status == status &&
-      other.note == note &&
-      other.dateIn == dateIn &&
-      other.dueDate == dueDate &&
-      other.createdAt == createdAt &&
-      other.user == user;
+
+    return other.id == id &&
+        other.name == name &&
+        other.invoice == invoice &&
+        other.itemName == itemName &&
+        other.itemAmount == itemAmount &&
+        other.amount == amount &&
+        other.status == status &&
+        other.note == note &&
+        other.dateIn == dateIn &&
+        other.dueDate == dueDate &&
+        other.createdAt == createdAt &&
+        other.user == user;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      name.hashCode ^
-      invoice.hashCode ^
-      itemName.hashCode ^
-      itemAmount.hashCode ^
-      amount.hashCode ^
-      status.hashCode ^
-      note.hashCode ^
-      dateIn.hashCode ^
-      dueDate.hashCode ^
-      createdAt.hashCode ^
-      user.hashCode;
+        name.hashCode ^
+        invoice.hashCode ^
+        itemName.hashCode ^
+        itemAmount.hashCode ^
+        amount.hashCode ^
+        status.hashCode ^
+        note.hashCode ^
+        dateIn.hashCode ^
+        dueDate.hashCode ^
+        createdAt.hashCode ^
+        user.hashCode;
   }
 }

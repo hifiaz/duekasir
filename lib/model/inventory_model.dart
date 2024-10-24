@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-
 class Inventory {
   int id;
   String? nama;
@@ -12,12 +11,12 @@ class Inventory {
   String? ukuran;
   int? hargaDasar;
   int? hargaJual;
-  double? hargaJualPersen;
-  double? diskonPersen;
+  int? hargaJualPersen;
+  int? diskonPersen;
   bool? isHargaJualPersen;
   DateTime? barangMasuk;
   DateTime? barangKeluar;
-  DateTime? createdAt;
+  String? createdAt;
   String? user;
   Inventory({
     required this.id,
@@ -48,12 +47,12 @@ class Inventory {
     String? ukuran,
     int? hargaDasar,
     int? hargaJual,
-    double? hargaJualPersen,
-    double? diskonPersen,
+    int? hargaJualPersen,
+    int? diskonPersen,
     bool? isHargaJualPersen,
     DateTime? barangMasuk,
     DateTime? barangKeluar,
-    DateTime? createdAt,
+    String? createdAt,
     String? user,
   }) {
     return Inventory(
@@ -92,7 +91,7 @@ class Inventory {
       'isHargaJualPersen': isHargaJualPersen,
       'barangMasuk': barangMasuk?.millisecondsSinceEpoch,
       'barangKeluar': barangKeluar?.millisecondsSinceEpoch,
-      'createdAt': createdAt?.millisecondsSinceEpoch,
+      'createdAt': createdAt,
       'user': user,
     };
   }
@@ -108,12 +107,12 @@ class Inventory {
       ukuran: map['ukuran'] != null ? map['ukuran'] as String : null,
       hargaDasar: map['hargaDasar'] != null ? map['hargaDasar'] as int : null,
       hargaJual: map['hargaJual'] != null ? map['hargaJual'] as int : null,
-      hargaJualPersen: map['hargaJualPersen'] != null ? map['hargaJualPersen'] as double : null,
-      diskonPersen: map['diskonPersen'] != null ? map['diskonPersen'] as double : null,
+      hargaJualPersen: map['hargaJualPersen'] != null ? map['hargaJualPersen'] as int : null,
+      diskonPersen: map['diskonPersen'] != null ? map['diskonPersen'] as int : null,
       isHargaJualPersen: map['isHargaJualPersen'] != null ? map['isHargaJualPersen'] as bool : null,
       barangMasuk: map['barangMasuk'] != null ? DateTime.fromMillisecondsSinceEpoch(map['barangMasuk'] as int) : null,
       barangKeluar: map['barangKeluar'] != null ? DateTime.fromMillisecondsSinceEpoch(map['barangKeluar'] as int) : null,
-      createdAt: map['createdAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int) : null,
+      createdAt: map['createdAt'] != null ? map['createdAt'] as String : null,
       user: map['user'] != null ? map['user'] as String : null,
     );
   }

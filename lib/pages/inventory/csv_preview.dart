@@ -37,8 +37,8 @@ class _CsvPreviewState extends State<CsvPreview> {
         ukuran: val[6].toString(),
         hargaDasar: val[7],
         hargaJual: val[8],
-        hargaJualPersen: double.parse(val[9].toString()),
-        diskonPersen: double.tryParse(val[10].toString()),
+        hargaJualPersen: int.parse(val[9].toString()),
+        diskonPersen: int.tryParse(val[10].toString()),
         isHargaJualPersen: val[11] == 'TRUE' ? true : false,
       );
       return data;

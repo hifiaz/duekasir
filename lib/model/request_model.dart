@@ -1,18 +1,17 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-
 class Request {
   final int id;
   final String? note;
-  final DateTime createdAt;
+  final DateTime? createdAt;
   final String? user;
   final String? status;
   final String? title;
   Request({
     required this.id,
     this.note,
-    required this.createdAt,
+    this.createdAt,
     this.user,
     this.status,
     this.title,
@@ -40,7 +39,7 @@ class Request {
     return <String, dynamic>{
       'id': id,
       'note': note,
-      'createdAt': createdAt.millisecondsSinceEpoch,
+      'createdAt': createdAt?.millisecondsSinceEpoch,
       'user': user,
       'status': status,
       'title': title,
@@ -51,7 +50,7 @@ class Request {
     return Request(
       id: map['id'] as int,
       note: map['note'] != null ? map['note'] as String : null,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
+      createdAt: map['createdAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int) : null,
       user: map['user'] != null ? map['user'] as String : null,
       status: map['status'] != null ? map['status'] as String : null,
       title: map['title'] != null ? map['title'] as String : null,

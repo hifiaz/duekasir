@@ -134,7 +134,7 @@ class _RentState extends State<Rent> {
                             subtitle: Text(
                               p.paid ?? false
                                   ? snapshot.data?.name ?? ''
-                                  : '${snapshot.data?.name} - Expired on ${(DateTime.now().difference(p.rentDate!).inDays)} days - ${p.rentDate!.day}/${p.rentDate!.month}/${p.rentDate!.year}',
+                                  : '${snapshot.data?.name} - Expired on ${(DateTime.now().difference(p.rentDateAsDateTime!).inDays)} days - ${p.rentDateAsDateTime!.day}/${p.rentDateAsDateTime!.month}/${p.rentDateAsDateTime!.year}',
                               style: p.paid ?? false
                                   ? const TextStyle(
                                       decoration: TextDecoration.lineThrough)
@@ -143,7 +143,7 @@ class _RentState extends State<Rent> {
                             trailing: p.paid ?? false
                                 ? null
                                 : DateTime.now()
-                                        .difference(p.rentDate!)
+                                        .difference(p.rentDateAsDateTime!)
                                         .inDays
                                         .isNegative
                                     ? const Icon(Icons.check_circle,
@@ -167,8 +167,8 @@ class _RentState extends State<Rent> {
                     },
                   ).toList());
                 },
-                error: (e, ee) => const Text(
-                    'Something wrong please force close app and reopen'),
+                error: (e, ee) => Text(
+                    'Something wrong please force close app and reopen $e $ee'),
                 loading: () => const Center(child: CircularProgressIndicator()),
               ),
             ),
